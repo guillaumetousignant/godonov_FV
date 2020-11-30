@@ -1,6 +1,6 @@
-# MCG 5136 Assignment 2
+# MCG 5136 Assignment 3
 # Guillaume Tousignant, 0300151859
-# November 6th, 2020
+# November 27th, 2020
 
 import matplotlib.pyplot as plt
 import numpy as np
