@@ -1,0 +1,10 @@
+.gitignore linguist-vendored
+.makeignore linguist-vendored
+.travis.yml linguist-vendored
+LICENSE linguist-vendored
+makefile linguist-vendored
+README.md linguist-vendored
+
+* text=auto eol=crlf
+*.{cmd,[cC][mM][dD]} text eol=crlf
+*.{bat,[bB][aA][tT]} text eol=crlf

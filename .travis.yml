@@ -1,0 +1,21 @@
+language: cpp
+compiler: g++
+before_install:
+  - test -n $CC  && unset CC
+  - test -n $CXX && unset CXX
+addons:
+  apt:
+    packages:
+    - openssh-client
+    - openssh-server
+    - cppcheck
+    - cmake
+script: 
+  - mkdir -p build
+  - cd build
+  - cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=.. -DBUILD_TESTS=ON
+  - cmake --build .
+  - ./unit_tests
+before_script: 
+after_script:  make clean
+before_script:
