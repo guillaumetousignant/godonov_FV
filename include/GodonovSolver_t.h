@@ -14,6 +14,7 @@ class GodonovSolver_t final : public Solver_t {
         double cfl_;
 
         virtual void solve();
+        void calculate_fluxes();
 };
 
 #endif

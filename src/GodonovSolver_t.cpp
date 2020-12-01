@@ -12,3 +12,5 @@ GodonovSolver_t::GodonovSolver_t(double rho_L, double rho_R, double u_L, double 
 GodonovSolver_t::~GodonovSolver_t() {}
 
 void GodonovSolver_t::solve() {}
+
+void GodonovSolver_t::calculate_fluxes() {}
