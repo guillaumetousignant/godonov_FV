@@ -1,5 +1,4 @@
 add_library(flow_solver 
-    Problem_t.cpp
     Solver_t.cpp
     ExactSolver_t.cpp
     GodonovSolver_t.cpp)
