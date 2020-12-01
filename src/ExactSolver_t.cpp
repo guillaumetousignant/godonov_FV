@@ -132,16 +132,16 @@ void ExactSolver_t::write_solution() {
                                 {discontinuity_ + time_ * wave_speed[1][0], discontinuity_ + time_ * wave_speed[1][1]}};
     const double contact_x = discontinuity_ + time_ * u_star_;
 
-    std::vector<double> x(n_points_);
-    std::vector<double> rho(n_points_);
-    std::vector<double> u(n_points_);
-    std::vector<double> p(n_points_);
-    std::vector<double> mach(n_points_);
-    std::vector<double> T(n_points_);
+    std::vector<double> x(n_cells_);
+    std::vector<double> rho(n_cells_);
+    std::vector<double> u(n_cells_);
+    std::vector<double> p(n_cells_);
+    std::vector<double> mach(n_cells_);
+    std::vector<double> T(n_cells_);
 
-    for (int i = 0; i < n_points_; ++i) {
+    for (int i = 0; i < n_cells_; ++i) {
         // Watch out for integer division when lerping in c++
-        x[i] = x_span_[0] + i/(n_points_ - 1.0) * (x_span_[1] - x_span_[0]);
+        x[i] = x_span_[0] + i/(n_cells_ - 1.0) * (x_span_[1] - x_span_[0]);
 
         if (x[i] < wave_x[0][0]) { // Left state
             rho[i] = gamma_[0] * p_[0]/std::pow(a_[0], 2);
@@ -189,5 +189,5 @@ void ExactSolver_t::write_solution() {
         T[i] = p[i]/(rho[i] * R_);
     }
 
-    write_file_data(n_points_, time_, rho, u, p, x, mach, T, problem_number_);
+    write_file_data(n_cells_, time_, rho, u, p, x, mach, T, problem_number_);
 }
