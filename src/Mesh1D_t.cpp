@@ -7,7 +7,10 @@ Mesh1D_t::Mesh1D_t(int n_cells) :
         p_(new double[n_cells_ + 2]),
         x_(new double[n_cells_ + 2]),
         delta_x_((x_[1] - x_[0])/n_cells_),
-        n_faces_(n_cells + 1) {}
+        n_faces_(n_cells + 1),
+        F_1_(new double[n_faces_]),
+        F_2_(new double[n_faces_]),
+        F_3_(new double[n_faces_]) {}
 
 Mesh1D_t::~Mesh1D_t() {
     if (rho_ != nullptr) {
@@ -24,6 +27,18 @@ Mesh1D_t::~Mesh1D_t() {
 
     if (x_ != nullptr) {
         delete [] x_;
+    }
+
+    if (F_1_ != nullptr) {
+        delete [] F_1_;
+    }
+
+    if (F_2_ != nullptr) {
+        delete [] F_2_;
+    }
+
+    if (F_3_ != nullptr) {
+        delete [] F_3_;
     }
 }
 
