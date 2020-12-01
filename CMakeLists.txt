@@ -7,21 +7,10 @@ endif()
 
 project(assignment_3_project VERSION 1.0.0 LANGUAGES C CXX)
 
-add_executable(assignment_3 
-    src/main.cpp)
-
-target_include_directories(assignment_3 
-    PRIVATE
-        include/
-)
-
-target_compile_features(assignment_3 PRIVATE cxx_std_20)
+add_subdirectory(src)
 
 option(BUILD_TESTING "Build all tests." OFF)
-
 if (BUILD_TESTING)
     enable_testing()
     add_subdirectory(tests)
 endif()
-
-install(TARGETS assignment_3 DESTINATION bin)
