@@ -1,4 +1,4 @@
-#include "Problem_t.h"
+#include "ExactSolver_t.h"
 #include <cmath>
 #include <filesystem>
 #include <iostream>
@@ -9,17 +9,8 @@
 
 namespace fs = std::filesystem;
 
-Problem_t::Problem_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double time, double discontinuity, int n_points, int problem_number) :
-        gamma_{1.4, 1.4},
-        R_(8.31446261815324),
-        a_{std::sqrt(gamma_[0] * p_L/rho_L), std::sqrt(gamma_[1] * p_R/rho_R)},
-        u_{u_L, u_R},
-        p_{p_L, p_R},
-        time_(time),
-        discontinuity_(discontinuity),
-        n_points_(n_points),
-        problem_number_(problem_number),
-        x_span_{0.0, 10.0},
+ExactSolver_t::ExactSolver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double time, double discontinuity, int n_points, int problem_number) :
+        Solver_t(rho_L, rho_R, u_L, u_R, p_L, p_R, time, discontinuity, n_points, problem_number),
         a_star_{0.0, 0.0},
         p_star_{0.0, 0.0},
         p_star_prime_{0.0, 0.0},
@@ -33,35 +24,35 @@ Problem_t::Problem_t(double rho_L, double rho_R, double u_L, double u_R, double 
     u_star_ = (u_hat[0] * z + u_hat[1])/(1.0 + z);
 }
 
-Problem_t::~Problem_t() {}
+ExactSolver_t::~ExactSolver_t() {}
 
-void Problem_t::left_shock() {
+void ExactSolver_t::left_shock() {
     const double W = 0.25 * (gamma_[0] + 1.0) * (u_star_ - u_[0]) /a_[0] - std::sqrt(1.0 + std::pow(0.25 * (gamma_[0] + 1.0) * (u_star_ - u_[0]) /a_[0], 2));
 
     p_star_[0] = p_[0] + C_[0] * (u_star_ - u_[0]) * W;
     p_star_prime_[0] = 2.0 * C_[0] * std::pow(W, 3) / (1.0 + std::pow(W, 2));
 }
 
-void Problem_t::right_shock() {
+void ExactSolver_t::right_shock() {
     const double W = 0.25 * (gamma_[1] + 1.0) * (u_star_ - u_[1]) /a_[1] + std::sqrt(1.0 + std::pow(0.25 * (gamma_[1] + 1.0) * (u_star_ - u_[1]) /a_[1], 2));
 
     p_star_[1] = p_[1] + C_[1] * (u_star_ - u_[1]) * W;
     p_star_prime_[1] = 2.0 * C_[1] * std::pow(W, 3) / (1.0 + std::pow(W, 2));
 }
 
-void Problem_t::left_rarefaction() {
+void ExactSolver_t::left_rarefaction() {
     a_star_[0] = a_[0] - 0.5 * (gamma_[0] - 1.0) * (u_star_ - u_[0]);
     p_star_[0] = p_[0] * std::pow(a_star_[0]/a_[0], 2 * gamma_[0] / (gamma_[0] - 1.0));
     p_star_prime_[0] = -gamma_[0] * p_star_[0] / a_star_[0];
 }
 
-void Problem_t::right_rarefaction() {
+void ExactSolver_t::right_rarefaction() {
     a_star_[1] = a_[1] + 0.5 * (gamma_[1] - 1.0) * (u_star_ - u_[1]);
     p_star_[1] = p_[1] * std::pow(a_star_[1]/a_[1], 2 * gamma_[1] / (gamma_[1] - 1.0));
     p_star_prime_[1] = gamma_[1] * p_star_[1] / a_star_[1];
 }
 
-void Problem_t::solve() {
+void ExactSolver_t::solve() {
     constexpr double epsilon = 1.0e-6;
     double error = std::numeric_limits<double>::infinity();
     
@@ -75,7 +66,7 @@ void Problem_t::solve() {
     while (std::abs(1.0 - p_star_[0]/p_star_[1]) >= epsilon);
 }
 
-void Problem_t::calculate_a_star() {
+void ExactSolver_t::calculate_a_star() {
     if (u_star_ <= u_[0]) { // left shock
         a_star_[0] = a_[0] * std::sqrt(((gamma_[0] + 1.0) + (gamma_[0] - 1.0) * p_star_[0]/p_[0]) / ((gamma_[0] + 1.0) + (gamma_[0] - 1.0) * p_[0]/p_star_[0]));
     }
@@ -91,7 +82,7 @@ void Problem_t::calculate_a_star() {
     }
 }
 
-void Problem_t::write_file_data(int N_points, double time, const std::vector<double> &rho, const std::vector<double> &u, const std::vector<double> &p, const std::vector<double> &x, const std::vector<double> &mach, const std::vector<double> &T, int problem_number) {
+void ExactSolver_t::write_file_data(int N_points, double time, const std::vector<double> &rho, const std::vector<double> &u, const std::vector<double> &p, const std::vector<double> &x, const std::vector<double> &mach, const std::vector<double> &T, int problem_number) {
     std::stringstream ss;
     std::ofstream file;
 
@@ -112,7 +103,7 @@ void Problem_t::write_file_data(int N_points, double time, const std::vector<dou
     file.close();
 }
 
-void Problem_t::write_solution() {
+void ExactSolver_t::write_solution() {
     calculate_a_star(); // Can't be sure it was calculated
 
     double wave_speed[2][2]; // {{left_start, left_end}, {right_start, right_end}}

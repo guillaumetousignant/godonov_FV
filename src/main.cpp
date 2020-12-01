@@ -5,7 +5,7 @@
 #include <chrono>
 #include <vector>
 #include <iostream>
-#include "Problem_t.h"
+#include "ExactSolver_t.h"
 
 int main(void) {
     constexpr int n_problems = 4;
@@ -42,11 +42,11 @@ int main(void) {
                                     5.0,
                                     5.0};
     
-    std::vector<Problem_t> problems;
+    std::vector<ExactSolver_t> problems;
     problems.reserve(4);
 
     for (int i = 0; i < n_problems; ++i) {
-        problems.push_back(Problem_t(rho[i][0], rho[i][1], u[i][0], u[i][1], p[i][0], p[i][1], time[i], discontinuity[i], n_points_analytic, i + 1));
+        problems.push_back(ExactSolver_t(rho[i][0], rho[i][1], u[i][0], u[i][1], p[i][0], p[i][1], time[i], discontinuity[i], n_points_analytic, i + 1));
     }
 
     // Starting actual computation
