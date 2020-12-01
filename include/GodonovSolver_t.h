@@ -14,6 +14,19 @@ class GodonovSolver_t final : public Solver_t {
         double cfl_;
 
         virtual void solve();
+
+    private:
+        double* a_star_L_; // These are split to be easier to deal with when working on a GPU
+        double* a_star_R_;
+        double* u_star_;
+        double* p_star_L_;
+        double* p_star_R_;
+        double* p_star_prime_L_;
+        double* p_star_prime_R_;
+        double* C_L_;
+        double* C_R_;
+
+        double u_star_initial_guess(double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double gamma_L, double gamma_R);
         void calculate_fluxes();
 };
 
