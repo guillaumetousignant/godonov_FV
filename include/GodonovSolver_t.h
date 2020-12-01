@@ -7,10 +7,11 @@
 
 class GodonovSolver_t final : public Solver_t { 
     public: 
-        GodonovSolver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double time, double discontinuity, int n_cells, int problem_number);
+        GodonovSolver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double time, double discontinuity, int n_cells, int problem_number, double cfl);
         virtual ~GodonovSolver_t();
 
         Mesh1D_t mesh_;
+        double cfl_;
 
         virtual void solve();
 };
