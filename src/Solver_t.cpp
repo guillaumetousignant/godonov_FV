@@ -11,7 +11,7 @@ Solver_t::Solver_t(double rho_L, double rho_R, double u_L, double u_R, double p_
         discontinuity_(discontinuity),
         n_cells_(n_cells),
         problem_number_(problem_number),
-        x_span_{0.0, 10.0} {
+        x_{0.0, 10.0} {
 
 
 }

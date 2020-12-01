@@ -141,7 +141,7 @@ void ExactSolver_t::write_solution() {
 
     for (int i = 0; i < n_cells_; ++i) {
         // Watch out for integer division when lerping in c++
-        x[i] = x_span_[0] + i/(n_cells_ - 1.0) * (x_span_[1] - x_span_[0]);
+        x[i] = x_[0] + i/(n_cells_ - 1.0) * (x_[1] - x_[0]);
 
         if (x[i] < wave_x[0][0]) { // Left state
             rho[i] = gamma_[0] * p_[0]/std::pow(a_[0], 2);

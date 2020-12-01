@@ -15,7 +15,7 @@ class Solver_t {
         double discontinuity_;
         int n_cells_;
         int problem_number_;
-        double x_span_[2];
+        double x_[2];
 
         virtual void solve() = 0;
 };
