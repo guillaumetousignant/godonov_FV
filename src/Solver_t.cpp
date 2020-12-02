@@ -25,7 +25,7 @@ Solver_t::Solver_t(double rho_L, double rho_R, double u_L, double u_R, double p_
 
 Solver_t::~Solver_t() {}
 
-void Solver_t::write_file_data(int N_points, double time, const std::vector<double> &rho, const std::vector<double> &u, const std::vector<double> &p, const std::vector<double> &x, const std::vector<double> &mach, const std::vector<double> &T, int problem_number, std::string suffix) {
+void Solver_t::write_file_data(int N_points, double time, const std::vector<double> &rho, const std::vector<double> &u, const std::vector<double> &p, const std::vector<double> &x, const std::vector<double> &mach, const std::vector<double> &T, int problem_number, std::string suffix, int N) {
     std::stringstream ss;
     std::ofstream file;
 
@@ -35,7 +35,7 @@ void Solver_t::write_file_data(int N_points, double time, const std::vector<doub
     ss << "output_" << problem_number << suffix << ".dat";
     file.open(save_dir / ss.str());
 
-    file << "TITLE = \"Problem " << problem_number << " at t= " << time << "\"" << std::endl;
+    file << "TITLE = \"Problem " << problem_number << " at t= " << time << "\" and N= " << N << "\"" << std::endl;
     file << "VARIABLES = \"X\", \"U_x\", \"rho\", \"p\", \"mach\", \"T\"" << std::endl;
     file << "ZONE T= \"Zone     1\",  I= " << N_points << ",  J= 1,  DATAPACKING = POINT, SOLUTIONTIME = " << time << std::endl;
 

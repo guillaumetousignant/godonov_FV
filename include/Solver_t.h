@@ -22,7 +22,7 @@ class Solver_t {
 
         virtual void solve() = 0;
         virtual void write_solution(std::string suffix = "") = 0;
-        void write_file_data(int N_points, double time, const std::vector<double> &rho, const std::vector<double> &u, const std::vector<double> &p, const std::vector<double> &x, const std::vector<double> &mach, const std::vector<double> &T, int problem_number, std::string suffix);
+        void write_file_data(int N_points, double time, const std::vector<double> &rho, const std::vector<double> &u, const std::vector<double> &p, const std::vector<double> &x, const std::vector<double> &mach, const std::vector<double> &T, int problem_number, std::string suffix, int N);
 };
 
 #endif

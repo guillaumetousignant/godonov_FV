@@ -56,7 +56,7 @@ void GodonovSolver_t<FluxCalculator>::write_solution(std::string suffix /* = "" 
         }
     }
 
-    write_file_data(n_points_ * mesh_.n_cells_, end_time_, rho, u, p, x, mach, T, problem_number_, suffix);
+    write_file_data(n_points_ * mesh_.n_cells_, end_time_, rho, u, p, x, mach, T, problem_number_, suffix, mesh_.n_cells_);
 }
 
 template<typename FluxCalculator>

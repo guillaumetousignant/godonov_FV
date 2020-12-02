@@ -161,5 +161,5 @@ void ExactSolver_t::write_solution(std::string suffix /* = "" */) {
         T[i] = p[i]/(rho[i] * R_);
     }
 
-    write_file_data(n_points_, end_time_, rho, u, p, x, mach, T, problem_number_, suffix);
+    write_file_data(n_points_, end_time_, rho, u, p, x, mach, T, problem_number_, suffix, 1);
 }
