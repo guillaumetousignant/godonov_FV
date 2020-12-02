@@ -17,6 +17,7 @@ def find_problem_files(filter):
     p_arrays = []
     mach_arrays = []
     T_arrays = []
+    N_arrays = []
 
     t_finder = re.compile(r"SOLUTIONTIME = [-+]?\d*\.?\d+")
     I_finder = re.compile(r"I= \d*")
@@ -33,9 +34,9 @@ def find_problem_files(filter):
             N_points_match = I_finder.search(lines[2])
             N_elements_match = N_finder.search(lines[0])
             N_points = int(N_points_match.group(0)[3:])
-            N_elements = int(N_elements_match.group(0)[3:])
             problem_match = problem_finder.search(lines[0])
             problem_numbers.append(int(problem_match.group(0)[8:]))
+            N_arrays.append(int(N_elements_match.group(0)[3:]))
 
             x_arrays.append(np.zeros(N_points))
             ux_arrays.append(np.zeros(N_points))
@@ -53,9 +54,31 @@ def find_problem_files(filter):
                 mach_arrays[-1][i] = float(numbers[4])
                 T_arrays[-1][i] = float(numbers[5])
 
-    return zip(*sorted(zip(problem_numbers, filenames, times, x_arrays, ux_arrays, rho_arrays, p_arrays, mach_arrays, T_arrays)))
+    return zip(*sorted(zip(problem_numbers, filenames, times, x_arrays, ux_arrays, rho_arrays, p_arrays, mach_arrays, T_arrays, N_arrays))) # Return in order of problem number
 
-problem_numbers, filenames, times, x_arrays, ux_arrays, rho_arrays, p_arrays, mach_arrays, T_arrays = find_problem_files("_exact")
+N = [100, 200, 500, 1000]
+problem_numbers_riemann = []
+filenames_riemann = []
+times_riemann = []
+x_arrays_riemann = []
+ux_arrays_riemann = []
+rho_arrays_riemann = []
+p_arrays_riemann = []
+mach_arrays_riemann = []
+T_arrays_riemann = []
+
+problem_numbers, filenames, times, x_arrays, ux_arrays, rho_arrays, p_arrays, mach_arrays, T_arrays, N_arrays = find_problem_files("_exact")
+for i in N:
+    problem_numbers_riemann_N, filenames_riemann_N, times_riemann_N, x_arrays_riemann_N, ux_arrays_riemann_N, rho_arrays_riemann_N, p_arrays_riemann_N, mach_arrays_riemann_N, T_arrays_riemann_N = find_problem_files(f"_riemann_N{N}")
+    problem_numbers_riemann.append(problem_numbers_riemann_N)
+    filenames_riemann.append(filenames_riemann_N)
+    times_riemann.append(times_riemann_N)
+    x_arrays_riemann.append(x_arrays_riemann_N)
+    ux_arrays_riemann.append(ux_arrays_riemann_N)
+    rho_arrays_riemann.append(rho_arrays_riemann_N)
+    p_arrays_riemann.append(p_arrays_riemann_N)
+    mach_arrays_riemann.append(mach_arrays_riemann_N)
+    T_arrays_riemann.append(T_arrays_riemann_N)
 
 # Plotting
 save_path = Path.cwd() / "figures"
