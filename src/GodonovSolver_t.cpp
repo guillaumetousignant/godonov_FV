@@ -43,8 +43,8 @@ void GodonovSolver_t<FluxCalculator>::write_solution(std::string suffix /* = "" 
     std::vector<double> mach(n_points_ * mesh_.n_cells_);
     std::vector<double> T(n_points_ * mesh_.n_cells_);
 
-    for (int i = 0; i < mesh_.n_cells_; ++i) {
-        const int offset = i * n_points_;
+    for (int i = 1; i <= mesh_.n_cells_; ++i) { // Don't take the ghost cells
+        const int offset = (i - 1) * n_points_;
         for (int j = 0; j < n_points_; ++j) {
             // Watch out for integer division when lerping in c++
             x[offset + j] = (n_points_ == 1) ? mesh_.x_[i] : mesh_.x_[i] - mesh_.delta_x_ + j/(n_points_ - 1.0) * mesh_.delta_x_;
