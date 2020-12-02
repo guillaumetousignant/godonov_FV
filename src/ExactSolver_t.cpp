@@ -9,8 +9,8 @@
 
 namespace fs = std::filesystem;
 
-ExactSolver_t::ExactSolver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double time, double discontinuity, int n_points, int problem_number) :
-        Solver_t(rho_L, rho_R, u_L, u_R, p_L, p_R, time, discontinuity, n_points, problem_number),
+ExactSolver_t::ExactSolver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double end_time, double discontinuity, int n_points, int problem_number) :
+        Solver_t(rho_L, rho_R, u_L, u_R, p_L, p_R, end_time, discontinuity, n_points, problem_number),
         a_star_{0.0, 0.0},
         p_star_{0.0, 0.0},
         p_star_prime_{0.0, 0.0},
@@ -128,9 +128,9 @@ void ExactSolver_t::write_solution() {
         wave_speed[1][1] = u_[1] + a_[1];
     }
 
-    const double wave_x[2][2] = {{discontinuity_ + time_ * wave_speed[0][0], discontinuity_ + time_ * wave_speed[0][1]}, 
-                                {discontinuity_ + time_ * wave_speed[1][0], discontinuity_ + time_ * wave_speed[1][1]}};
-    const double contact_x = discontinuity_ + time_ * u_star_;
+    const double wave_x[2][2] = {{discontinuity_ + end_time_ * wave_speed[0][0], discontinuity_ + end_time_ * wave_speed[0][1]}, 
+                                {discontinuity_ + end_time_ * wave_speed[1][0], discontinuity_ + end_time_ * wave_speed[1][1]}};
+    const double contact_x = discontinuity_ + end_time_ * u_star_;
 
     std::vector<double> x(n_cells_);
     std::vector<double> rho(n_cells_);
@@ -150,7 +150,7 @@ void ExactSolver_t::write_solution() {
             mach[i] = u[i] / std::sqrt(p[i] / std::pow(rho[i], gamma_[0]));
         }
         else if (x[i] < wave_x[0][1]) { // Left fan state
-            const double v = (x[i] - discontinuity_)/time_;
+            const double v = (x[i] - discontinuity_)/end_time_;
             const double a = (gamma_[0] - 1.0)/(gamma_[0] + 1.0) * (u_[0] - v) + 2.0/(gamma_[0] + 1.0) * a_[0];
 
             u[i] = v + a;
@@ -171,7 +171,7 @@ void ExactSolver_t::write_solution() {
             mach[i] = u[i] / std::sqrt(p[i] / std::pow(rho[i], gamma_[1]));
         }
         else if (x[i] < wave_x[1][1]) { // Right fan state
-            const double v = (x[i] - discontinuity_)/time_;
+            const double v = (x[i] - discontinuity_)/end_time_;
             const double a = (gamma_[1] - 1.0)/(gamma_[1] + 1.0) * (v - u_[1]) + 2.0/(gamma_[1] + 1.0) * a_[1];
 
             u[i] = v - a;
@@ -189,5 +189,5 @@ void ExactSolver_t::write_solution() {
         T[i] = p[i]/(rho[i] * R_);
     }
 
-    write_file_data(n_cells_, time_, rho, u, p, x, mach, T, problem_number_);
+    write_file_data(n_cells_, end_time_, rho, u, p, x, mach, T, problem_number_);
 }

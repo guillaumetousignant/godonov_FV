@@ -71,7 +71,7 @@ void RiemannProblem::solve_flux(double a_L, double a_R, double u_L, double u_R, 
     while (std::abs(1.0 - p_star_L/p_star_R) >= epsilon);
 }
 
-void RiemannProblem::get_boundary_state(double &a_face, double &u_face, double &p_face, double delta_t, double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double gamma_L, double gamma_R, double u_star, double a_star_L, double a_star_R, double p_star_L, double p_star_R) {
+void RiemannProblem::get_boundary_state(double &a_face, double &u_face, double &p_face, double &gamma_face, double delta_t, double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double gamma_L, double gamma_R, double u_star, double a_star_L, double a_star_R, double p_star_L, double p_star_R) {
     double wave_speed[4]; // {left_start, left_end, right_start, right_end}
 
     if (u_star <= u_L) { // left shock
@@ -102,6 +102,7 @@ void RiemannProblem::get_boundary_state(double &a_face, double &u_face, double &
         a_face = a_L;
         u_face = u_L;
         p_face = p_L;
+        gamma_face = gamma_L; // Not sure about those
     }
     else if (0.0 < wave_x[1]) { // Left fan state
         const double v = 0.0; //x[i]/delta_t; // What to do here?
@@ -109,16 +110,19 @@ void RiemannProblem::get_boundary_state(double &a_face, double &u_face, double &
 
         u_face = v + a_face;
         p_face = p_L * std::pow(a_face/a_L, 2.0 * gamma_L/(gamma_L - 1.0));
+        gamma_face = gamma_L; // Not sure about those
     }
     else if (0.0 < contact_x) { // Left star state
         a_face = a_star_L;
         u_face = u_star;
         p_face = p_star_L;
+        gamma_face = gamma_L; // Not sure about those
     }
     else if (0.0 < wave_x[2]) { // Right star state
         a_face = a_star_R;
         u_face = u_star;
         p_face = p_star_R;
+        gamma_face = gamma_R; // Not sure about those
     }
     else if (0.0 < wave_x[3]) { // Right fan state
         const double v = 0.0; //x[i]/delta_t; // What to do here?
@@ -126,10 +130,12 @@ void RiemannProblem::get_boundary_state(double &a_face, double &u_face, double &
 
         u_face = v - a_face;
         p_face = p_R * std::pow(a_face/a_R, 2.0 * gamma_R/(gamma_R - 1.0));
+        gamma_face = gamma_R; // Not sure about those
     }
     else { // Right state
         a_face = a_R;
         u_face = u_R;
         p_face = p_R;
+        gamma_face = gamma_R; // Not sure about those
     }
 }

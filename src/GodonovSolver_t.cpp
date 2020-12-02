@@ -1,5 +1,6 @@
 #include "GodonovSolver_t.h"
 #include "RiemannProblem.h"
+#include <cmath>
 
 GodonovSolver_t::GodonovSolver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double time, double discontinuity, int n_cells, int problem_number, double cfl) :
         Solver_t(rho_L, rho_R, u_L, u_R, p_L, p_R, time, discontinuity, n_cells, problem_number),
@@ -56,7 +57,11 @@ GodonovSolver_t::~GodonovSolver_t() {
     }
 }
 
-void GodonovSolver_t::solve() {}
+void GodonovSolver_t::solve() {
+    double time = 0.0;
+
+    while (time < )
+}
 
 void GodonovSolver_t::calculate_fluxes(double delta_t) {
     for (int i = 0; i < mesh_.n_faces_; ++i) {
@@ -65,8 +70,11 @@ void GodonovSolver_t::calculate_fluxes(double delta_t) {
         C_R_[i] = RiemannProblem::calculate_C(mesh_.a_[i+1], mesh_.p_[i+1], mesh_.gamma_[i+1]);
         RiemannProblem::solve_flux(mesh_.a_[i], mesh_.a_[i+1], mesh_.u_[i], mesh_.u_[i+1], mesh_.p_[i], mesh_.p_[i+1], mesh_.gamma_[i], mesh_.gamma_[i+1], C_L_[i], C_R_[i], u_star_[i], a_star_L_[i], a_star_R_[i], p_star_L_[i], p_star_R_[i], p_star_prime_L_[i], p_star_prime_R_[i]);
         RiemannProblem::calculate_a_star(mesh_.a_[i], mesh_.a_[i+1], mesh_.u_[i], mesh_.u_[i+1], mesh_.p_[i], mesh_.p_[i+1], mesh_.gamma_[i], mesh_.gamma_[i+1], u_star_[i], a_star_L_[i], a_star_R_[i], p_star_L_[i], p_star_R_[i]);
-        double a_face, u_face, p_face;
-        RiemannProblem::get_boundary_state(a_face, u_face, p_face);
+        double a_face, u_face, p_face, gamma_face;
+        RiemannProblem::get_boundary_state(a_face, u_face, p_face, gamma_face, delta_t, mesh_.a_[i], mesh_.a_[i+1], mesh_.u_[i], mesh_.u_[i+1], mesh_.p_[i], mesh_.p_[i+1], mesh_.gamma_[i], mesh_.gamma_[i+1], u_star_[i], a_star_L_[i], a_star_R_[i], p_star_L_[i], p_star_R_[i]);
 
+        mesh_.F_1_[i] = gamma_face * p_face /(std::pow(a_face, 2));
+        mesh_.F_2_[i] = gamma_face * p_face * std::pow(u_face, 2)/std::pow(a_face, 2) + p_face;
+        mesh_.F_3_[i] = u_face * (gamma_face * p_face /(gamma_face - 1) + p_face * std::pow(u_face, 2)/2);
     }
 }

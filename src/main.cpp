@@ -32,10 +32,10 @@ int main(void) {
                             {91.88e3, 200.0e3},
                             {404.4e3, 101.1e3}};
     
-    const double time[] = {12.0e-3,
-                           25.0e-3,
-                           35.0e-3,
-                           7.0e-3};
+    const double end_time[] = {12.0e-3,
+                               25.0e-3,
+                               35.0e-3,
+                               7.0e-3};
 
     const double discontinuity[] = {2.0,
                                     2.0,
@@ -46,7 +46,7 @@ int main(void) {
     problems.reserve(4);
 
     for (int i = 0; i < n_problems; ++i) {
-        problems.push_back(ExactSolver_t(rho[i][0], rho[i][1], u[i][0], u[i][1], p[i][0], p[i][1], time[i], discontinuity[i], n_points_analytic, i + 1));
+        problems.push_back(ExactSolver_t(rho[i][0], rho[i][1], u[i][0], u[i][1], p[i][0], p[i][1], end_time[i], discontinuity[i], n_points_analytic, i + 1));
     }
 
     // Starting actual computation

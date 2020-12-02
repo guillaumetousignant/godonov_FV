@@ -3,7 +3,7 @@
 
 class Solver_t { 
     public: 
-        Solver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double time, double discontinuity, int n_cells, int problem_number);
+        Solver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double end_time, double discontinuity, int n_cells, int problem_number);
         virtual ~Solver_t();
 
         double gamma_[2];
@@ -11,7 +11,7 @@ class Solver_t {
         double a_[2];
         double u_[2];
         double p_[2];
-        double time_;
+        double end_time_;
         double discontinuity_;
         int n_cells_;
         int problem_number_;
