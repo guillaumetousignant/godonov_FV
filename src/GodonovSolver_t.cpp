@@ -81,7 +81,7 @@ void GodonovSolver_t<FluxCalculator>::timestep(double delta_t) {
         U_3 += delta_t * (mesh_.F_3_[i-1] - mesh_.F_3_[i])/mesh_.delta_x_;
 
         mesh_.u_[i] = U_2/U_1;
-        mesh_.p_[i] = (mesh_.gamma_[i]) * (U_2 - U_1 * std::pow(mesh_.u_[i], 2) * 0.5);
+        mesh_.p_[i] = (mesh_.gamma_[i] - 1) * (U_3 - U_2 * mesh_.u_[i] * 0.5);
         mesh_.a_[i] = std::sqrt(mesh_.gamma_[i] * mesh_.p_[i] /U_1);
     }
 }
