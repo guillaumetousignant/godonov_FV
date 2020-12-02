@@ -26,7 +26,9 @@ class GodonovSolver_t final : public Solver_t {
         double* C_L_;
         double* C_R_;
 
+        double calculate_delta_t();
         void calculate_fluxes(double delta_t);
+        void timestep(double delta_t);
 };
 
 #endif

@@ -1,6 +1,7 @@
 #include "GodonovSolver_t.h"
 #include "RiemannProblem.h"
 #include <cmath>
+#include <algorithm>
 
 GodonovSolver_t::GodonovSolver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double time, double discontinuity, int n_cells, int problem_number, double cfl) :
         Solver_t(rho_L, rho_R, u_L, u_R, p_L, p_R, time, discontinuity, n_cells, problem_number),
@@ -60,7 +61,24 @@ GodonovSolver_t::~GodonovSolver_t() {
 void GodonovSolver_t::solve() {
     double time = 0.0;
 
-    while (time < )
+    while (time < end_time_) {
+        double delta_t = calculate_delta_t();
+        if (time + delta_t > end_time_) {
+            delta_t = end_time_ - time;
+        }
+
+        calculate_fluxes(delta_t);
+        timestep(delta_t);
+    }
+}
+
+double GodonovSolver_t::calculate_delta_t() {
+    // Will have to do a reduce on a gpu?
+    double max_u = 0.0;
+    for (int i = 1; i <= n_cells_; ++i) {
+        max_u = std::max(max_u, std::abs(mesh_.u_[i]) + mesh_.a_[i]);
+    }
+    return cfl_ * mesh_.delta_x_/max_u;
 }
 
 void GodonovSolver_t::calculate_fluxes(double delta_t) {
@@ -75,6 +93,15 @@ void GodonovSolver_t::calculate_fluxes(double delta_t) {
 
         mesh_.F_1_[i] = gamma_face * p_face /(std::pow(a_face, 2));
         mesh_.F_2_[i] = gamma_face * p_face * std::pow(u_face, 2)/std::pow(a_face, 2) + p_face;
-        mesh_.F_3_[i] = u_face * (gamma_face * p_face /(gamma_face - 1) + p_face * std::pow(u_face, 2)/2);
+        mesh_.F_3_[i] = u_face * (gamma_face * p_face /(gamma_face - 1) + gamma_face * p_face * std::pow(u_face, 2) * 0.5 /std::pow(a_face, 2));
     }
+}
+
+void GodonovSolver_t::timestep(double delta_t) {
+    for (int i = 1; i <= n_cells_; ++i) {
+        double U_1 = mesh_.gamma_[i] * mesh_.p_[i] /std::pow(mesh_.a_[i], 2);
+        double U_2 = mesh_.gamma_[i] * mesh_.p_[i] * mesh_.u_[i]/std::pow(mesh_.a_[i], 2);
+        double U_3 = mesh_.p_[i]/(mesh_.gamma_[i] - 1) + mesh_.gamma_[i] * mesh_.p_[i] * std::pow(mesh_.u_[i], 2) * 0.5/std::pow(mesh_.a_[i], 2);
+    }
+
 }
