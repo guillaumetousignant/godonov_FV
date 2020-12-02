@@ -1,13 +1,6 @@
 #include "ExactSolver_t.h"
 #include <cmath>
-#include <filesystem>
-#include <iostream>
-#include <fstream>
-#include <sstream> 
-#include <iomanip>
 #include <limits>
-
-namespace fs = std::filesystem;
 
 ExactSolver_t::ExactSolver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double end_time, double discontinuity, int n_points, int problem_number) :
         Solver_t(rho_L, rho_R, u_L, u_R, p_L, p_R, end_time, discontinuity, n_points, problem_number),
@@ -82,28 +75,7 @@ void ExactSolver_t::calculate_a_star() {
     }
 }
 
-void ExactSolver_t::write_file_data(int N_points, double time, const std::vector<double> &rho, const std::vector<double> &u, const std::vector<double> &p, const std::vector<double> &x, const std::vector<double> &mach, const std::vector<double> &T, int problem_number) {
-    std::stringstream ss;
-    std::ofstream file;
-
-    fs::path save_dir = fs::current_path() / "data";
-    fs::create_directory(save_dir);
-
-    ss << "output_" << problem_number << ".dat";
-    file.open(save_dir / ss.str());
-
-    file << "TITLE = \"Problem " << problem_number << " at t= " << time << "\"" << std::endl;
-    file << "VARIABLES = \"X\", \"U_x\", \"rho\", \"p\", \"mach\", \"T\"" << std::endl;
-    file << "ZONE T= \"Zone     1\",  I= " << N_points << ",  J= 1,  DATAPACKING = POINT, SOLUTIONTIME = " << time << std::endl;
-
-    for (int i = 0; i < N_points; ++i) {
-        file << std::setw(12) << x[i] << " " << std::setw(12) << u[i] << " " << std::setw(12) << rho[i] << " " << std::setw(12) << p[i] << " " << std::setw(12) << mach[i] << " " << std::setw(12) << T[i] << std::endl;
-    }
-
-    file.close();
-}
-
-void ExactSolver_t::write_solution() {
+void ExactSolver_t::write_solution(std::string suffix = "") {
     calculate_a_star(); // Can't be sure it was calculated
 
     double wave_speed[2][2]; // {{left_start, left_end}, {right_start, right_end}}
@@ -132,16 +104,16 @@ void ExactSolver_t::write_solution() {
                                 {discontinuity_ + end_time_ * wave_speed[1][0], discontinuity_ + end_time_ * wave_speed[1][1]}};
     const double contact_x = discontinuity_ + end_time_ * u_star_;
 
-    std::vector<double> x(n_cells_);
-    std::vector<double> rho(n_cells_);
-    std::vector<double> u(n_cells_);
-    std::vector<double> p(n_cells_);
-    std::vector<double> mach(n_cells_);
-    std::vector<double> T(n_cells_);
+    std::vector<double> x(n_points_);
+    std::vector<double> rho(n_points_);
+    std::vector<double> u(n_points_);
+    std::vector<double> p(n_points_);
+    std::vector<double> mach(n_points_);
+    std::vector<double> T(n_points_);
 
-    for (int i = 0; i < n_cells_; ++i) {
+    for (int i = 0; i < n_points_; ++i) {
         // Watch out for integer division when lerping in c++
-        x[i] = x_[0] + i/(n_cells_ - 1.0) * (x_[1] - x_[0]);
+        x[i] = x_[0] + i/(n_points_ - 1.0) * (x_[1] - x_[0]);
 
         if (x[i] < wave_x[0][0]) { // Left state
             rho[i] = gamma_[0] * p_[0]/std::pow(a_[0], 2);
@@ -189,5 +161,5 @@ void ExactSolver_t::write_solution() {
         T[i] = p[i]/(rho[i] * R_);
     }
 
-    write_file_data(n_cells_, end_time_, rho, u, p, x, mach, T, problem_number_);
+    write_file_data(n_points_, end_time_, rho, u, p, x, mach, T, problem_number_, suffix);
 }

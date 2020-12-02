@@ -3,6 +3,7 @@
 
 #include "Solver_t.h"
 #include <vector>
+#include <string>
 
 class ExactSolver_t final : public Solver_t { 
     public: 
@@ -21,8 +22,7 @@ class ExactSolver_t final : public Solver_t {
         void right_rarefaction();
         virtual void solve();
         void calculate_a_star();
-        void write_file_data(int N_points, double time, const std::vector<double> &rho, const std::vector<double> &u, const std::vector<double> &p, const std::vector<double> &x, const std::vector<double> &mach, const std::vector<double> &T, int problem_number);
-        void write_solution();
+        virtual void write_solution(std::string suffix /* = "" */);
 };
 
 #endif
