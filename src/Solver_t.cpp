@@ -8,7 +8,7 @@
 
 namespace fs = std::filesystem;
 
-Solver_t::Solver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double end_time, double discontinuity, int n_points, int problem_number) :
+Solver_t::Solver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double x_L, double x_R, double end_time, double discontinuity, int n_points, int problem_number) :
         gamma_{1.4, 1.4},
         R_(8.31446261815324),
         a_{std::sqrt(gamma_[0] * p_L/rho_L), std::sqrt(gamma_[1] * p_R/rho_R)},
@@ -18,7 +18,7 @@ Solver_t::Solver_t(double rho_L, double rho_R, double u_L, double u_R, double p_
         discontinuity_(discontinuity),
         n_points_(n_points),
         problem_number_(problem_number),
-        x_{0.0, 10.0} {
+        x_{x_L, x_R} {
 
 
 }

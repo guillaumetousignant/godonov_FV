@@ -1,13 +1,13 @@
 #include "Mesh1D_t.h"
 
-Mesh1D_t::Mesh1D_t(int n_cells) :
+Mesh1D_t::Mesh1D_t(int n_cells, double delta_x) :
         n_cells_(n_cells),
         a_(n_cells_ + 2),  // Plus 2, because the ending cells are ghost cells
         u_(n_cells_ + 2),
         p_(n_cells_ + 2),
         x_(n_cells_ + 2),
         gamma_(n_cells_ + 2),
-        delta_x_((x_[1] - x_[0])/n_cells_),
+        delta_x_(delta_x),
         n_faces_(n_cells + 1),
         F_1_(n_faces_),
         F_2_(n_faces_),

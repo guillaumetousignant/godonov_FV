@@ -45,6 +45,11 @@ int main(void) {
                                     2.0,
                                     5.0,
                                     5.0};
+
+    const double x_span[4][2] = {{0.0, 10.0},
+                                 {0.0, 10.0},
+                                 {0.0, 10.0},
+                                 {0.0, 10.0}};
     
     std::vector<ExactSolver_t> exact_solution;
     std::vector<GodonovSolver_t<ExactRiemannFlux_t>> riemann_solution;
@@ -52,9 +57,9 @@ int main(void) {
     riemann_solution.reserve(n_problems * n_resolutions);
 
     for (int i = 0; i < n_problems; ++i) {
-        exact_solution.push_back(ExactSolver_t(rho[i][0], rho[i][1], u[i][0], u[i][1], p[i][0], p[i][1], end_time[i], discontinuity[i], n_points_exact, i + 1));
+        exact_solution.push_back(ExactSolver_t(rho[i][0], rho[i][1], u[i][0], u[i][1], p[i][0], p[i][1], x_span[i][0], x_span[i][1], end_time[i], discontinuity[i], n_points_exact, i + 1));
         for (int j = 0; j < n_resolutions; ++j) {
-            riemann_solution.push_back(GodonovSolver_t<ExactRiemannFlux_t>(rho[i][0], rho[i][1], u[i][0], u[i][1], p[i][0], p[i][1], end_time[i], discontinuity[i], n_points, n_cells[j], i + 1, cfl));
+            riemann_solution.push_back(GodonovSolver_t<ExactRiemannFlux_t>(rho[i][0], rho[i][1], u[i][0], u[i][1], p[i][0], p[i][1], x_span[i][0], x_span[i][1], end_time[i], discontinuity[i], n_points, n_cells[j], i + 1, cfl));
         }
     }
 

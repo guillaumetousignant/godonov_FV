@@ -2,8 +2,8 @@
 #include <cmath>
 #include <limits>
 
-ExactSolver_t::ExactSolver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double end_time, double discontinuity, int n_points, int problem_number) :
-        Solver_t(rho_L, rho_R, u_L, u_R, p_L, p_R, end_time, discontinuity, n_points, problem_number),
+ExactSolver_t::ExactSolver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double x_L, double x_R, double end_time, double discontinuity, int n_points, int problem_number) :
+        Solver_t(rho_L, rho_R, u_L, u_R, p_L, p_R, x_L, x_R, end_time, discontinuity, n_points, problem_number),
         a_star_{0.0, 0.0},
         p_star_{0.0, 0.0},
         p_star_prime_{0.0, 0.0},

@@ -5,7 +5,7 @@
 
 class Mesh1D_t { 
     public: 
-        Mesh1D_t(int n_cells);
+        Mesh1D_t(int n_cells, double delta_x);
         ~Mesh1D_t();
 
         int n_cells_;

@@ -6,9 +6,9 @@
 template class GodonovSolver_t<ExactRiemannFlux_t>; // Like, I understand why I need this, but man is it crap.
 
 template<typename FluxCalculator>
-GodonovSolver_t<FluxCalculator>::GodonovSolver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double time, double discontinuity, int n_points, int n_cells, int problem_number, double cfl) :
-        Solver_t(rho_L, rho_R, u_L, u_R, p_L, p_R, time, discontinuity, n_points, problem_number),
-        mesh_(n_cells),
+GodonovSolver_t<FluxCalculator>::GodonovSolver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double x_L, double x_R, double time, double discontinuity, int n_points, int n_cells, int problem_number, double cfl) :
+        Solver_t(rho_L, rho_R, u_L, u_R, p_L, p_R, x_L, x_R, time, discontinuity, n_points, problem_number),
+        mesh_(n_cells, x_[1] - x_[0]),
         cfl_(cfl),
         flux_calculator_(n_cells + 1) {
 
