@@ -58,12 +58,15 @@ GodonovSolver_t::~GodonovSolver_t() {
 
 void GodonovSolver_t::solve() {}
 
-void GodonovSolver_t::calculate_fluxes() {
+void GodonovSolver_t::calculate_fluxes(double delta_t) {
     for (int i = 0; i < mesh_.n_faces_; ++i) {
         u_star_[i] = RiemannProblem::u_star_initial_guess(mesh_.a_[i], mesh_.a_[i+1], mesh_.u_[i], mesh_.u_[i+1], mesh_.p_[i], mesh_.p_[i+1], mesh_.gamma_[i], mesh_.gamma_[i+1]);
         C_L_[i] = RiemannProblem::calculate_C(mesh_.a_[i], mesh_.p_[i], mesh_.gamma_[i]);
         C_R_[i] = RiemannProblem::calculate_C(mesh_.a_[i+1], mesh_.p_[i+1], mesh_.gamma_[i+1]);
         RiemannProblem::solve_flux(mesh_.a_[i], mesh_.a_[i+1], mesh_.u_[i], mesh_.u_[i+1], mesh_.p_[i], mesh_.p_[i+1], mesh_.gamma_[i], mesh_.gamma_[i+1], C_L_[i], C_R_[i], u_star_[i], a_star_L_[i], a_star_R_[i], p_star_L_[i], p_star_R_[i], p_star_prime_L_[i], p_star_prime_R_[i]);
         RiemannProblem::calculate_a_star(mesh_.a_[i], mesh_.a_[i+1], mesh_.u_[i], mesh_.u_[i+1], mesh_.p_[i], mesh_.p_[i+1], mesh_.gamma_[i], mesh_.gamma_[i+1], u_star_[i], a_star_L_[i], a_star_R_[i], p_star_L_[i], p_star_R_[i]);
+        double a_face, u_face, p_face;
+        RiemannProblem::get_boundary_state(a_face, u_face, p_face);
+
     }
 }

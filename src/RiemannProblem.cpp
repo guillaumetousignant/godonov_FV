@@ -70,3 +70,66 @@ void RiemannProblem::solve_flux(double a_L, double a_R, double u_L, double u_R, 
     }
     while (std::abs(1.0 - p_star_L/p_star_R) >= epsilon);
 }
+
+void RiemannProblem::get_boundary_state(double &a_face, double &u_face, double &p_face, double delta_t, double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double gamma_L, double gamma_R, double u_star, double a_star_L, double a_star_R, double p_star_L, double p_star_R) {
+    double wave_speed[4]; // {left_start, left_end, right_start, right_end}
+
+    if (u_star <= u_L) { // left shock
+        const double mach = 0.25 * (gamma_L + 1.0) * (u_star - u_L)/a_L - std::sqrt(1.0 + std::pow(0.25 * (gamma_L + 1.0) * (u_star - u_L)/a_L, 2));
+
+        wave_speed[0] = wave_speed[1] = u_L + a_L * mach;
+    }
+    else { // left rarefaction
+        wave_speed[0] = u_L - a_L;
+        wave_speed[1] = u_star - a_star_L;
+    }
+
+    if (u_star >= u_R) { // right shock
+        const double mach = 0.25 * (gamma_R + 1.0) * (u_star - u_R)/a_R + std::sqrt(1.0 + std::pow(0.25 * (gamma_R + 1.0) * (u_star - u_R)/a_R, 2));
+
+        wave_speed[2] = wave_speed[3] = u_R + a_R * mach;
+    }
+    else { // right rarefaction
+        wave_speed[2] = u_star + a_star_R;
+        wave_speed[3] = u_R + a_R;
+    }
+
+    const double wave_x[4] = {delta_t * wave_speed[0], delta_t * wave_speed[1], 
+                                 delta_t * wave_speed[2], delta_t * wave_speed[3]};
+    const double contact_x = delta_t * u_star;
+
+    if (0.0 < wave_x[0]) { // Left state
+        a_face = a_L;
+        u_face = u_L;
+        p_face = p_L;
+    }
+    else if (0.0 < wave_x[1]) { // Left fan state
+        const double v = 0.0; //x[i]/delta_t; // What to do here?
+        a_face = (gamma_L - 1.0)/(gamma_L + 1.0) * (u_L - v) + 2.0/(gamma_L + 1.0) * a_L;
+
+        u_face = v + a_face;
+        p_face = p_L * std::pow(a_face/a_L, 2.0 * gamma_L/(gamma_L - 1.0));
+    }
+    else if (0.0 < contact_x) { // Left star state
+        a_face = a_star_L;
+        u_face = u_star;
+        p_face = p_star_L;
+    }
+    else if (0.0 < wave_x[2]) { // Right star state
+        a_face = a_star_R;
+        u_face = u_star;
+        p_face = p_star_R;
+    }
+    else if (0.0 < wave_x[3]) { // Right fan state
+        const double v = 0.0; //x[i]/delta_t; // What to do here?
+        a_face = (gamma_R - 1.0)/(gamma_R + 1.0) * (v - u_R) + 2.0/(gamma_R + 1.0) * a_R;
+
+        u_face = v - a_face;
+        p_face = p_R * std::pow(a_face/a_R, 2.0 * gamma_R/(gamma_R - 1.0));
+    }
+    else { // Right state
+        a_face = a_R;
+        u_face = u_R;
+        p_face = p_R;
+    }
+}
