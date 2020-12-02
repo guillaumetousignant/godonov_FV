@@ -102,6 +102,11 @@ void GodonovSolver_t::timestep(double delta_t) {
         double U_1 = mesh_.gamma_[i] * mesh_.p_[i] /std::pow(mesh_.a_[i], 2);
         double U_2 = mesh_.gamma_[i] * mesh_.p_[i] * mesh_.u_[i]/std::pow(mesh_.a_[i], 2);
         double U_3 = mesh_.p_[i]/(mesh_.gamma_[i] - 1) + mesh_.gamma_[i] * mesh_.p_[i] * std::pow(mesh_.u_[i], 2) * 0.5/std::pow(mesh_.a_[i], 2);
-    }
 
+        U_1 += delta_t * (mesh_.F_1_[i-1] - mesh_.F_1_[i])/mesh_.delta_x_;
+
+        mesh_.a_[i] = 
+        mesh_.u_[i] = 
+        mesh_.p_[i] = 
+    }
 }
