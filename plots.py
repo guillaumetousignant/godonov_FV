@@ -53,19 +53,17 @@ def find_problem_files(filter):
                 mach_arrays[-1][i] = float(numbers[4])
                 T_arrays[-1][i] = float(numbers[5])
 
-    return filenames, times, problem_numbers, x_arrays, ux_arrays, rho_arrays, p_arrays, mach_arrays, T_arrays
+    return zip(*sorted(zip(problem_numbers, filenames, times, x_arrays, ux_arrays, rho_arrays, p_arrays, mach_arrays, T_arrays)))
 
-filenames, times, problem_numbers, x_arrays, ux_arrays, rho_arrays, p_arrays, mach_arrays, T_arrays = find_problem_files("_exact")
+problem_numbers, filenames, times, x_arrays, ux_arrays, rho_arrays, p_arrays, mach_arrays, T_arrays = find_problem_files("_exact")
 
 # Plotting
 save_path = Path.cwd() / "figures"
 save_path.mkdir(parents=True, exist_ok=True)
 
 for i in range(len(filenames)):
-    ind = np.argsort(x_arrays[i], axis=0)
-
     u_fig, u_ax = plt.subplots(1, 1)
-    u_ax.plot(np.take_along_axis(x_arrays[i], ind, axis=0), np.take_along_axis(ux_arrays[i], ind, axis=0))
+    u_ax.plot(x_arrays[i], ux_arrays[i])
 
     u_ax.grid()
     u_ax.set_ylabel('$U_x$ [$m/s$]')
@@ -76,7 +74,7 @@ for i in range(len(filenames)):
     u_fig.savefig(save_path / f"problem_{problem_numbers[i]}_u.png", format='png', transparent=True)
 
     rho_fig, rho_ax = plt.subplots(1, 1)
-    rho_ax.plot(np.take_along_axis(x_arrays[i], ind, axis=0), np.take_along_axis(rho_arrays[i], ind, axis=0))
+    rho_ax.plot(x_arrays[i], rho_arrays[i])
 
     rho_ax.grid()
     rho_ax.set_ylabel(r'$\rho$ [$kg/m^3$]')
@@ -87,7 +85,7 @@ for i in range(len(filenames)):
     rho_fig.savefig(save_path / f"problem_{problem_numbers[i]}_rho.png", format='png', transparent=True)
 
     p_fig, p_ax = plt.subplots(1, 1)
-    p_ax.plot(np.take_along_axis(x_arrays[i], ind, axis=0), np.take_along_axis(p_arrays[i]/1000, ind, axis=0))
+    p_ax.plot(x_arrays[i], p_arrays[i]/1000)
 
     p_ax.grid()
     p_ax.set_ylabel('p [kPa]')
@@ -98,7 +96,7 @@ for i in range(len(filenames)):
     p_fig.savefig(save_path / f"problem_{problem_numbers[i]}_p.png", format='png', transparent=True)
 
     mach_fig, mach_ax = plt.subplots(1, 1)
-    mach_ax.plot(np.take_along_axis(x_arrays[i], ind, axis=0), np.take_along_axis(mach_arrays[i], ind, axis=0))
+    mach_ax.plot(x_arrays[i], mach_arrays[i])
 
     mach_ax.grid()
     mach_ax.set_ylabel('M [-]')
@@ -109,7 +107,7 @@ for i in range(len(filenames)):
     mach_fig.savefig(save_path / f"problem_{problem_numbers[i]}_mach.png", format='png', transparent=True)
 
     T_fig, T_ax = plt.subplots(1, 1)
-    T_ax.plot(np.take_along_axis(x_arrays[i], ind, axis=0), np.take_along_axis(T_arrays[i], ind, axis=0))
+    T_ax.plot(x_arrays[i], T_arrays[i])
 
     T_ax.grid()
     T_ax.set_ylabel('T [K]')
