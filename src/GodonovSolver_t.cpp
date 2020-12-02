@@ -1,6 +1,9 @@
 #include "GodonovSolver_t.h"
+#include "ExactRiemannFlux_t.h"
 #include <cmath>
 #include <algorithm>
+
+template class GodonovSolver_t<ExactRiemannFlux_t>; // Like, I understand why I need this, but man is it crap.
 
 template<typename FluxCalculator>
 GodonovSolver_t<FluxCalculator>::GodonovSolver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double time, double discontinuity, int n_points, int n_cells, int problem_number, double cfl) :
@@ -33,8 +36,6 @@ void GodonovSolver_t<FluxCalculator>::solve() {
 
 template<typename FluxCalculator>
 void GodonovSolver_t<FluxCalculator>::write_solution(std::string suffix /* = "" */) {
-    calculate_a_star(); // Can't be sure it was calculated
-
     std::vector<double> x(n_points_ * mesh_.n_cells_);
     std::vector<double> rho(n_points_ * mesh_.n_cells_);
     std::vector<double> u(n_points_ * mesh_.n_cells_);
