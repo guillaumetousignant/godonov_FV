@@ -2,7 +2,8 @@ add_library(flow_solver
     Solver_t.cpp
     ExactSolver_t.cpp
     GodonovSolver_t.cpp
-    Mesh1D_t.cpp)
+    Mesh1D_t.cpp
+    RiemannProblem.cpp)
 
 target_include_directories(flow_solver PUBLIC 
     $<INSTALL_INTERFACE:include/flow_solver/>    
