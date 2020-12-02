@@ -22,7 +22,7 @@ class ExactSolver_t final : public Solver_t {
         void right_rarefaction();
         virtual void solve();
         void calculate_a_star();
-        virtual void write_solution(std::string suffix /* = "" */);
+        virtual void write_solution(std::string suffix = "");
 };
 
 #endif

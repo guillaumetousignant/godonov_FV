@@ -32,67 +32,30 @@ void GodonovSolver_t<FluxCalculator>::solve() {
 }
 
 template<typename FluxCalculator>
-void GodonovSolver_t<FluxCalculator>::write_solution() {
+void GodonovSolver_t<FluxCalculator>::write_solution(std::string suffix /* = "" */) {
     calculate_a_star(); // Can't be sure it was calculated
 
-    std::vector<double> x(n_points_);
-    std::vector<double> rho(n_points_);
-    std::vector<double> u(n_points_);
-    std::vector<double> p(n_points_);
-    std::vector<double> mach(n_points_);
-    std::vector<double> T(n_points_);
+    std::vector<double> x(n_points_ * mesh_.n_cells_);
+    std::vector<double> rho(n_points_ * mesh_.n_cells_);
+    std::vector<double> u(n_points_ * mesh_.n_cells_);
+    std::vector<double> p(n_points_ * mesh_.n_cells_);
+    std::vector<double> mach(n_points_ * mesh_.n_cells_);
+    std::vector<double> T(n_points_ * mesh_.n_cells_);
 
     for (int i = 0; i < mesh_.n_cells_; ++i) {
-        // Watch out for integer division when lerping in c++
-        x[i] = x_[0] + i/(mesh_.n_cells_ - 1.0) * (x_[1] - x_[0]);
-
-        if (x[i] < wave_x[0][0]) { // Left state
-            rho[i] = gamma_[0] * p_[0]/std::pow(a_[0], 2);
-            u[i] = u_[0];
-            p[i] = p_[0];
-            mach[i] = u[i] / std::sqrt(p[i] / std::pow(rho[i], gamma_[0]));
+        const int offset = i * n_points_;
+        for (int j = 0; j < n_points_; ++j) {
+            // Watch out for integer division when lerping in c++
+            x[offset + j] = (n_points_ == 1) ? mesh_.x_[i] : mesh_.x_[i] - mesh_.delta_x_ + j/(n_points_ - 1.0) * mesh_.delta_x_;
+            rho[offset + j] = mesh_.gamma_[i] * mesh_.p_[i]/std::pow(mesh_.a_[i], 2);
+            u[offset + j] = mesh_.u_[i];
+            p[offset + j] = mesh_.p_[i];
+            mach[offset + j] = u[offset + j] / std::sqrt(p[offset + j] / std::pow(rho[offset + j], mesh_.gamma_[i]));
+            T[offset + j] = p[offset + j]/(rho[offset + j] * R_);
         }
-        else if (x[i] < wave_x[0][1]) { // Left fan state
-            const double v = (x[i] - discontinuity_)/end_time_;
-            const double a = (gamma_[0] - 1.0)/(gamma_[0] + 1.0) * (u_[0] - v) + 2.0/(gamma_[0] + 1.0) * a_[0];
-
-            u[i] = v + a;
-            p[i] = p_[0] * std::pow(a/a_[0], 2.0 * gamma_[0]/(gamma_[0] - 1.0));
-            rho[i] = gamma_[0] * p[i] /std::pow(a, 2);
-            mach[i] = u[i] / std::sqrt(p[i] / std::pow(rho[i], gamma_[0]));
-        }
-        else if (x[i] < contact_x) { // Left star state
-            rho[i] = gamma_[0] * p_star_[0]/std::pow(a_star_[0], 2);
-            u[i] = u_star_;
-            p[i] = p_star_[0];
-            mach[i] = u[i] / std::sqrt(p[i] / std::pow(rho[i], gamma_[0]));
-        }
-        else if (x[i] < wave_x[1][0]) { // Right star state
-            rho[i] = gamma_[1] * p_star_[1]/std::pow(a_star_[1], 2);
-            u[i] = u_star_;
-            p[i] = p_star_[1];
-            mach[i] = u[i] / std::sqrt(p[i] / std::pow(rho[i], gamma_[1]));
-        }
-        else if (x[i] < wave_x[1][1]) { // Right fan state
-            const double v = (x[i] - discontinuity_)/end_time_;
-            const double a = (gamma_[1] - 1.0)/(gamma_[1] + 1.0) * (v - u_[1]) + 2.0/(gamma_[1] + 1.0) * a_[1];
-
-            u[i] = v - a;
-            p[i] = p_[1] * std::pow(a/a_[1], 2.0 * gamma_[1]/(gamma_[1] - 1.0));
-            rho[i] = gamma_[1] * p[i] /std::pow(a, 2);
-            mach[i] = u[i] / std::sqrt(p[i] / std::pow(rho[i], gamma_[1]));
-        }
-        else { // Right state
-            rho[i] = gamma_[1] * p_[1]/std::pow(a_[1], 2);
-            u[i] = u_[1];
-            p[i] = p_[1];
-            mach[i] = u[i] / std::sqrt(p[i] / std::pow(rho[i], gamma_[1]));
-        }
-
-        T[i] = p[i]/(rho[i] * R_);
     }
 
-    write_file_data(n_points_, end_time_, rho, u, p, x, mach, T, problem_number_);
+    write_file_data(n_points_, end_time_, rho, u, p, x, mach, T, problem_number_, suffix);
 }
 
 template<typename FluxCalculator>

@@ -16,12 +16,12 @@ class Solver_t {
         double p_[2];
         double end_time_;
         double discontinuity_;
-        int n_points_; // For plotting purposes
+        int n_points_; // Number of points per cell to plot
         int problem_number_;
         double x_[2];
 
         virtual void solve() = 0;
-        virtual void write_solution() = 0;
+        virtual void write_solution(std::string suffix = "") = 0;
         void write_file_data(int N_points, double time, const std::vector<double> &rho, const std::vector<double> &u, const std::vector<double> &p, const std::vector<double> &x, const std::vector<double> &mach, const std::vector<double> &T, int problem_number, std::string suffix);
 };
 

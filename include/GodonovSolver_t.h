@@ -4,6 +4,7 @@
 #include "Solver_t.h"
 #include "Mesh1D_t.h"
 #include <vector>
+#include <string>
 
 template<typename FluxCalculator>
 class GodonovSolver_t final : public Solver_t { 
@@ -16,7 +17,7 @@ class GodonovSolver_t final : public Solver_t {
         FluxCalculator flux_calculator_;
 
         virtual void solve();
-        virtual void write_solution();
+        virtual void write_solution(std::string suffix = "");
 
     private:
         double calculate_delta_t();

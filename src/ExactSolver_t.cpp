@@ -75,7 +75,7 @@ void ExactSolver_t::calculate_a_star() {
     }
 }
 
-void ExactSolver_t::write_solution(std::string suffix = "") {
+void ExactSolver_t::write_solution(std::string suffix /* = "" */) {
     calculate_a_star(); // Can't be sure it was calculated
 
     double wave_speed[2][2]; // {{left_start, left_end}, {right_start, right_end}}
