@@ -69,6 +69,7 @@ void GodonovSolver_t::solve() {
 
         calculate_fluxes(delta_t);
         timestep(delta_t);
+        time += delta_t;
     }
 }
 
