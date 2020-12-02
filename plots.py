@@ -66,10 +66,11 @@ rho_arrays_riemann = []
 p_arrays_riemann = []
 mach_arrays_riemann = []
 T_arrays_riemann = []
+N_arrays_riemann = []
 
 problem_numbers, filenames, times, x_arrays, ux_arrays, rho_arrays, p_arrays, mach_arrays, T_arrays, N_arrays = find_problem_files("_exact")
 for i in N:
-    problem_numbers_riemann_N, filenames_riemann_N, times_riemann_N, x_arrays_riemann_N, ux_arrays_riemann_N, rho_arrays_riemann_N, p_arrays_riemann_N, mach_arrays_riemann_N, T_arrays_riemann_N = find_problem_files(f"_riemann_N{i}")
+    problem_numbers_riemann_N, filenames_riemann_N, times_riemann_N, x_arrays_riemann_N, ux_arrays_riemann_N, rho_arrays_riemann_N, p_arrays_riemann_N, mach_arrays_riemann_N, T_arrays_riemann_N, N_arrays_riemann_N = find_problem_files(f"_riemann_N{i}")
     problem_numbers_riemann.append(problem_numbers_riemann_N)
     filenames_riemann.append(filenames_riemann_N)
     times_riemann.append(times_riemann_N)
@@ -79,6 +80,7 @@ for i in N:
     p_arrays_riemann.append(p_arrays_riemann_N)
     mach_arrays_riemann.append(mach_arrays_riemann_N)
     T_arrays_riemann.append(T_arrays_riemann_N)
+    N_arrays_riemann.append(N_arrays_riemann_N)
 
 # Plotting
 save_path = Path.cwd() / "figures"
