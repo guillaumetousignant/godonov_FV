@@ -3,53 +3,17 @@
 #include <cmath>
 
 ExactRiemannFlux_t::ExactRiemannFlux_t(int n_faces) :
-        a_star_L_(new double[n_faces]),
-        a_star_R_(new double[n_faces]),
-        u_star_(new double[n_faces]),
-        p_star_L_(new double[n_faces]),
-        p_star_R_(new double[n_faces]),
-        p_star_prime_L_(new double[n_faces]),
-        p_star_prime_R_(new double[n_faces]),
-        C_L_(new double[n_faces]),
-        C_R_(new double[n_faces]) {}
+        a_star_L_(n_faces),
+        a_star_R_(n_faces),
+        u_star_(n_faces),
+        p_star_L_(n_faces),
+        p_star_R_(n_faces),
+        p_star_prime_L_(n_faces),
+        p_star_prime_R_(n_faces),
+        C_L_(n_faces),
+        C_R_(n_faces) {}
 
-ExactRiemannFlux_t::~ExactRiemannFlux_t() {
-    if (a_star_L_ != nullptr) {
-        delete [] a_star_L_;
-    }
-
-    if (a_star_R_ != nullptr) {
-        delete [] a_star_R_;
-    }
-
-    if (u_star_ != nullptr) {
-        delete [] u_star_;
-    }
-
-    if (p_star_L_ != nullptr) {
-        delete [] p_star_L_;
-    }
-
-    if (p_star_R_ != nullptr) {
-        delete [] p_star_R_;
-    }
-
-    if (p_star_prime_L_ != nullptr) {
-        delete [] p_star_prime_L_;
-    }
-
-    if (p_star_prime_R_ != nullptr) {
-        delete [] p_star_prime_R_;
-    }
-
-    if (C_L_ != nullptr) {
-        delete [] C_L_;
-    }
-
-    if (C_R_ != nullptr) {
-        delete [] C_R_;
-    }
-}
+ExactRiemannFlux_t::~ExactRiemannFlux_t() {}
 
 void ExactRiemannFlux_t::calculate_fluxes(Mesh1D_t &mesh, double delta_t) {
     for (int i = 0; i < mesh.n_faces_; ++i) {
