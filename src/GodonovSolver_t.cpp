@@ -47,7 +47,7 @@ void GodonovSolver_t<FluxCalculator>::write_solution(std::string suffix /* = "" 
         const int offset = (i - 1) * n_points_;
         for (int j = 0; j < n_points_; ++j) {
             // Watch out for integer division when lerping in c++
-            x[offset + j] = (n_points_ == 1) ? mesh_.x_[i] : mesh_.x_[i] - mesh_.delta_x_ + j/(n_points_ - 1.0) * mesh_.delta_x_;
+            x[offset + j] = (n_points_ == 1) ? mesh_.x_[i] : mesh_.x_[i] - mesh_.delta_x_/2 + j/(n_points_ - 1.0) * mesh_.delta_x_;
             rho[offset + j] = mesh_.gamma_[i] * mesh_.p_[i]/std::pow(mesh_.a_[i], 2);
             u[offset + j] = mesh_.u_[i];
             p[offset + j] = mesh_.p_[i];

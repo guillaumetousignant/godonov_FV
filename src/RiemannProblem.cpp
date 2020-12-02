@@ -15,7 +15,7 @@ double RiemannProblem::calculate_C(double a, double p, double gamma) {
     return gamma * p/a;
 }
 
-void RiemannProblem::calculate_a_star(double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double gamma_L, double gamma_R, double u_star, double a_star_L, double a_star_R, double p_star_L, double p_star_R) {
+void RiemannProblem::calculate_a_star(double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double gamma_L, double gamma_R, double u_star, double &a_star_L, double &a_star_R, double p_star_L, double p_star_R) {
     if (u_star <= u_L) { // left shock
         a_star_L = a_L * std::sqrt(((gamma_L + 1.0) + (gamma_L - 1.0) * p_star_L/p_L) / ((gamma_L + 1.0) + (gamma_L - 1.0) * p_L/p_star_L));
     }
@@ -57,7 +57,7 @@ void RiemannProblem::right_rarefaction(double a_R, double u_R, double p_R, doubl
     p_star_prime_R = gamma_R * p_star_R / a_star_R;
 }
 
-void RiemannProblem::solve_flux(double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double gamma_L, double gamma_R, double C_L, double C_R, double &u_star, double a_star_L, double a_star_R, double &p_star_L, double &p_star_R, double &p_star_prime_L, double &p_star_prime_R) {
+void RiemannProblem::solve_flux(double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double gamma_L, double gamma_R, double C_L, double C_R, double &u_star, double &a_star_L, double &a_star_R, double &p_star_L, double &p_star_R, double &p_star_prime_L, double &p_star_prime_R) {
     constexpr double epsilon = 1.0e-6;
     double error = std::numeric_limits<double>::infinity();
     
