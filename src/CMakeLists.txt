@@ -4,7 +4,10 @@ add_library(flow_solver
     GodonovSolver_t.cpp
     Mesh1D_t.cpp
     RiemannProblem.cpp
-    Solver_t.cpp)
+    Solver_t.cpp
+    HLLEFlux_t.cpp
+    RoeEntropyFlux_t.cpp
+    RoeFlux_t.cpp)
 
 target_include_directories(flow_solver PUBLIC 
     $<INSTALL_INTERFACE:include/flow_solver/>    
