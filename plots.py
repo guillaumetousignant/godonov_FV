@@ -86,58 +86,73 @@ for i in N:
 save_path = Path.cwd() / "figures"
 save_path.mkdir(parents=True, exist_ok=True)
 
-for i in range(len(filenames)):
+for i in range(len(problem_numbers)):
     u_fig, u_ax = plt.subplots(1, 1)
-    u_ax.plot(x_arrays[i], ux_arrays[i])
+    u_ax.plot(x_arrays[i], ux_arrays[i], label="Exact solution")
+    for j in range(len(N)):
+        u_ax.plot(x_arrays_riemann[j][i], x_arrays_riemann[j][i], label=f"Riemann problem fluxes, N = {N[j]}")
 
     u_ax.grid()
     u_ax.set_ylabel('$U_x$ [$m/s$]')
     u_ax.set_xlabel('x [m]')
     u_ax.set_title(f"Problem {problem_numbers[i]}, $U_x$ along x at t = {times[i]}s")
-    u_fig.canvas.set_window_title(f'Problem {problem_numbers[i]} $U_x$')
+    u_ax.legend()
+    u_fig.canvas.set_window_title(f'Problem {problem_numbers[i]} U_x')
     u_fig.savefig(save_path / f"problem_{problem_numbers[i]}_u.svg", format='svg', transparent=True)
     u_fig.savefig(save_path / f"problem_{problem_numbers[i]}_u.png", format='png', transparent=True)
 
     rho_fig, rho_ax = plt.subplots(1, 1)
-    rho_ax.plot(x_arrays[i], rho_arrays[i])
+    rho_ax.plot(x_arrays[i], rho_arrays[i], label="Exact solution")
+    for j in range(len(N)):
+        rho_ax.plot(x_arrays_riemann[j][i], rho_arrays_riemann[j][i], label=f"Riemann problem fluxes, N = {N[j]}")
 
     rho_ax.grid()
     rho_ax.set_ylabel(r'$\rho$ [$kg/m^3$]')
     rho_ax.set_xlabel('x [m]')
     rho_ax.set_title(f"Problem {problem_numbers[i]}, $\\rho$ along x at t = {times[i]}s")
-    rho_fig.canvas.set_window_title(f'Problem {problem_numbers[i]} $\\rho$')
+    rho_ax.legend()
+    rho_fig.canvas.set_window_title(f'Problem {problem_numbers[i]} rho')
     rho_fig.savefig(save_path / f"problem_{problem_numbers[i]}_rho.svg", format='svg', transparent=True)
     rho_fig.savefig(save_path / f"problem_{problem_numbers[i]}_rho.png", format='png', transparent=True)
 
     p_fig, p_ax = plt.subplots(1, 1)
-    p_ax.plot(x_arrays[i], p_arrays[i]/1000)
+    p_ax.plot(x_arrays[i], p_arrays[i]/1000, label="Exact solution")
+    for j in range(len(N)):
+        p_ax.plot(x_arrays_riemann[j][i], p_arrays_riemann[j][i]/1000, label=f"Riemann problem fluxes, N = {N[j]}")
 
     p_ax.grid()
     p_ax.set_ylabel('p [kPa]')
     p_ax.set_xlabel('x [m]')
     p_ax.set_title(f"Problem {problem_numbers[i]}, p along x at t = {times[i]}s")
+    p_ax.legend()
     p_fig.canvas.set_window_title(f'Problem {problem_numbers[i]} p')
     p_fig.savefig(save_path / f"problem_{problem_numbers[i]}_p.svg", format='svg', transparent=True)
     p_fig.savefig(save_path / f"problem_{problem_numbers[i]}_p.png", format='png', transparent=True)
 
     mach_fig, mach_ax = plt.subplots(1, 1)
-    mach_ax.plot(x_arrays[i], mach_arrays[i])
+    mach_ax.plot(x_arrays[i], mach_arrays[i], label="Exact solution")
+    for j in range(len(N)):
+        mach_ax.plot(x_arrays_riemann[j][i], mach_arrays_riemann[j][i], label=f"Riemann problem fluxes, N = {N[j]}")
 
     mach_ax.grid()
     mach_ax.set_ylabel('M [-]')
     mach_ax.set_xlabel('x [m]')
     mach_ax.set_title(f"Problem {problem_numbers[i]}, M along x at t = {times[i]}s")
+    mach_ax.legend()
     mach_fig.canvas.set_window_title(f'Problem {problem_numbers[i]} M')
     mach_fig.savefig(save_path / f"problem_{problem_numbers[i]}_mach.svg", format='svg', transparent=True)
     mach_fig.savefig(save_path / f"problem_{problem_numbers[i]}_mach.png", format='png', transparent=True)
 
     T_fig, T_ax = plt.subplots(1, 1)
-    T_ax.plot(x_arrays[i], T_arrays[i])
+    T_ax.plot(x_arrays[i], T_arrays[i], label="Exact solution")
+    for j in range(len(N)):
+        T_ax.plot(x_arrays_riemann[j][i], T_arrays_riemann[j][i], label=f"Riemann problem fluxes, N = {N[j]}")
 
     T_ax.grid()
     T_ax.set_ylabel('T [K]')
     T_ax.set_xlabel('x [m]')
     T_ax.set_title(f"Problem {problem_numbers[i]}, T along x at t = {times[i]}s")
+    T_ax.legend()
     T_fig.canvas.set_window_title(f'Problem {problem_numbers[i]} T')
     T_fig.savefig(save_path / f"problem_{problem_numbers[i]}_T.svg", format='svg', transparent=True)
     T_fig.savefig(save_path / f"problem_{problem_numbers[i]}_T.png", format='png', transparent=True)
