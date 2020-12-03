@@ -25,7 +25,7 @@ void ExactRiemannFlux_t::calculate_fluxes(Mesh1D_t &mesh, double delta_t) {
         double a_face, u_face, p_face, gamma_face;
         RiemannProblem::get_boundary_state(a_face, u_face, p_face, gamma_face, delta_t, mesh.a_[i], mesh.a_[i+1], mesh.u_[i], mesh.u_[i+1], mesh.p_[i], mesh.p_[i+1], mesh.gamma_[i], mesh.gamma_[i+1], u_star_[i], a_star_L_[i], a_star_R_[i], p_star_L_[i], p_star_R_[i]);
 
-        mesh.F_1_[i] = gamma_face * p_face /(std::pow(a_face, 2));
+        mesh.F_1_[i] = gamma_face * p_face * u_face /(std::pow(a_face, 2));
         mesh.F_2_[i] = gamma_face * p_face * std::pow(u_face, 2)/std::pow(a_face, 2) + p_face;
         mesh.F_3_[i] = u_face * (gamma_face * p_face /(gamma_face - 1) + gamma_face * p_face * std::pow(u_face, 2) * 0.5 /std::pow(a_face, 2));
     }
