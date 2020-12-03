@@ -1,9 +1,15 @@
 #include "GodonovSolver_t.h"
 #include "ExactRiemannFlux_t.h"
+#include "RoeFlux_t.h"
+#include "RoeEntropyFlux_t.h"
+#include "HLLEFlux_t.h"
 #include <cmath>
 #include <algorithm>
 
 template class GodonovSolver_t<ExactRiemannFlux_t>; // Like, I understand why I need this, but man is it crap.
+template class GodonovSolver_t<RoeFlux_t>;
+template class GodonovSolver_t<RoeEntropyFlux_t>;
+template class GodonovSolver_t<HLLEFlux_t>;
 
 template<typename FluxCalculator>
 GodonovSolver_t<FluxCalculator>::GodonovSolver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double x_L, double x_R, double time, double discontinuity, int n_points, int n_cells, int problem_number, double cfl) :
