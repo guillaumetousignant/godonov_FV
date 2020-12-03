@@ -8,6 +8,9 @@
 #include "ExactSolver_t.h"
 #include "GodonovSolver_t.h"
 #include "ExactRiemannFlux_t.h"
+#include "RoeFlux_t.h"
+#include "RoeEntropyFlux_t.h"
+#include "HLLEFlux_t.h"
 
 int main(void) {
     constexpr int n_problems = 4;
@@ -53,17 +56,20 @@ int main(void) {
     
     std::vector<ExactSolver_t> exact_solution;
     std::vector<GodonovSolver_t<ExactRiemannFlux_t>> riemann_solution;
+    std::vector<GodonovSolver_t<RoeFlux_t>> roe_solution;
     exact_solution.reserve(n_problems);
     riemann_solution.reserve(n_problems * n_resolutions);
+    roe_solution.reserve(n_problems * n_resolutions);
 
     for (int i = 0; i < n_problems; ++i) {
         exact_solution.push_back(ExactSolver_t(rho[i][0], rho[i][1], u[i][0], u[i][1], p[i][0], p[i][1], x_span[i][0], x_span[i][1], end_time[i], discontinuity[i], n_points_exact, i + 1));
         for (int j = 0; j < n_resolutions; ++j) {
             riemann_solution.push_back(GodonovSolver_t<ExactRiemannFlux_t>(rho[i][0], rho[i][1], u[i][0], u[i][1], p[i][0], p[i][1], x_span[i][0], x_span[i][1], end_time[i], discontinuity[i], n_points, n_cells[j], i + 1, cfl));
+            roe_solution.push_back(GodonovSolver_t<RoeFlux_t>(rho[i][0], rho[i][1], u[i][0], u[i][1], p[i][0], p[i][1], x_span[i][0], x_span[i][1], end_time[i], discontinuity[i], n_points, n_cells[j], i + 1, cfl));
         }
     }
 
-    // Starting actual computation
+    // Starting computation
     auto t_start_exact = std::chrono::high_resolution_clock::now();
     for (auto &problem : exact_solution) {
         problem.solve();
@@ -80,8 +86,18 @@ int main(void) {
     }
     auto t_end_riemann = std::chrono::high_resolution_clock::now();
 
-    std::cout << "ExactRiemann solver computation time: " 
+    std::cout << "Exact Riemann solver computation time: " 
             << std::chrono::duration<double, std::milli>(t_end_riemann - t_start_riemann).count()/1000.0 
+            << "s." << std::endl;
+
+    auto t_start_roe = std::chrono::high_resolution_clock::now();
+    for (auto &problem : roe_solution) {
+        problem.solve();
+    }
+    auto t_end_roe = std::chrono::high_resolution_clock::now();
+
+    std::cout << "Roe solver computation time: " 
+            << std::chrono::duration<double, std::milli>(t_end_roe - t_start_roe).count()/1000.0 
             << "s." << std::endl;
 
     // Output
@@ -91,6 +107,10 @@ int main(void) {
 
     for (auto &problem : riemann_solution) {
         problem.write_solution("_riemann_N" + std::to_string(problem.mesh_.n_cells_));
+    }
+
+    for (auto &problem : roe_solution) {
+        problem.write_solution("_roe_N" + std::to_string(problem.mesh_.n_cells_));
     }
 
     return 0;
