@@ -8,16 +8,20 @@ import os
 import re
 from pathlib import Path
 
+class Result:
+    pass
+
 def find_problem_files(filter):
-    times = []
-    problem_numbers = []
-    x_arrays = []
-    ux_arrays = []
-    rho_arrays = []
-    p_arrays = []
-    mach_arrays = []
-    T_arrays = []
-    N_arrays = []
+    result = Result()
+    result.times = []
+    result.problem_numbers = []
+    result.x_arrays = []
+    result.ux_arrays = []
+    result.rho_arrays = []
+    result.p_arrays = []
+    result.mach_arrays = []
+    result.T_arrays = []
+    result.N_arrays = []
 
     t_finder = re.compile(r"SOLUTIONTIME = [-+]?\d*\.?\d+")
     I_finder = re.compile(r"I= \d*")
@@ -25,136 +29,159 @@ def find_problem_files(filter):
     problem_finder = re.compile(r"Problem \d*")
 
     # Input from all the output_X.dat files
-    filenames = [f for f in os.listdir(os.path.join(os.getcwd(), 'data')) if os.path.isfile(os.path.join(os.getcwd(), 'data', f)) and "output_" in f and filter in f and f.endswith(".dat")]
-    for filename in filenames:
+    result.filenames = [f for f in os.listdir(os.path.join(os.getcwd(), 'data')) if os.path.isfile(os.path.join(os.getcwd(), 'data', f)) \
+                            and "output_" in f \
+                            and filter in f \
+                            and f.endswith(".dat")]
+
+    for filename in result.filenames:
         with open(os.path.join(os.getcwd(), 'data', filename), 'r') as file:
             lines = file.readlines()
             t_match = t_finder.search(lines[2])
-            times.append(float(t_match.group(0)[15:]))
+            result.times.append(float(t_match.group(0)[15:]))
             N_points_match = I_finder.search(lines[2])
             N_elements_match = N_finder.search(lines[0])
             N_points = int(N_points_match.group(0)[3:])
             problem_match = problem_finder.search(lines[0])
-            problem_numbers.append(int(problem_match.group(0)[8:]))
-            N_arrays.append(int(N_elements_match.group(0)[3:]))
+            result.problem_numbers.append(int(problem_match.group(0)[8:]))
+            result.N_arrays.append(int(N_elements_match.group(0)[3:]))
 
-            x_arrays.append(np.zeros(N_points))
-            ux_arrays.append(np.zeros(N_points))
-            rho_arrays.append(np.zeros(N_points))
-            p_arrays.append(np.zeros(N_points))
-            mach_arrays.append(np.zeros(N_points))
-            T_arrays.append(np.zeros(N_points))
+            result.x_arrays.append(np.zeros(N_points))
+            result.ux_arrays.append(np.zeros(N_points))
+            result.rho_arrays.append(np.zeros(N_points))
+            result.p_arrays.append(np.zeros(N_points))
+            result.mach_arrays.append(np.zeros(N_points))
+            result.T_arrays.append(np.zeros(N_points))
 
             for i in range(N_points):
                 numbers = lines[i+3].split()
-                x_arrays[-1][i] = float(numbers[0])
-                ux_arrays[-1][i] = float(numbers[1])
-                rho_arrays[-1][i] = float(numbers[2])
-                p_arrays[-1][i] = float(numbers[3])
-                mach_arrays[-1][i] = float(numbers[4])
-                T_arrays[-1][i] = float(numbers[5])
+                result.x_arrays[-1][i] = float(numbers[0])
+                result.ux_arrays[-1][i] = float(numbers[1])
+                result.rho_arrays[-1][i] = float(numbers[2])
+                result.p_arrays[-1][i] = float(numbers[3])
+                result.mach_arrays[-1][i] = float(numbers[4])
+                result.T_arrays[-1][i] = float(numbers[5])
 
-    return zip(*sorted(zip(problem_numbers, filenames, times, x_arrays, ux_arrays, rho_arrays, p_arrays, mach_arrays, T_arrays, N_arrays))) # Return in order of problem number
+    # Put in problem order
+    result.problem_numbers, result.filenames, result.times, result.x_arrays, result.ux_arrays, result.rho_arrays, result.p_arrays, result.mach_arrays, result.T_arrays, result.N_arrays = \
+        zip(*sorted(zip(result.problem_numbers, result.filenames, result.times, result.x_arrays, result.ux_arrays, result.rho_arrays, result.p_arrays, result.mach_arrays, result.T_arrays, result.N_arrays)))
+
+    return result
+
+def find_problem_files_N(filter, N_vec):
+    result = Result()
+    result.problem_numbers = []
+    result.filenames = []
+    result.times = []
+    result.x_arrays = []
+    result.ux_arrays = []
+    result.rho_arrays = []
+    result.p_arrays = []
+    result.mach_arrays = []
+    result.T_arrays = []
+    result.N_arrays = []
+    result.N = N_vec
+
+    for i in result.N:
+        result_N = find_problem_files(f"{filter}_N{i}.")
+        result.problem_numbers.append(result_N.problem_numbers)
+        result.filenames.append(result_N.filenames)
+        result.times.append(result_N.times)
+        result.x_arrays.append(result_N.x_arrays)
+        result.ux_arrays.append(result_N.ux_arrays)
+        result.rho_arrays.append(result_N.rho_arrays)
+        result.p_arrays.append(result_N.p_arrays)
+        result.mach_arrays.append(result_N.mach_arrays)
+        result.T_arrays.append(result_N.T_arrays)
+        result.N_arrays.append(result_N.N_arrays)
+
+    return result
+
+def generate_figures(save_path, result_exact, result, title, suffix):
+    for i in range(len(result_exact.problem_numbers)):
+        u_fig, u_ax = plt.subplots(1, 1)
+        u_ax.plot(result_exact.x_arrays[i], result_exact.ux_arrays[i], label="Exact solution")
+        for j in range(len(result.N)):
+            u_ax.plot(result.x_arrays[j][i], result.ux_arrays[j][i], label=f"{title} fluxes, N = {N[j]}")
+
+        u_ax.grid()
+        u_ax.set_ylabel('$U_x$ [$m/s$]')
+        u_ax.set_xlabel('x [m]')
+        u_ax.set_title(f"Problem {result_exact.problem_numbers[i]}, {title} fluxes, $U_x$ along x at t = {result_exact.times[i]}s")
+        u_ax.legend()
+        u_fig.canvas.set_window_title(f'Problem {result_exact.problem_numbers[i]}, {title} fluxes U_x')
+        u_fig.savefig(save_path / f"problem_{result_exact.problem_numbers[i]}_u_{suffix}.svg", format='svg', transparent=True)
+        u_fig.savefig(save_path / f"problem_{result_exact.problem_numbers[i]}_u_{suffix}.png", format='png', transparent=True)
+
+        rho_fig, rho_ax = plt.subplots(1, 1)
+        rho_ax.plot(result_exact.x_arrays[i], result_exact.rho_arrays[i], label="Exact solution")
+        for j in range(len(result.N)):
+            rho_ax.plot(result.x_arrays[j][i], result.rho_arrays[j][i], label=f"{title} fluxes, N = {N[j]}")
+
+        rho_ax.grid()
+        rho_ax.set_ylabel(r'$\rho$ [$kg/m^3$]')
+        rho_ax.set_xlabel('x [m]')
+        rho_ax.set_title(f"Problem {result_exact.problem_numbers[i]}, {title} fluxes, $\\rho$ along x at t = {result_exact.times[i]}s")
+        rho_ax.legend()
+        rho_fig.canvas.set_window_title(f'Problem {result_exact.problem_numbers[i]}, {title} fluxes rho')
+        rho_fig.savefig(save_path / f"problem_{result_exact.problem_numbers[i]}_rho_{suffix}.svg", format='svg', transparent=True)
+        rho_fig.savefig(save_path / f"problem_{result_exact.problem_numbers[i]}_rho_{suffix}.png", format='png', transparent=True)
+
+        p_fig, p_ax = plt.subplots(1, 1)
+        p_ax.plot(result_exact.x_arrays[i], result_exact.p_arrays[i]/1000, label="Exact solution")
+        for j in range(len(result.N)):
+            p_ax.plot(result.x_arrays[j][i], result.p_arrays[j][i]/1000, label=f"{title} fluxes, N = {N[j]}")
+
+        p_ax.grid()
+        p_ax.set_ylabel('p [kPa]')
+        p_ax.set_xlabel('x [m]')
+        p_ax.set_title(f"Problem {result_exact.problem_numbers[i]}, {title} fluxes, p along x at t = {result_exact.times[i]}s")
+        p_ax.legend()
+        p_fig.canvas.set_window_title(f'Problem {result_exact.problem_numbers[i]}, {title} fluxes p')
+        p_fig.savefig(save_path / f"problem_{result_exact.problem_numbers[i]}_p_{suffix}.svg", format='svg', transparent=True)
+        p_fig.savefig(save_path / f"problem_{result_exact.problem_numbers[i]}_p_{suffix}.png", format='png', transparent=True)
+
+        mach_fig, mach_ax = plt.subplots(1, 1)
+        mach_ax.plot(result_exact.x_arrays[i], result_exact.mach_arrays[i], label="Exact solution")
+        for j in range(len(result.N)):
+            mach_ax.plot(result.x_arrays[j][i], result.mach_arrays[j][i], label=f"{title} fluxes, N = {N[j]}")
+
+        mach_ax.grid()
+        mach_ax.set_ylabel('M [-]')
+        mach_ax.set_xlabel('x [m]')
+        mach_ax.set_title(f"Problem {result_exact.problem_numbers[i]}, {title} fluxes, M along x at t = {result_exact.times[i]}s")
+        mach_ax.legend()
+        mach_fig.canvas.set_window_title(f'Problem {result_exact.problem_numbers[i]}, {title} fluxes M')
+        mach_fig.savefig(save_path / f"problem_{result_exact.problem_numbers[i]}_mach_{suffix}.svg", format='svg', transparent=True)
+        mach_fig.savefig(save_path / f"problem_{result_exact.problem_numbers[i]}_mach_{suffix}.png", format='png', transparent=True)
+
+        T_fig, T_ax = plt.subplots(1, 1)
+        T_ax.plot(result_exact.x_arrays[i], result_exact.T_arrays[i], label="Exact solution")
+        for j in range(len(result.N)):
+            T_ax.plot(result.x_arrays[j][i], result.T_arrays[j][i], label=f"{title} fluxes, N = {N[j]}")
+
+        T_ax.grid()
+        T_ax.set_ylabel('T [K]')
+        T_ax.set_xlabel('x [m]')
+        T_ax.set_title(f"Problem {result_exact.problem_numbers[i]}, {title} fluxes, T along x at t = {result_exact.times[i]}s")
+        T_ax.legend()
+        T_fig.canvas.set_window_title(f'Problem {result_exact.problem_numbers[i]}, {title} fluxes T')
+        T_fig.savefig(save_path / f"problem_{result_exact.problem_numbers[i]}_T_{suffix}.svg", format='svg', transparent=True)
+        T_fig.savefig(save_path / f"problem_{result_exact.problem_numbers[i]}_T_{suffix}.png", format='png', transparent=True)
+
 
 N = [100, 200, 500, 1000]
-problem_numbers_riemann = []
-filenames_riemann = []
-times_riemann = []
-x_arrays_riemann = []
-ux_arrays_riemann = []
-rho_arrays_riemann = []
-p_arrays_riemann = []
-mach_arrays_riemann = []
-T_arrays_riemann = []
-N_arrays_riemann = []
 
-problem_numbers, filenames, times, x_arrays, ux_arrays, rho_arrays, p_arrays, mach_arrays, T_arrays, N_arrays = find_problem_files("_exact")
-for i in N:
-    problem_numbers_riemann_N, filenames_riemann_N, times_riemann_N, x_arrays_riemann_N, ux_arrays_riemann_N, rho_arrays_riemann_N, p_arrays_riemann_N, mach_arrays_riemann_N, T_arrays_riemann_N, N_arrays_riemann_N = find_problem_files(f"_riemann_N{i}.")
-    problem_numbers_riemann.append(problem_numbers_riemann_N)
-    filenames_riemann.append(filenames_riemann_N)
-    times_riemann.append(times_riemann_N)
-    x_arrays_riemann.append(x_arrays_riemann_N)
-    ux_arrays_riemann.append(ux_arrays_riemann_N)
-    rho_arrays_riemann.append(rho_arrays_riemann_N)
-    p_arrays_riemann.append(p_arrays_riemann_N)
-    mach_arrays_riemann.append(mach_arrays_riemann_N)
-    T_arrays_riemann.append(T_arrays_riemann_N)
-    N_arrays_riemann.append(N_arrays_riemann_N)
+result_exact = find_problem_files("exact")
+result_riemann = find_problem_files_N("riemann", N)
+result_roe = find_problem_files_N("roe", N)
+
 
 # Plotting
 save_path = Path.cwd() / "figures"
 save_path.mkdir(parents=True, exist_ok=True)
 
-for i in range(len(problem_numbers)):
-    u_fig, u_ax = plt.subplots(1, 1)
-    u_ax.plot(x_arrays[i], ux_arrays[i], label="Exact solution")
-    for j in range(len(N)):
-        u_ax.plot(x_arrays_riemann[j][i], ux_arrays_riemann[j][i], label=f"Riemann problem fluxes, N = {N[j]}")
-
-    u_ax.grid()
-    u_ax.set_ylabel('$U_x$ [$m/s$]')
-    u_ax.set_xlabel('x [m]')
-    u_ax.set_title(f"Problem {problem_numbers[i]}, $U_x$ along x at t = {times[i]}s")
-    u_ax.legend()
-    u_fig.canvas.set_window_title(f'Problem {problem_numbers[i]} U_x')
-    u_fig.savefig(save_path / f"problem_{problem_numbers[i]}_u.svg", format='svg', transparent=True)
-    u_fig.savefig(save_path / f"problem_{problem_numbers[i]}_u.png", format='png', transparent=True)
-
-    rho_fig, rho_ax = plt.subplots(1, 1)
-    rho_ax.plot(x_arrays[i], rho_arrays[i], label="Exact solution")
-    for j in range(len(N)):
-        rho_ax.plot(x_arrays_riemann[j][i], rho_arrays_riemann[j][i], label=f"Riemann problem fluxes, N = {N[j]}")
-
-    rho_ax.grid()
-    rho_ax.set_ylabel(r'$\rho$ [$kg/m^3$]')
-    rho_ax.set_xlabel('x [m]')
-    rho_ax.set_title(f"Problem {problem_numbers[i]}, $\\rho$ along x at t = {times[i]}s")
-    rho_ax.legend()
-    rho_fig.canvas.set_window_title(f'Problem {problem_numbers[i]} rho')
-    rho_fig.savefig(save_path / f"problem_{problem_numbers[i]}_rho.svg", format='svg', transparent=True)
-    rho_fig.savefig(save_path / f"problem_{problem_numbers[i]}_rho.png", format='png', transparent=True)
-
-    p_fig, p_ax = plt.subplots(1, 1)
-    p_ax.plot(x_arrays[i], p_arrays[i]/1000, label="Exact solution")
-    for j in range(len(N)):
-        p_ax.plot(x_arrays_riemann[j][i], p_arrays_riemann[j][i]/1000, label=f"Riemann problem fluxes, N = {N[j]}")
-
-    p_ax.grid()
-    p_ax.set_ylabel('p [kPa]')
-    p_ax.set_xlabel('x [m]')
-    p_ax.set_title(f"Problem {problem_numbers[i]}, p along x at t = {times[i]}s")
-    p_ax.legend()
-    p_fig.canvas.set_window_title(f'Problem {problem_numbers[i]} p')
-    p_fig.savefig(save_path / f"problem_{problem_numbers[i]}_p.svg", format='svg', transparent=True)
-    p_fig.savefig(save_path / f"problem_{problem_numbers[i]}_p.png", format='png', transparent=True)
-
-    mach_fig, mach_ax = plt.subplots(1, 1)
-    mach_ax.plot(x_arrays[i], mach_arrays[i], label="Exact solution")
-    for j in range(len(N)):
-        mach_ax.plot(x_arrays_riemann[j][i], mach_arrays_riemann[j][i], label=f"Riemann problem fluxes, N = {N[j]}")
-
-    mach_ax.grid()
-    mach_ax.set_ylabel('M [-]')
-    mach_ax.set_xlabel('x [m]')
-    mach_ax.set_title(f"Problem {problem_numbers[i]}, M along x at t = {times[i]}s")
-    mach_ax.legend()
-    mach_fig.canvas.set_window_title(f'Problem {problem_numbers[i]} M')
-    mach_fig.savefig(save_path / f"problem_{problem_numbers[i]}_mach.svg", format='svg', transparent=True)
-    mach_fig.savefig(save_path / f"problem_{problem_numbers[i]}_mach.png", format='png', transparent=True)
-
-    T_fig, T_ax = plt.subplots(1, 1)
-    T_ax.plot(x_arrays[i], T_arrays[i], label="Exact solution")
-    for j in range(len(N)):
-        T_ax.plot(x_arrays_riemann[j][i], T_arrays_riemann[j][i], label=f"Riemann problem fluxes, N = {N[j]}")
-
-    T_ax.grid()
-    T_ax.set_ylabel('T [K]')
-    T_ax.set_xlabel('x [m]')
-    T_ax.set_title(f"Problem {problem_numbers[i]}, T along x at t = {times[i]}s")
-    T_ax.legend()
-    T_fig.canvas.set_window_title(f'Problem {problem_numbers[i]} T')
-    T_fig.savefig(save_path / f"problem_{problem_numbers[i]}_T.svg", format='svg', transparent=True)
-    T_fig.savefig(save_path / f"problem_{problem_numbers[i]}_T.png", format='png', transparent=True)
+generate_figures(save_path, result_exact, result_riemann, "Riemann problem", "riemann")
+generate_figures(save_path, result_exact, result_roe, "Roe", "roe")
 
 plt.show()
