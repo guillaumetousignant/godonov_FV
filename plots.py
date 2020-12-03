@@ -90,7 +90,7 @@ for i in range(len(problem_numbers)):
     u_fig, u_ax = plt.subplots(1, 1)
     u_ax.plot(x_arrays[i], ux_arrays[i], label="Exact solution")
     for j in range(len(N)):
-        u_ax.plot(x_arrays_riemann[j][i], x_arrays_riemann[j][i], label=f"Riemann problem fluxes, N = {N[j]}")
+        u_ax.plot(x_arrays_riemann[j][i], ux_arrays_riemann[j][i], label=f"Riemann problem fluxes, N = {N[j]}")
 
     u_ax.grid()
     u_ax.set_ylabel('$U_x$ [$m/s$]')
