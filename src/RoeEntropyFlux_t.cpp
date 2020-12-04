@@ -1,4 +1,6 @@
 #include "RoeEntropyFlux_t.h"
+#include <cmath>
+#include <algorithm>
 
 RoeEntropyFlux_t::RoeEntropyFlux_t(int n_faces) {}
 
@@ -71,6 +73,21 @@ void RoeEntropyFlux_t::calculate_fluxes(Mesh1D_t &mesh, double delta_t) {
                                       0.0,               0.0,             std::abs(u_hat + a_hat)};
         double L_hat[9];
         invert_matrix(R_hat, L_hat);
+
+        const double lambda_0_L = mesh.u_[i] - mesh.a_[i];
+        const double lambda_2_L = mesh.u_[i] + mesh.a_[i];
+        const double lambda_0_R = mesh.u_[i+1] - mesh.a_[i+1];
+        const double lambda_2_R = mesh.u_[i+1] + mesh.a_[i+1];
+        const double delta_0 = std::max(0.0, 4 * (lambda_0_R - lambda_0_L));
+        const double delta_2 = std::max(0.0, 4 * (lambda_2_R - lambda_2_L));
+
+        if (Lambda_hat[0] <= 0.5 * delta_0) {
+            Lambda_hat[0] = std::pow(Lambda_hat[0], 2)/delta_0 + 0.25 * delta_0;
+        }
+
+        if (Lambda_hat[8] <= 0.5 * delta_2) {
+            Lambda_hat[8] = std::pow(Lambda_hat[8], 2)/delta_2 + 0.25 * delta_2;
+        }
 
         double mult_matrix[9]; // Temp value, Roe matrix will be stored in R_hat
         multiply_matrix(R_hat, Lambda_hat, mult_matrix);
