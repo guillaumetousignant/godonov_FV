@@ -174,8 +174,8 @@ N = [100, 200, 500, 1000]
 
 result_exact = find_problem_files("exact")
 #result_riemann = find_problem_files_N("riemann", N)
-result_roe = find_problem_files_N("roe", N)
-#result_roe_entropy = find_problem_files_N("roe_entropy", N)
+#result_roe = find_problem_files_N("roe", N)
+result_roe_entropy = find_problem_files_N("roe_entropy", N)
 #result_hlle = find_problem_files_N("hlle", N)
 
 
@@ -185,8 +185,8 @@ save_path.mkdir(parents=True, exist_ok=True)
 
 # Plotting everything at the same time will stack overflow.
 #generate_figures(save_path, result_exact, result_riemann, "Riemann problem", "riemann")
-generate_figures(save_path, result_exact, result_roe, "Roe", "roe")
-#generate_figures(save_path, result_exact, result_roe_entropy, "Roe entropy fix", "roe_entropy")
+#generate_figures(save_path, result_exact, result_roe, "Roe", "roe")
+generate_figures(save_path, result_exact, result_roe_entropy, "Roe entropy fix", "roe_entropy")
 #generate_figures(save_path, result_exact, result_hlle, "HLLE", "hlle")
 
 plt.show()
