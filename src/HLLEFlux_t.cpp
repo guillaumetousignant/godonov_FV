@@ -23,11 +23,14 @@ void HLLEFlux_t::calculate_fluxes(Mesh1D_t &mesh, double delta_t) {
         const double U_2_R = mesh.gamma_[i+1] * mesh.p_[i+1] * mesh.u_[i+1]/std::pow(mesh.a_[i+1], 2);
         const double U_3_R = mesh.p_[i+1]/(mesh.gamma_[i+1] - 1) + mesh.gamma_[i+1] * mesh.p_[i+1] * std::pow(mesh.u_[i+1], 2) * 0.5/std::pow(mesh.a_[i+1], 2);
 
-        const double u_hat = ((std::sqrt(mesh.gamma_[i] * mesh.p_[i]) * mesh.u_[i]/mesh.a_[i]) + (std::sqrt(mesh.gamma_[i+1] * mesh.p_[i+1]) * mesh.u_[i+1]/mesh.a_[i+1])) / 
-                                ((std::sqrt(mesh.gamma_[i] * mesh.p_[i]) / mesh.a_[i]) + (std::sqrt(mesh.gamma_[i+1] * mesh.p_[i+1]) / mesh.a_[i+1]));
-        const double h_hat = (std::sqrt(mesh.gamma_[i] * mesh.p_[i]) * (std::pow(mesh.a_[i], 2) / (mesh.gamma_[i] - 1) + std::pow(mesh.u_[i], 2) * 0.5) /mesh.a_[i] 
-                                + std::sqrt(mesh.gamma_[i+1] * mesh.p_[i+1]) * (std::pow(mesh.a_[i+1], 2) / (mesh.gamma_[i+1] - 1) + std::pow(mesh.u_[i+1], 2) * 0.5) /mesh.a_[i+1])
-                                / ((std::sqrt(mesh.gamma_[i] * mesh.p_[i]) / mesh.a_[i]) + (std::sqrt(mesh.gamma_[i+1] * mesh.p_[i+1]) / mesh.a_[i+1]));
+        const double rho_p_L = std::sqrt(mesh.gamma_[i] * mesh.p_[i]); // We need it like 4 times. I assume it would have been optimized by the compiler anyway?
+        const double rho_p_R = std::sqrt(mesh.gamma_[i+1] * mesh.p_[i+1]); // We need it like 4 times. I assume it would have been optimized by the compiler anyway?
+
+        const double u_hat = ((rho_p_L * mesh.u_[i]/mesh.a_[i]) + (rho_p_R * mesh.u_[i+1]/mesh.a_[i+1])) / 
+                                ((rho_p_L / mesh.a_[i]) + (rho_p_R / mesh.a_[i+1]));
+        const double h_hat = (rho_p_L * (std::pow(mesh.a_[i], 2) / (mesh.gamma_[i] - 1) + std::pow(mesh.u_[i], 2) * 0.5) /mesh.a_[i] 
+                                + rho_p_R * (std::pow(mesh.a_[i+1], 2) / (mesh.gamma_[i+1] - 1) + std::pow(mesh.u_[i+1], 2) * 0.5) /mesh.a_[i+1])
+                                / ((rho_p_L / mesh.a_[i]) + (rho_p_R / mesh.a_[i+1]));
         //const double rho_hat = std::sqrt(mesh.gamma_[i] * mesh.p_[i] * mesh.gamma_[i+1] * mesh.p_[i+1])/(mesh.a_[i] * mesh.a_[i+1]);
         const double gamma_hat = (mesh.gamma_[i] + mesh.gamma_[i+1]) * 0.5; // Not sure, with an equation for this we could solve for a_hat directly.
 
