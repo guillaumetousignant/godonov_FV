@@ -1,5 +1,6 @@
 #include "HLLEFlux_t.h"
 #include <cmath>
+#include <algorithm>
 
 HLLEFlux_t::HLLEFlux_t(int n_faces) {}
 
@@ -22,9 +23,19 @@ void HLLEFlux_t::calculate_fluxes(Mesh1D_t &mesh, double delta_t) {
         const double U_2_R = mesh.gamma_[i+1] * mesh.p_[i+1] * mesh.u_[i+1]/std::pow(mesh.a_[i+1], 2);
         const double U_3_R = mesh.p_[i+1]/(mesh.gamma_[i+1] - 1) + mesh.gamma_[i+1] * mesh.p_[i+1] * std::pow(mesh.u_[i+1], 2) * 0.5/std::pow(mesh.a_[i+1], 2);
 
+        const double u_hat = ((std::sqrt(mesh.gamma_[i] * mesh.p_[i]) * mesh.u_[i]/mesh.a_[i]) + (std::sqrt(mesh.gamma_[i+1] * mesh.p_[i+1]) * mesh.u_[i+1]/mesh.a_[i+1])) / 
+                                ((std::sqrt(mesh.gamma_[i] * mesh.p_[i]) / mesh.a_[i]) + (std::sqrt(mesh.gamma_[i+1] * mesh.p_[i+1]) / mesh.a_[i+1]));
+        const double h_hat = (std::sqrt(mesh.gamma_[i] * mesh.p_[i]) * (std::pow(mesh.a_[i], 2) / (mesh.gamma_[i] - 1) + std::pow(mesh.u_[i], 2) * 0.5) /mesh.a_[i] 
+                                + std::sqrt(mesh.gamma_[i+1] * mesh.p_[i+1]) * (std::pow(mesh.a_[i+1], 2) / (mesh.gamma_[i+1] - 1) + std::pow(mesh.u_[i+1], 2) * 0.5) /mesh.a_[i+1])
+                                / ((std::sqrt(mesh.gamma_[i] * mesh.p_[i]) / mesh.a_[i]) + (std::sqrt(mesh.gamma_[i+1] * mesh.p_[i+1]) / mesh.a_[i+1]));
+        //const double rho_hat = std::sqrt(mesh.gamma_[i] * mesh.p_[i] * mesh.gamma_[i+1] * mesh.p_[i+1])/(mesh.a_[i] * mesh.a_[i+1]);
+        const double gamma_hat = (mesh.gamma_[i] + mesh.gamma_[i+1]) * 0.5; // Not sure, with an equation for this we could solve for a_hat directly.
 
-        const double lambda_minus = mesh.u_[i] - mesh.a_[i]; // Not sure about those
-        const double lambda_plus = mesh.u_[i+1] + mesh.a_[i+1]; // Not sure about those
+        const double a_hat = std::sqrt((h_hat - std::pow(u_hat, 2) * 0.5) * (gamma_hat - 1));
+
+
+        const double lambda_minus = std::min(mesh.u_[i] - mesh.a_[i], u_hat - a_hat); // Not sure about those
+        const double lambda_plus = std::max(mesh.u_[i+1] + mesh.a_[i+1], u_hat + a_hat); // Not sure about those
 
         if (lambda_minus > 0) {
             mesh.F_1_[i] = F_1_L;
