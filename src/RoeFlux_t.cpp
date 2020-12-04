@@ -21,8 +21,16 @@ void RoeFlux_t::invert_matrix(const double (&input)[9], double (&output)[9]) {
     output[8] = (input[0] * input[4] - input[3] * input[1]) * invdet;
 }
 
-void RoeFlux_t::multiply_matrix(const double (&left)[9], const double (&right)[9], double (&result)[9]) {
-
+void RoeFlux_t::multiply_matrix(const double (&left)[9], const double (&right)[9], double (&result)[9]) { // What do you mean loops
+    result[0] = left[0] * right[0] + left[1] * right[3] + left[2] * right[6];
+    result[1] = left[0] * right[1] + left[1] * right[4] + left[2] * right[7];
+    result[2] = left[0] * right[2] + left[1] * right[5] + left[2] * right[8];
+    result[3] = left[3] * right[0] + left[4] * right[3] + left[5] * right[6];
+    result[4] = left[3] * right[1] + left[4] * right[4] + left[5] * right[7];
+    result[5] = left[3] * right[2] + left[4] * right[5] + left[5] * right[8];
+    result[6] = left[6] * right[0] + left[7] * right[3] + left[8] * right[6];
+    result[7] = left[6] * right[1] + left[7] * right[4] + left[8] * right[7];
+    result[8] = left[6] * right[2] + left[7] * right[5] + left[8] * right[8];
 }
 
 
