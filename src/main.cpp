@@ -112,8 +112,8 @@ int main(void) {
     }
     auto t_end_roe_entropy = std::chrono::high_resolution_clock::now();
 
-    std::cout << "Roe solver computation time: " 
-            << std::chrono::duration<double, std::milli>(t_start_roe_entropy - t_end_roe_entropy).count()/1000.0 
+    std::cout << "Roe entropy fix solver computation time: " 
+            << std::chrono::duration<double, std::milli>(t_end_roe_entropy - t_start_roe_entropy).count()/1000.0 
             << "s." << std::endl;
 
     auto t_start_hlle = std::chrono::high_resolution_clock::now();
