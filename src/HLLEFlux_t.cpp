@@ -36,7 +36,6 @@ void HLLEFlux_t::calculate_fluxes(Mesh1D_t &mesh, double delta_t) {
 
         const double a_hat = std::sqrt((h_hat - std::pow(u_hat, 2) * 0.5) * (gamma_hat - 1));
 
-
         const double lambda_minus = std::min(mesh.u_[i] - mesh.a_[i], u_hat - a_hat); // Not sure about those
         const double lambda_plus = std::max(mesh.u_[i+1] + mesh.a_[i+1], u_hat + a_hat); // Not sure about those
 
