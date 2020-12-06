@@ -18,14 +18,17 @@ class GodonovSolverHigherOrder_t final : public Solver_t {
         std::vector<double> u_hat_;
         std::vector<double> a_hat_;
         std::vector<double> p_hat_;
+        std::vector<double> F_1_hat_;
+        std::vector<double> F_2_hat_;
+        std::vector<double> F_3_hat_;
 
         virtual void solve();
         virtual void write_solution(std::string suffix = "");
 
     private:
         double calculate_delta_t();
-        void predictor(double delta_t);
-        void timestep(double delta_t);
+        void predictor(double delta_t, double delta_x, const std::vector<double> &gamma, const std::vector<double> &u, const std::vector<double> &a, const std::vector<double> &p, std::vector<double> &u_hat, std::vector<double> &a_hat, std::vector<double> &p_hat, const std::vector<double> F_1, const std::vector<double> F_2, const std::vector<double> F_3);
+        void corrector(double delta_t, double delta_x, const std::vector<double> &gamma, std::vector<double> &u, std::vector<double> &a, std::vector<double> &p, const std::vector<double> F_1, const std::vector<double> F_2, const std::vector<double> F_3, const std::vector<double> F_1_hat, const std::vector<double> F_2_hat, const std::vector<double> F_3_hat);
 };
 
 #endif

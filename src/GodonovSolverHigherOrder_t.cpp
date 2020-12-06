@@ -19,7 +19,10 @@ GodonovSolverHigherOrder_t<FluxCalculator>::GodonovSolverHigherOrder_t(double rh
         flux_calculator_(n_cells + 1),
         u_hat_(n_cells + 2),
         a_hat_(n_cells + 2),
-        p_hat_(n_cells + 2) {
+        p_hat_(n_cells + 2),
+        F_1_hat_(n_cells + 1),
+        F_2_hat_(n_cells + 1),
+        F_3_hat_(n_cells + 1) {
 
     mesh_.initial_conditions(a_[0], a_[1], u_[0], u_[1], p_[0], p_[1], x_[0], x_[1], gamma_[0], gamma_[1], discontinuity_);
 
@@ -45,9 +48,10 @@ void GodonovSolverHigherOrder_t<FluxCalculator>::solve() {
         }
 
         flux_calculator_.calculate_fluxes(delta_t, mesh_.gamma_, mesh_.u_, mesh_.a_, mesh_.p_, mesh_.F_1_, mesh_.F_2_, mesh_.F_3_);
-        predictor(delta_t);
+        predictor(delta_t, mesh_.delta_x_, mesh_.gamma_, mesh_.u_, mesh_.a_, mesh_.p_, u_hat_, a_hat_, p_hat_, mesh_.F_1_, mesh_.F_2_, mesh_.F_3_);
 
-        timestep(delta_t);
+        flux_calculator_.calculate_fluxes(delta_t, mesh_.gamma_, u_hat_, a_hat_, p_hat_, F_1_hat_, F_2_hat_, F_3_hat_);
+        corrector(delta_t,delta_t, mesh_.gamma_, mesh_.u_, mesh_.a_, mesh_.p_, mesh_.F_1_, mesh_.F_2_, mesh_.F_3_, F_1_hat_, F_2_hat_, F_3_hat_);
         time += delta_t;
     }
 }
@@ -88,35 +92,35 @@ double GodonovSolverHigherOrder_t<FluxCalculator>::calculate_delta_t() {
 }
 
 template<typename FluxCalculator>
-void GodonovSolverHigherOrder_t<FluxCalculator>::predictor(double delta_t) {
-    for (int i = 1; i <= mesh_.n_cells_; ++i) {
-        const double U_1 = mesh_.gamma_[i] * mesh_.p_[i] /std::pow(mesh_.a_[i], 2);
-        const double U_2 = mesh_.gamma_[i] * mesh_.p_[i] * mesh_.u_[i]/std::pow(mesh_.a_[i], 2);
-        const double U_3 = mesh_.p_[i]/(mesh_.gamma_[i] - 1) + mesh_.gamma_[i] * mesh_.p_[i] * std::pow(mesh_.u_[i], 2) * 0.5/std::pow(mesh_.a_[i], 2);
+void GodonovSolverHigherOrder_t<FluxCalculator>::predictor(double delta_t, double delta_x, const std::vector<double> &gamma, const std::vector<double> &u, const std::vector<double> &a, const std::vector<double> &p, std::vector<double> &u_hat, std::vector<double> &a_hat, std::vector<double> &p_hat, const std::vector<double> F_1, const std::vector<double> F_2, const std::vector<double> F_3) {
+    for (int i = 1; i <= gamma.size() - 2; ++i) {
+        double U_1 = gamma[i] * p[i] /std::pow(a[i], 2);
+        double U_2 = gamma[i] * p[i] * u[i]/std::pow(a[i], 2);
+        double U_3 = p[i]/(gamma[i] - 1) + gamma[i] * p[i] * std::pow(u[i], 2) * 0.5/std::pow(a[i], 2);
 
-        const double U_1_hat = U_1 + delta_t * (mesh_.F_1_[i-1] - mesh_.F_1_[i])/mesh_.delta_x_;
-        const double U_2_hat = U_2 + delta_t * (mesh_.F_2_[i-1] - mesh_.F_2_[i])/mesh_.delta_x_;
-        const double U_3_hat = U_3 + delta_t * (mesh_.F_3_[i-1] - mesh_.F_3_[i])/mesh_.delta_x_;
+        U_1 += delta_t * (F_1[i-1] - F_1[i])/delta_x;
+        U_2 += delta_t * (F_2[i-1] - F_2[i])/delta_x;
+        U_3 += delta_t * (F_3[i-1] - F_3[i])/delta_x;
 
-        u_hat_[i] = U_2_hat/U_1_hat;
-        p_hat_[i] = (mesh_.gamma_[i] - 1) * (U_3_hat - U_2_hat * u_hat_[i] * 0.5);
-        a_hat_[i] = std::sqrt(mesh_.gamma_[i] * p_hat_[i] /U_1_hat); // gamma will never change like this
+        u_hat[i] = U_2/U_1;
+        p_hat[i] = (gamma[i] - 1) * (U_3 - U_2 * u[i] * 0.5);
+        a_hat[i] = std::sqrt(gamma[i] * p[i] /U_1);
     }
 }
 
 template<typename FluxCalculator>
-void GodonovSolverHigherOrder_t<FluxCalculator>::timestep(double delta_t) {
-    for (int i = 1; i <= mesh_.n_cells_; ++i) {
-        double U_1 = mesh_.gamma_[i] * mesh_.p_[i] /std::pow(mesh_.a_[i], 2);
-        double U_2 = mesh_.gamma_[i] * mesh_.p_[i] * mesh_.u_[i]/std::pow(mesh_.a_[i], 2);
-        double U_3 = mesh_.p_[i]/(mesh_.gamma_[i] - 1) + mesh_.gamma_[i] * mesh_.p_[i] * std::pow(mesh_.u_[i], 2) * 0.5/std::pow(mesh_.a_[i], 2);
+void GodonovSolverHigherOrder_t<FluxCalculator>::corrector(double delta_t, double delta_x, const std::vector<double> &gamma, std::vector<double> &u, std::vector<double> &a, std::vector<double> &p, const std::vector<double> F_1, const std::vector<double> F_2, const std::vector<double> F_3, const std::vector<double> F_1_hat, const std::vector<double> F_2_hat, const std::vector<double> F_3_hat) {
+    for (int i = 1; i <= gamma.size() - 2; ++i) {
+        double U_1 = gamma[i] * p[i] /std::pow(a[i], 2);
+        double U_2 = gamma[i] * p[i] * u[i]/std::pow(a[i], 2);
+        double U_3 = p[i]/(gamma[i] - 1) + gamma[i] * p[i] * std::pow(u[i], 2) * 0.5/std::pow(a[i], 2);
 
-        U_1 += delta_t * (mesh_.F_1_[i-1] - mesh_.F_1_[i])/mesh_.delta_x_;
-        U_2 += delta_t * (mesh_.F_2_[i-1] - mesh_.F_2_[i])/mesh_.delta_x_;
-        U_3 += delta_t * (mesh_.F_3_[i-1] - mesh_.F_3_[i])/mesh_.delta_x_;
+        U_1 += 0.5 * delta_t * (F_1[i-1] - F_1[i] + F_1_hat[i-1] - F_1_hat[i])/delta_x;
+        U_2 += 0.5 * delta_t * (F_2[i-1] - F_2[i] + F_2_hat[i-1] - F_2_hat[i])/delta_x;
+        U_3 += 0.5 * delta_t * (F_3[i-1] - F_3[i] + F_3_hat[i-1] - F_3_hat[i])/delta_x;
 
-        mesh_.u_[i] = U_2/U_1;
-        mesh_.p_[i] = (mesh_.gamma_[i] - 1) * (U_3 - U_2 * mesh_.u_[i] * 0.5);
-        mesh_.a_[i] = std::sqrt(mesh_.gamma_[i] * mesh_.p_[i] /U_1);
+        u[i] = U_2/U_1;
+        p[i] = (gamma[i] - 1) * (U_3 - U_2 * u[i] * 0.5);
+        a[i] = std::sqrt(gamma[i] * p[i] /U_1);
     }
 }

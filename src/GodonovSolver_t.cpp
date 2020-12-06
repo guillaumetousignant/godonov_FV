@@ -35,7 +35,7 @@ void GodonovSolver_t<FluxCalculator>::solve() {
         }
 
         flux_calculator_.calculate_fluxes(delta_t, mesh_.gamma_, mesh_.u_, mesh_.a_, mesh_.p_, mesh_.F_1_, mesh_.F_2_, mesh_.F_3_);
-        timestep(delta_t);
+        timestep(delta_t, mesh_.delta_x_, mesh_.gamma_, mesh_.u_, mesh_.a_, mesh_.p_, mesh_.F_1_, mesh_.F_2_, mesh_.F_3_);
         time += delta_t;
     }
 }
@@ -76,18 +76,18 @@ double GodonovSolver_t<FluxCalculator>::calculate_delta_t() {
 }
 
 template<typename FluxCalculator>
-void GodonovSolver_t<FluxCalculator>::timestep(double delta_t) {
-    for (int i = 1; i <= mesh_.n_cells_; ++i) {
-        double U_1 = mesh_.gamma_[i] * mesh_.p_[i] /std::pow(mesh_.a_[i], 2);
-        double U_2 = mesh_.gamma_[i] * mesh_.p_[i] * mesh_.u_[i]/std::pow(mesh_.a_[i], 2);
-        double U_3 = mesh_.p_[i]/(mesh_.gamma_[i] - 1) + mesh_.gamma_[i] * mesh_.p_[i] * std::pow(mesh_.u_[i], 2) * 0.5/std::pow(mesh_.a_[i], 2);
+void GodonovSolver_t<FluxCalculator>::timestep(double delta_t, double delta_x, const std::vector<double> &gamma, std::vector<double> &u, std::vector<double> &a, std::vector<double> &p, const std::vector<double> F_1, const std::vector<double> F_2, const std::vector<double> F_3) {
+    for (int i = 1; i <= gamma.size() - 2; ++i) {
+        double U_1 = gamma[i] * p[i] /std::pow(a[i], 2);
+        double U_2 = gamma[i] * p[i] * u[i]/std::pow(a[i], 2);
+        double U_3 = p[i]/(gamma[i] - 1) + gamma[i] * p[i] * std::pow(u[i], 2) * 0.5/std::pow(a[i], 2);
 
-        U_1 += delta_t * (mesh_.F_1_[i-1] - mesh_.F_1_[i])/mesh_.delta_x_;
-        U_2 += delta_t * (mesh_.F_2_[i-1] - mesh_.F_2_[i])/mesh_.delta_x_;
-        U_3 += delta_t * (mesh_.F_3_[i-1] - mesh_.F_3_[i])/mesh_.delta_x_;
+        U_1 += delta_t * (F_1[i-1] - F_1[i])/delta_x;
+        U_2 += delta_t * (F_2[i-1] - F_2[i])/delta_x;
+        U_3 += delta_t * (F_3[i-1] - F_3[i])/delta_x;
 
-        mesh_.u_[i] = U_2/U_1;
-        mesh_.p_[i] = (mesh_.gamma_[i] - 1) * (U_3 - U_2 * mesh_.u_[i] * 0.5);
-        mesh_.a_[i] = std::sqrt(mesh_.gamma_[i] * mesh_.p_[i] /U_1);
+        u[i] = U_2/U_1;
+        p[i] = (gamma[i] - 1) * (U_3 - U_2 * u[i] * 0.5);
+        a[i] = std::sqrt(gamma[i] * p[i] /U_1);
     }
 }

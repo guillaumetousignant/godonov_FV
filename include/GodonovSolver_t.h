@@ -21,7 +21,7 @@ class GodonovSolver_t final : public Solver_t {
 
     private:
         double calculate_delta_t();
-        void timestep(double delta_t);
+        void timestep(double delta_t, double delta_x, const std::vector<double> &gamma, std::vector<double> &u, std::vector<double> &a, std::vector<double> &p, const std::vector<double> F_1, const std::vector<double> F_2, const std::vector<double> F_3);
 };
 
 #endif
