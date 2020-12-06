@@ -7,7 +7,8 @@ add_library(flow_solver
     Solver_t.cpp
     HLLEFlux_t.cpp
     RoeEntropyFlux_t.cpp
-    RoeFlux_t.cpp)
+    RoeFlux_t.cpp
+    GodonovSolverHigherOrder_t.cpp)
 
 target_include_directories(flow_solver PUBLIC 
     $<INSTALL_INTERFACE:include/flow_solver/>    
