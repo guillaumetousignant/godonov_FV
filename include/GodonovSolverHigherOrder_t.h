@@ -15,12 +15,16 @@ class GodonovSolverHigherOrder_t final : public Solver_t {
         Mesh1D_t mesh_;
         double cfl_;
         FluxCalculator flux_calculator_;
+        std::vector<double> u_hat_;
+        std::vector<double> a_hat_;
+        std::vector<double> p_hat_;
 
         virtual void solve();
         virtual void write_solution(std::string suffix = "");
 
     private:
         double calculate_delta_t();
+        void predictor(double delta_t);
         void timestep(double delta_t);
 };
 

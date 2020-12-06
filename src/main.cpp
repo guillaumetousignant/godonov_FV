@@ -2,15 +2,15 @@
 // Guillaume Tousignant, 0300151859
 // November 27th, 2020
 
-#include <chrono>
-#include <vector>
-#include <iostream>
 #include "ExactSolver_t.h"
 #include "GodonovSolverHigherOrder_t.h"
 #include "ExactRiemannFlux_t.h"
 #include "RoeFlux_t.h"
 #include "RoeEntropyFlux_t.h"
 #include "HLLEFlux_t.h"
+#include <chrono>
+#include <vector>
+#include <iostream>
 
 int main(void) {
     constexpr int n_problems = 4;

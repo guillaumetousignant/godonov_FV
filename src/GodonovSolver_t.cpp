@@ -34,7 +34,7 @@ void GodonovSolver_t<FluxCalculator>::solve() {
             delta_t = end_time_ - time;
         }
 
-        flux_calculator_.calculate_fluxes(mesh_, delta_t);
+        flux_calculator_.calculate_fluxes(delta_t, mesh_.gamma_, mesh_.u_, mesh_.a_, mesh_.p_, mesh_.F_1_, mesh_.F_2_, mesh_.F_3_);
         timestep(delta_t);
         time += delta_t;
     }
