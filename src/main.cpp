@@ -2,12 +2,7 @@
 // Guillaume Tousignant, 0300151859
 // November 27th, 2020
 
-#include "solvers/ExactSolver_t.h"
-#include "solvers/GodonovSolverHigherOrder_t.h"
-#include "fluxes/ExactRiemannFlux_t.h"
-#include "fluxes/RoeFlux_t.h"
-#include "fluxes/RoeEntropyFlux_t.h"
-#include "fluxes/HLLEFlux_t.h"
+#include "FVM.h"
 #include <chrono>
 #include <vector>
 #include <iostream>
