@@ -12,17 +12,18 @@ using FVM::Fluxes::RoeFlux_t;
 using FVM::Fluxes::RoeEntropyFlux_t;
 using FVM::Fluxes::HLLEFlux_t;
 
-template class GodonovSolverHigherOrder_t<ExactRiemannFlux_t>; // Like, I understand why I need this, but man is it crap.
+/*template class GodonovSolverHigherOrder_t<ExactRiemannFlux_t>; // Like, I understand why I need this, but man is it crap.
 template class GodonovSolverHigherOrder_t<RoeFlux_t>;
 template class GodonovSolverHigherOrder_t<RoeEntropyFlux_t>;
-template class GodonovSolverHigherOrder_t<HLLEFlux_t>;
+template class GodonovSolverHigherOrder_t<HLLEFlux_t>;*/
 
-template<typename FluxCalculator>
-GodonovSolverHigherOrder_t<FluxCalculator>::GodonovSolverHigherOrder_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double x_L, double x_R, double time, double discontinuity, int n_points, int n_cells, int problem_number, double cfl) :
+template<typename FluxCalculator, typename FluxLimiter>
+GodonovSolverHigherOrder_t<FluxCalculator, FluxLimiter>::GodonovSolverHigherOrder_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double x_L, double x_R, double time, double discontinuity, int n_points, int n_cells, int problem_number, double cfl) :
         Solver_t(rho_L, rho_R, u_L, u_R, p_L, p_R, x_L, x_R, time, discontinuity, n_points, problem_number),
         mesh_(n_cells, (x_[1] - x_[0])/n_cells),
         cfl_(cfl),
         flux_calculator_(),
+        flux_limiter_(),
         u_hat_(n_cells + 2),
         a_hat_(n_cells + 2),
         p_hat_(n_cells + 2),
@@ -40,11 +41,11 @@ GodonovSolverHigherOrder_t<FluxCalculator>::GodonovSolverHigherOrder_t(double rh
     p_hat_[n_cells + 1] = mesh_.p_[n_cells + 1];
 }
 
-template<typename FluxCalculator>
-GodonovSolverHigherOrder_t<FluxCalculator>::~GodonovSolverHigherOrder_t() {}
+template<typename FluxCalculator, typename FluxLimiter>
+GodonovSolverHigherOrder_t<FluxCalculator, FluxLimiter>::~GodonovSolverHigherOrder_t() {}
 
-template<typename FluxCalculator>
-void GodonovSolverHigherOrder_t<FluxCalculator>::solve() {
+template<typename FluxCalculator, typename FluxLimiter>
+void GodonovSolverHigherOrder_t<FluxCalculator, FluxLimiter>::solve() {
     double time = 0.0;
 
     while (time < end_time_) {
@@ -62,8 +63,8 @@ void GodonovSolverHigherOrder_t<FluxCalculator>::solve() {
     }
 }
 
-template<typename FluxCalculator>
-void GodonovSolverHigherOrder_t<FluxCalculator>::write_solution(std::string suffix /* = "" */) {
+template<typename FluxCalculator, typename FluxLimiter>
+void GodonovSolverHigherOrder_t<FluxCalculator, FluxLimiter>::write_solution(std::string suffix /* = "" */) {
     std::vector<double> x(n_points_ * mesh_.n_cells_);
     std::vector<double> rho(n_points_ * mesh_.n_cells_);
     std::vector<double> u(n_points_ * mesh_.n_cells_);
@@ -87,8 +88,8 @@ void GodonovSolverHigherOrder_t<FluxCalculator>::write_solution(std::string suff
     write_file_data(n_points_ * mesh_.n_cells_, end_time_, rho, u, p, x, mach, T, problem_number_, suffix, mesh_.n_cells_);
 }
 
-template<typename FluxCalculator>
-double GodonovSolverHigherOrder_t<FluxCalculator>::calculate_delta_t() {
+template<typename FluxCalculator, typename FluxLimiter>
+double GodonovSolverHigherOrder_t<FluxCalculator, FluxLimiter>::calculate_delta_t() {
     // Will have to do a reduce on a gpu?
     double max_u = 0.0;
     for (int i = 1; i <= mesh_.n_cells_; ++i) {
@@ -97,8 +98,8 @@ double GodonovSolverHigherOrder_t<FluxCalculator>::calculate_delta_t() {
     return cfl_ * mesh_.delta_x_/max_u;
 }
 
-template<typename FluxCalculator>
-void GodonovSolverHigherOrder_t<FluxCalculator>::predictor(double delta_t, double delta_x, const std::vector<double> &gamma, const std::vector<double> &u, const std::vector<double> &a, const std::vector<double> &p, std::vector<double> &u_hat, std::vector<double> &a_hat, std::vector<double> &p_hat, const std::vector<double> F_1, const std::vector<double> F_2, const std::vector<double> F_3) {
+template<typename FluxCalculator, typename FluxLimiter>
+void GodonovSolverHigherOrder_t<FluxCalculator, FluxLimiter>::predictor(double delta_t, double delta_x, const std::vector<double> &gamma, const std::vector<double> &u, const std::vector<double> &a, const std::vector<double> &p, std::vector<double> &u_hat, std::vector<double> &a_hat, std::vector<double> &p_hat, const std::vector<double> F_1, const std::vector<double> F_2, const std::vector<double> F_3) {
     for (int i = 1; i <= gamma.size() - 2; ++i) {
         double U_1 = gamma[i] * p[i] /std::pow(a[i], 2);
         double U_2 = gamma[i] * p[i] * u[i]/std::pow(a[i], 2);
@@ -114,8 +115,8 @@ void GodonovSolverHigherOrder_t<FluxCalculator>::predictor(double delta_t, doubl
     }
 }
 
-template<typename FluxCalculator>
-void GodonovSolverHigherOrder_t<FluxCalculator>::corrector(double delta_t, double delta_x, const std::vector<double> &gamma, std::vector<double> &u, std::vector<double> &a, std::vector<double> &p, const std::vector<double> F_1, const std::vector<double> F_2, const std::vector<double> F_3, const std::vector<double> F_1_hat, const std::vector<double> F_2_hat, const std::vector<double> F_3_hat) {
+template<typename FluxCalculator, typename FluxLimiter>
+void GodonovSolverHigherOrder_t<FluxCalculator, FluxLimiter>::corrector(double delta_t, double delta_x, const std::vector<double> &gamma, std::vector<double> &u, std::vector<double> &a, std::vector<double> &p, const std::vector<double> F_1, const std::vector<double> F_2, const std::vector<double> F_3, const std::vector<double> F_1_hat, const std::vector<double> F_2_hat, const std::vector<double> F_3_hat) {
     #pragma omp parallel for schedule(guided)
     for (int i = 1; i <= gamma.size() - 2; ++i) {
         double U_1 = gamma[i] * p[i] /std::pow(a[i], 2);

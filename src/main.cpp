@@ -14,6 +14,10 @@ using FVM::Fluxes::ExactRiemannFlux_t;
 using FVM::Fluxes::RoeFlux_t;
 using FVM::Fluxes::RoeEntropyFlux_t;
 using FVM::Fluxes::HLLEFlux_t;
+using FVM::Limiters::MinmodLimiter_t;
+using FVM::Limiters::SuperbeeLimiter_t;
+using FVM::Limiters::VanAlbadaLimiter_t;
+using FVM::Limiters::VanLeerLimiter_t;
 
 int main(void) {
     constexpr int n_problems = 4;
@@ -58,10 +62,10 @@ int main(void) {
                                  {0.0, 10.0}};
     
     std::vector<ExactSolver_t> exact_solution;
-    std::vector<GodonovSolverHigherOrder_t<ExactRiemannFlux_t>> riemann_solution;
-    std::vector<GodonovSolverHigherOrder_t<RoeFlux_t>> roe_solution;
-    std::vector<GodonovSolverHigherOrder_t<RoeEntropyFlux_t>> roe_entropy_solution;
-    std::vector<GodonovSolverHigherOrder_t<HLLEFlux_t>> hlle_solution;
+    std::vector<GodonovSolverHigherOrder_t<ExactRiemannFlux_t, VanAlbadaLimiter_t>> riemann_solution;
+    std::vector<GodonovSolverHigherOrder_t<RoeFlux_t, VanAlbadaLimiter_t>> roe_solution;
+    std::vector<GodonovSolverHigherOrder_t<RoeEntropyFlux_t, VanAlbadaLimiter_t>> roe_entropy_solution;
+    std::vector<GodonovSolverHigherOrder_t<HLLEFlux_t, VanAlbadaLimiter_t>> hlle_solution;
     exact_solution.reserve(n_problems);
     riemann_solution.reserve(n_problems * n_resolutions);
     roe_solution.reserve(n_problems * n_resolutions);
@@ -71,10 +75,10 @@ int main(void) {
     for (int i = 0; i < n_problems; ++i) {
         exact_solution.push_back(ExactSolver_t(rho[i][0], rho[i][1], u[i][0], u[i][1], p[i][0], p[i][1], x_span[i][0], x_span[i][1], end_time[i], discontinuity[i], n_points_exact, i + 1));
         for (int j = 0; j < n_resolutions; ++j) {
-            riemann_solution.push_back(GodonovSolverHigherOrder_t<ExactRiemannFlux_t>(rho[i][0], rho[i][1], u[i][0], u[i][1], p[i][0], p[i][1], x_span[i][0], x_span[i][1], end_time[i], discontinuity[i], n_points, n_cells[j], i + 1, cfl));
-            roe_solution.push_back(GodonovSolverHigherOrder_t<RoeFlux_t>(rho[i][0], rho[i][1], u[i][0], u[i][1], p[i][0], p[i][1], x_span[i][0], x_span[i][1], end_time[i], discontinuity[i], n_points, n_cells[j], i + 1, cfl));
-            roe_entropy_solution.push_back(GodonovSolverHigherOrder_t<RoeEntropyFlux_t>(rho[i][0], rho[i][1], u[i][0], u[i][1], p[i][0], p[i][1], x_span[i][0], x_span[i][1], end_time[i], discontinuity[i], n_points, n_cells[j], i + 1, cfl));
-            hlle_solution.push_back(GodonovSolverHigherOrder_t<HLLEFlux_t>(rho[i][0], rho[i][1], u[i][0], u[i][1], p[i][0], p[i][1], x_span[i][0], x_span[i][1], end_time[i], discontinuity[i], n_points, n_cells[j], i + 1, cfl));
+            riemann_solution.push_back(GodonovSolverHigherOrder_t<ExactRiemannFlux_t, VanAlbadaLimiter_t>(rho[i][0], rho[i][1], u[i][0], u[i][1], p[i][0], p[i][1], x_span[i][0], x_span[i][1], end_time[i], discontinuity[i], n_points, n_cells[j], i + 1, cfl));
+            roe_solution.push_back(GodonovSolverHigherOrder_t<RoeFlux_t, VanAlbadaLimiter_t>(rho[i][0], rho[i][1], u[i][0], u[i][1], p[i][0], p[i][1], x_span[i][0], x_span[i][1], end_time[i], discontinuity[i], n_points, n_cells[j], i + 1, cfl));
+            roe_entropy_solution.push_back(GodonovSolverHigherOrder_t<RoeEntropyFlux_t, VanAlbadaLimiter_t>(rho[i][0], rho[i][1], u[i][0], u[i][1], p[i][0], p[i][1], x_span[i][0], x_span[i][1], end_time[i], discontinuity[i], n_points, n_cells[j], i + 1, cfl));
+            hlle_solution.push_back(GodonovSolverHigherOrder_t<HLLEFlux_t, VanAlbadaLimiter_t>(rho[i][0], rho[i][1], u[i][0], u[i][1], p[i][0], p[i][1], x_span[i][0], x_span[i][1], end_time[i], discontinuity[i], n_points, n_cells[j], i + 1, cfl));
         }
     }
 

@@ -7,7 +7,7 @@
 #include <string>
 
 namespace FVM { namespace Solvers {
-    template<typename FluxCalculator>
+    template<typename FluxCalculator, typename FluxLimiter>
     class GodonovSolverHigherOrder_t final : public FVM::Entities::Solver_t { 
         public: 
             GodonovSolverHigherOrder_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double x_L, double x_R, double time, double discontinuity, int n_points, int n_cells, int problem_number, double cfl);
@@ -16,6 +16,7 @@ namespace FVM { namespace Solvers {
             FVM::Entities::Mesh1D_t mesh_;
             double cfl_;
             FluxCalculator flux_calculator_;
+            FluxLimiter flux_limiter_;
             std::vector<double> u_hat_;
             std::vector<double> a_hat_;
             std::vector<double> p_hat_;
