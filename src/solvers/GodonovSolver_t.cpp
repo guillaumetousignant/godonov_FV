@@ -83,6 +83,7 @@ double GodonovSolver_t<FluxCalculator>::calculate_delta_t() {
 
 template<typename FluxCalculator>
 void GodonovSolver_t<FluxCalculator>::timestep(double delta_t, double delta_x, const std::vector<double> &gamma, std::vector<double> &u, std::vector<double> &a, std::vector<double> &p, const std::vector<double> F_1, const std::vector<double> F_2, const std::vector<double> F_3) {
+    #pragma omp parallel for schedule(guided)
     for (int i = 1; i <= gamma.size() - 2; ++i) {
         double U_1 = gamma[i] * p[i] /std::pow(a[i], 2);
         double U_2 = gamma[i] * p[i] * u[i]/std::pow(a[i], 2);

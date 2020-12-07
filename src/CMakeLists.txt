@@ -14,6 +14,11 @@ if(NOT ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug"))
     set_property(TARGET FVM PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
 endif()
 
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(FVM PUBLIC optimized OpenMP::OpenMP_CXX)
+endif()
+
 install(TARGETS FVM 
     EXPORT FVM-export
     DESTINATION lib)

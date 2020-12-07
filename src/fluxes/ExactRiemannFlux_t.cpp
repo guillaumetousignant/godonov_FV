@@ -16,6 +16,7 @@ FVM::Fluxes::ExactRiemannFlux_t::ExactRiemannFlux_t(int n_faces) :
 FVM::Fluxes::ExactRiemannFlux_t::~ExactRiemannFlux_t() {}
 
 void FVM::Fluxes::ExactRiemannFlux_t::calculate_fluxes(double delta_t, const std::vector<double> &gamma, const std::vector<double> &u, const std::vector<double> &a, const std::vector<double> &p, std::vector<double> &F_1, std::vector<double> &F_2, std::vector<double> &F_3) {
+    #pragma omp parallel for schedule(guided)
     for (int i = 0; i < F_1.size(); ++i) {
         u_star_[i] = FVM::RiemannProblem::u_star_initial_guess(a[i], a[i+1], u[i], u[i+1], p[i], p[i+1], gamma[i], gamma[i+1]);
         C_L_[i] = FVM::RiemannProblem::calculate_C(a[i], p[i], gamma[i]);
