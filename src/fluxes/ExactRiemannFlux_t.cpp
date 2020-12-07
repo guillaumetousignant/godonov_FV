@@ -1,5 +1,5 @@
-#include "ExactRiemannFlux_t.h"
-#include "RiemannProblem.h"
+#include "fluxes/ExactRiemannFlux_t.h"
+#include "functions/RiemannProblem.h"
 #include <cmath>
 
 ExactRiemannFlux_t::ExactRiemannFlux_t(int n_faces) :

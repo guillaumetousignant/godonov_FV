@@ -1,7 +1,7 @@
 #ifndef EXACTRIEMANNFLUX_T_H
 #define EXACTRIEMANNFLUX_T_H
 
-#include "FluxCalculator_t.h"
+#include "entities/FluxCalculator_t.h"
 #include <vector>
 
 class ExactRiemannFlux_t final : public FluxCalculator_t { 

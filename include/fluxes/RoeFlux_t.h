@@ -1,13 +1,13 @@
-#ifndef ROEENTROPYFLUX_T_H
-#define ROEENTROPYFLUX_T_H
+#ifndef ROEFLUX_T_H
+#define ROEFLUX_T_H
 
-#include "FluxCalculator_t.h"
+#include "entities/FluxCalculator_t.h"
 #include <vector>
 
-class RoeEntropyFlux_t final : public FluxCalculator_t { 
+class RoeFlux_t final : public FluxCalculator_t { 
     public: 
-        RoeEntropyFlux_t(int n_faces);
-        virtual ~RoeEntropyFlux_t();
+        RoeFlux_t(int n_faces);
+        virtual ~RoeFlux_t();
 
         void invert_matrix(const double (&input)[9], double (&output)[9]);
         void multiply_matrix(const double (&left)[9], const double (&right)[9], double (&result)[9]);

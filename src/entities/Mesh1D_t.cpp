@@ -1,4 +1,4 @@
-#include "Mesh1D_t.h"
+#include "entities/Mesh1D_t.h"
 
 Mesh1D_t::Mesh1D_t(int n_cells, double delta_x) :
         n_cells_(n_cells),

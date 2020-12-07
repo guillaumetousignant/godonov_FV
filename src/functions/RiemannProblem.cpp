@@ -1,4 +1,4 @@
-#include "RiemannProblem.h"
+#include "functions/RiemannProblem.h"
 #include <cmath>
 #include <limits>
 

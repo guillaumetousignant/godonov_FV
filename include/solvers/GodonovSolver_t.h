@@ -1,8 +1,8 @@
 #ifndef GODONOVSOLVER_T_H
 #define GODONOVSOLVER_T_H
 
-#include "Solver_t.h"
-#include "Mesh1D_t.h"
+#include "entities/Solver_t.h"
+#include "entities/Mesh1D_t.h"
 #include <vector>
 #include <string>
 

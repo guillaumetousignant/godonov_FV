@@ -1,7 +1,7 @@
 #ifndef EXACTSOLVER_T_H
 #define EXACTSOLVER_T_H
 
-#include "Solver_t.h"
+#include "entities/Solver_t.h"
 #include <vector>
 #include <string>
 
