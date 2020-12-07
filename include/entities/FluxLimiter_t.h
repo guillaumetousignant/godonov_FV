@@ -1,5 +1,5 @@
-#ifndef FLUXLIMITER_T_H
-#define FLUXLIMITER_T_H
+#ifndef FVM_FLUXLIMITER_T_H
+#define FVM_FLUXLIMITER_T_H
 
 #include <vector>
 

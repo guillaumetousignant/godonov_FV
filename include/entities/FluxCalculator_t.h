@@ -1,5 +1,5 @@
-#ifndef FLUXCALCULATOR_T_H
-#define FLUXCALCULATOR_T_H
+#ifndef FVM_FLUXCALCULATOR_T_H
+#define FVM_FLUXCALCULATOR_T_H
 
 #include <vector>
 

@@ -1,5 +1,5 @@
-#ifndef EXACTRIEMANNFLUX_T_H
-#define EXACTRIEMANNFLUX_T_H
+#ifndef FVM_EXACTRIEMANNFLUX_T_H
+#define FVM_EXACTRIEMANNFLUX_T_H
 
 #include "entities/FluxCalculator_t.h"
 #include <vector>

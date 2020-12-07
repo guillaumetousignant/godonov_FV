@@ -1,5 +1,5 @@
-#ifndef MESH1D_T_H
-#define MESH1D_T_H
+#ifndef FVM_MESH1D_T_H
+#define FVM_MESH1D_T_H
 
 #include <vector>
 

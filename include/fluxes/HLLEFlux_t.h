@@ -1,5 +1,5 @@
-#ifndef HLLEFLUX_T_H
-#define HLLEFLUX_T_H
+#ifndef FVM_HLLEFLUX_T_H
+#define FVM_HLLEFLUX_T_H
 
 #include "entities/FluxCalculator_t.h"
 #include <vector>

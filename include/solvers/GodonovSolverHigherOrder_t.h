@@ -1,5 +1,5 @@
-#ifndef GODONOVSOLVERHIGHERORDER_T_H
-#define GODONOVSOLVERHIGHERORDER_T_H
+#ifndef FVM_GODONOVSOLVERHIGHERORDER_T_H
+#define FVM_GODONOVSOLVERHIGHERORDER_T_H
 
 #include "entities/Solver_t.h"
 #include "entities/Mesh1D_t.h"

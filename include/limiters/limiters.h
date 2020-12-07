@@ -1,5 +1,5 @@
-#ifndef LIMITERS_H
-#define LIMITERS_H
+#ifndef FVM_LIMITERS_H
+#define FVM_LIMITERS_H
 
 namespace FVM { 
     /**

@@ -1,5 +1,5 @@
-#ifndef SOLVERS_H
-#define SOLVERS_H
+#ifndef FVM_SOLVERS_H
+#define FVM_SOLVERS_H
 
 namespace FVM { 
     /**

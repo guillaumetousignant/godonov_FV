@@ -1,5 +1,5 @@
-#ifndef ROEENTROPYFLUX_T_H
-#define ROEENTROPYFLUX_T_H
+#ifndef FVM_ROEENTROPYFLUX_T_H
+#define FVM_ROEENTROPYFLUX_T_H
 
 #include "entities/FluxCalculator_t.h"
 #include <vector>

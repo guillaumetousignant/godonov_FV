@@ -1,5 +1,5 @@
-#ifndef ENTITIES_H
-#define ENTITIES_H
+#ifndef FVM_ENTITIES_H
+#define FVM_ENTITIES_H
 
 namespace FVM { 
     /**

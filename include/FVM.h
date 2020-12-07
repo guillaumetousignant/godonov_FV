@@ -1,5 +1,5 @@
-#ifndef FVM_H
-#define FVM_H
+#ifndef FVM_FVM_H
+#define FVM_FVM_H
 
 /**
  * @brief Contains all the objects and functions of the library.

@@ -1,5 +1,5 @@
-#ifndef SOLVER_T_H
-#define SOLVER_T_H
+#ifndef FVM_SOLVER_T_H
+#define FVM_SOLVER_T_H
 
 #include <vector>
 #include <string>

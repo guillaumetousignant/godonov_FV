@@ -1,5 +1,5 @@
-#ifndef FLUXES_H
-#define FLUXES_H
+#ifndef FVM_FLUXES_H
+#define FVM_FLUXES_H
 
 namespace FVM { 
     /**

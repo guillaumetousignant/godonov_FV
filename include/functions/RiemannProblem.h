@@ -1,5 +1,5 @@
-#ifndef RIEMANNPROBLEM_H
-#define RIEMANNPROBLEM_H
+#ifndef FVM_RIEMANNPROBLEM_H
+#define FVM_RIEMANNPROBLEM_H
 
 namespace RiemannProblem {
     double u_star_initial_guess(double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double gamma_L, double gamma_R);
