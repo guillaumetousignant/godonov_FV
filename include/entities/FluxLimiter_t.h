@@ -9,7 +9,7 @@ namespace FVM { namespace Entities {
             FluxLimiter_t() {};
             virtual ~FluxLimiter_t() {};
 
-            virtual void phi(double a, double b) = 0;
+            virtual double phi(double a, double b) = 0;
     };
 }}
 #endif

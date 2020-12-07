@@ -9,7 +9,7 @@ namespace FVM { namespace Limiters {
             VanAlbadaLimiter_t();
             virtual ~VanAlbadaLimiter_t();
 
-            virtual void phi(double a, double b);
+            virtual double phi(double a, double b);
     };
 }}
 #endif

@@ -4,6 +4,7 @@ FVM::Limiters::VanLeerLimiter_t::VanLeerLimiter_t() {}
 
 FVM::Limiters::VanLeerLimiter_t::~VanLeerLimiter_t() {}
 
-void FVM::Limiters::VanLeerLimiter_t::phi(double a, double b) {
-
+double FVM::Limiters::VanLeerLimiter_t::phi(double a, double b) {
+    constexpr double epsilon = 1.0e-16;
+    return (std::abs(a * b) + a * b)/(a + b + epsilon);
 }

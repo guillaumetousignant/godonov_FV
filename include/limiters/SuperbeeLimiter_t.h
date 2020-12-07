@@ -9,7 +9,7 @@ namespace FVM { namespace Limiters {
             SuperbeeLimiter_t();
             virtual ~SuperbeeLimiter_t();
 
-            virtual void phi(double a, double b);
+            virtual double phi(double a, double b);
     };
 }}
 #endif

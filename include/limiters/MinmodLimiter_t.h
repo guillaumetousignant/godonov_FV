@@ -9,7 +9,7 @@ namespace FVM { namespace Limiters {
             MinmodLimiter_t();
             virtual ~MinmodLimiter_t();
 
-            virtual void phi(double a, double b);
+            virtual double phi(double a, double b);
     };
 }}
 #endif

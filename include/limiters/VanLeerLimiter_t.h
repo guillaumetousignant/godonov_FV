@@ -9,7 +9,7 @@ namespace FVM { namespace Limiters {
             VanLeerLimiter_t();
             virtual ~VanLeerLimiter_t();
 
-            virtual void phi(double a, double b);
+            virtual double phi(double a, double b);
     };
 }}
 #endif
