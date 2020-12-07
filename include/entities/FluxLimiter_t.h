@@ -3,12 +3,13 @@
 
 #include <vector>
 
-class FluxLimiter_t { 
-    public: 
-        FluxLimiter_t() {};
-        virtual ~FluxLimiter_t() {};
+namespace FVM { namespace Entities {
+    class FluxLimiter_t { 
+        public: 
+            FluxLimiter_t() {};
+            virtual ~FluxLimiter_t() {};
 
-        virtual void phi(double a, double b) = 0;
-};
-
+            virtual void phi(double a, double b) = 0;
+    };
+}}
 #endif

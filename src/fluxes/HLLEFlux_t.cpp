@@ -2,11 +2,11 @@
 #include <cmath>
 #include <algorithm>
 
-HLLEFlux_t::HLLEFlux_t(int n_faces) {}
+FVM::Fluxes::HLLEFlux_t::HLLEFlux_t(int n_faces) {}
 
-HLLEFlux_t::~HLLEFlux_t() {}
+FVM::Fluxes::HLLEFlux_t::~HLLEFlux_t() {}
 
-void HLLEFlux_t::calculate_fluxes(double delta_t, const std::vector<double> &gamma, const std::vector<double> &u, const std::vector<double> &a, const std::vector<double> &p, std::vector<double> &F_1, std::vector<double> &F_2, std::vector<double> &F_3) {
+void FVM::Fluxes::HLLEFlux_t::calculate_fluxes(double delta_t, const std::vector<double> &gamma, const std::vector<double> &u, const std::vector<double> &a, const std::vector<double> &p, std::vector<double> &F_1, std::vector<double> &F_2, std::vector<double> &F_3) {
     for (int i = 0; i < F_1.size(); ++i) {
         // This would be all better if I stored those in the mesh, but that would not be drop-in replacable with the Riemann problem fluxes.
         const double F_1_L = gamma[i] * p[i] * u[i] /(std::pow(a[i], 2)); // Those should probably be cached somewhere, they are computed twice.

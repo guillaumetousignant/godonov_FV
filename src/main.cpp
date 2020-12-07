@@ -7,6 +7,14 @@
 #include <vector>
 #include <iostream>
 
+using FVM::Solvers::ExactSolver_t;
+using FVM::Solvers::GodonovSolver_t;
+using FVM::Solvers::GodonovSolverHigherOrder_t;
+using FVM::Fluxes::ExactRiemannFlux_t;
+using FVM::Fluxes::RoeFlux_t;
+using FVM::Fluxes::RoeEntropyFlux_t;
+using FVM::Fluxes::HLLEFlux_t;
+
 int main(void) {
     constexpr int n_problems = 4;
     constexpr int n_resolutions = 4;

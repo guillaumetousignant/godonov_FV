@@ -2,7 +2,7 @@
 #include <cmath>
 #include <limits>
 
-double RiemannProblem::u_star_initial_guess(double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double gamma_L, double gamma_R) {
+double FVM::RiemannProblem::u_star_initial_guess(double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double gamma_L, double gamma_R) {
     const double u_hat_L = u_L + a_L * 2.0/(gamma_L - 1.0);
     const double u_hat_R = u_R - a_R * 2.0/(gamma_R - 1.0);
     const double sigma = (p_L >= p_R) ? gamma_L : gamma_R;
@@ -11,11 +11,11 @@ double RiemannProblem::u_star_initial_guess(double a_L, double a_R, double u_L, 
     return (u_hat_L * z + u_hat_R)/(1.0 + z);
 }
 
-double RiemannProblem::calculate_C(double a, double p, double gamma) {
+double FVM::RiemannProblem::calculate_C(double a, double p, double gamma) {
     return gamma * p/a;
 }
 
-void RiemannProblem::calculate_a_star(double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double gamma_L, double gamma_R, double u_star, double &a_star_L, double &a_star_R, double p_star_L, double p_star_R) {
+void FVM::RiemannProblem::calculate_a_star(double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double gamma_L, double gamma_R, double u_star, double &a_star_L, double &a_star_R, double p_star_L, double p_star_R) {
     if (u_star <= u_L) { // left shock
         a_star_L = a_L * std::sqrt(((gamma_L + 1.0) + (gamma_L - 1.0) * p_star_L/p_L) / ((gamma_L + 1.0) + (gamma_L - 1.0) * p_L/p_star_L));
     }
@@ -31,33 +31,33 @@ void RiemannProblem::calculate_a_star(double a_L, double a_R, double u_L, double
     }
 }
 
-void RiemannProblem::left_shock(double a_L, double u_L, double p_L, double gamma_L, double C_L, double u_star, double &p_star_L, double &p_star_prime_L) {
+void FVM::RiemannProblem::left_shock(double a_L, double u_L, double p_L, double gamma_L, double C_L, double u_star, double &p_star_L, double &p_star_prime_L) {
     const double W = 0.25 * (gamma_L + 1.0) * (u_star - u_L) /a_L - std::sqrt(1.0 + std::pow(0.25 * (gamma_L + 1.0) * (u_star - u_L) /a_L, 2));
 
     p_star_L = p_L + C_L * (u_star - u_L) * W;
     p_star_prime_L = 2.0 * C_L * std::pow(W, 3) / (1.0 + std::pow(W, 2));
 }
 
-void RiemannProblem::right_shock(double a_R, double u_R, double p_R, double gamma_R, double C_R, double u_star, double &p_star_R, double &p_star_prime_R) {
+void FVM::RiemannProblem::right_shock(double a_R, double u_R, double p_R, double gamma_R, double C_R, double u_star, double &p_star_R, double &p_star_prime_R) {
     const double W = 0.25 * (gamma_R + 1.0) * (u_star - u_R) /a_R + std::sqrt(1.0 + std::pow(0.25 * (gamma_R + 1.0) * (u_star - u_R) /a_R, 2));
 
     p_star_R = p_R + C_R * (u_star - u_R) * W;
     p_star_prime_R = 2.0 * C_R * std::pow(W, 3) / (1.0 + std::pow(W, 2));
 }
 
-void RiemannProblem::left_rarefaction(double a_L, double u_L, double p_L, double gamma_L, double u_star, double &a_star_L, double &p_star_L, double &p_star_prime_L) {
+void FVM::RiemannProblem::left_rarefaction(double a_L, double u_L, double p_L, double gamma_L, double u_star, double &a_star_L, double &p_star_L, double &p_star_prime_L) {
     a_star_L = a_L - 0.5 * (gamma_L - 1.0) * (u_star - u_L);
     p_star_L = p_L * std::pow(a_star_L/a_L, 2 * gamma_L / (gamma_L - 1.0));
     p_star_prime_L = -gamma_L * p_star_L / a_star_L;
 }
 
-void RiemannProblem::right_rarefaction(double a_R, double u_R, double p_R, double gamma_R, double u_star, double &a_star_R, double &p_star_R, double &p_star_prime_R) {
+void FVM::RiemannProblem::right_rarefaction(double a_R, double u_R, double p_R, double gamma_R, double u_star, double &a_star_R, double &p_star_R, double &p_star_prime_R) {
     a_star_R = a_R + 0.5 * (gamma_R - 1.0) * (u_star - u_R);
     p_star_R = p_R * std::pow(a_star_R/a_R, 2 * gamma_R / (gamma_R - 1.0));
     p_star_prime_R = gamma_R * p_star_R / a_star_R;
 }
 
-void RiemannProblem::solve_flux(double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double gamma_L, double gamma_R, double C_L, double C_R, double &u_star, double &a_star_L, double &a_star_R, double &p_star_L, double &p_star_R, double &p_star_prime_L, double &p_star_prime_R) {
+void FVM::RiemannProblem::solve_flux(double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double gamma_L, double gamma_R, double C_L, double C_R, double &u_star, double &a_star_L, double &a_star_R, double &p_star_L, double &p_star_R, double &p_star_prime_L, double &p_star_prime_R) {
     constexpr double epsilon = 1.0e-6;
     double error = std::numeric_limits<double>::infinity();
     
@@ -71,7 +71,7 @@ void RiemannProblem::solve_flux(double a_L, double a_R, double u_L, double u_R, 
     while (std::abs(1.0 - p_star_L/p_star_R) >= epsilon);
 }
 
-void RiemannProblem::get_boundary_state(double &a_face, double &u_face, double &p_face, double &gamma_face, double delta_t, double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double gamma_L, double gamma_R, double u_star, double a_star_L, double a_star_R, double p_star_L, double p_star_R) {
+void FVM::RiemannProblem::get_boundary_state(double &a_face, double &u_face, double &p_face, double &gamma_face, double delta_t, double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double gamma_L, double gamma_R, double u_star, double a_star_L, double a_star_R, double p_star_L, double p_star_R) {
     double wave_speed[4]; // {left_start, left_end, right_start, right_end}
 
     if (u_star <= u_L) { // left shock

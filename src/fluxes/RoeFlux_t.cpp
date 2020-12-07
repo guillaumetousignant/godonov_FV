@@ -1,11 +1,11 @@
 #include "fluxes/RoeFlux_t.h"
 #include <cmath>
 
-RoeFlux_t::RoeFlux_t(int n_faces) {}
+FVM::Fluxes::RoeFlux_t::RoeFlux_t(int n_faces) {}
 
-RoeFlux_t::~RoeFlux_t() {}
+FVM::Fluxes::RoeFlux_t::~RoeFlux_t() {}
 
-void RoeFlux_t::invert_matrix(const double (&input)[9], double (&output)[9]) {
+void FVM::Fluxes::RoeFlux_t::invert_matrix(const double (&input)[9], double (&output)[9]) {
     const double invdet = 1/(input[0] * (input[4] * input[8] - input[7] * input[5]) -
                              input[1] * (input[3] * input[8] - input[5] * input[6]) +
                              input[2] * (input[3] * input[7] - input[4] * input[6]));
@@ -21,7 +21,7 @@ void RoeFlux_t::invert_matrix(const double (&input)[9], double (&output)[9]) {
     output[8] = (input[0] * input[4] - input[3] * input[1]) * invdet;
 }
 
-void RoeFlux_t::multiply_matrix(const double (&left)[9], const double (&right)[9], double (&result)[9]) { // What do you mean loops
+void FVM::Fluxes::RoeFlux_t::multiply_matrix(const double (&left)[9], const double (&right)[9], double (&result)[9]) { // What do you mean loops
     result[0] = left[0] * right[0] + left[1] * right[3] + left[2] * right[6];
     result[1] = left[0] * right[1] + left[1] * right[4] + left[2] * right[7];
     result[2] = left[0] * right[2] + left[1] * right[5] + left[2] * right[8];
@@ -33,7 +33,7 @@ void RoeFlux_t::multiply_matrix(const double (&left)[9], const double (&right)[9
     result[8] = left[6] * right[2] + left[7] * right[5] + left[8] * right[8];
 }
 
-void RoeFlux_t::calculate_fluxes(double delta_t, const std::vector<double> &gamma, const std::vector<double> &u, const std::vector<double> &a, const std::vector<double> &p, std::vector<double> &F_1, std::vector<double> &F_2, std::vector<double> &F_3) {
+void FVM::Fluxes::RoeFlux_t::calculate_fluxes(double delta_t, const std::vector<double> &gamma, const std::vector<double> &u, const std::vector<double> &a, const std::vector<double> &p, std::vector<double> &F_1, std::vector<double> &F_2, std::vector<double> &F_3) {
     for (int i = 0; i < F_1.size(); ++i) {
         // This would be all better if I stored those in the mesh, but that would not be drop-in replacable with the Riemann problem fluxes.
         const double F_1_L = gamma[i] * p[i] * u[i] /(std::pow(a[i], 2)); // Those should probably be cached somewhere, they are computed twice.

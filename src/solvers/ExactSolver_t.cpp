@@ -2,7 +2,7 @@
 #include <cmath>
 #include <limits>
 
-ExactSolver_t::ExactSolver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double x_L, double x_R, double end_time, double discontinuity, int n_points, int problem_number) :
+FVM::Solvers::ExactSolver_t::ExactSolver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double x_L, double x_R, double end_time, double discontinuity, int n_points, int problem_number) :
         Solver_t(rho_L, rho_R, u_L, u_R, p_L, p_R, x_L, x_R, end_time, discontinuity, n_points, problem_number),
         a_star_{0.0, 0.0},
         p_star_{0.0, 0.0},
@@ -17,35 +17,35 @@ ExactSolver_t::ExactSolver_t(double rho_L, double rho_R, double u_L, double u_R,
     u_star_ = (u_hat[0] * z + u_hat[1])/(1.0 + z);
 }
 
-ExactSolver_t::~ExactSolver_t() {}
+FVM::Solvers::ExactSolver_t::~ExactSolver_t() {}
 
-void ExactSolver_t::left_shock() {
+void FVM::Solvers::ExactSolver_t::left_shock() {
     const double W = 0.25 * (gamma_[0] + 1.0) * (u_star_ - u_[0]) /a_[0] - std::sqrt(1.0 + std::pow(0.25 * (gamma_[0] + 1.0) * (u_star_ - u_[0]) /a_[0], 2));
 
     p_star_[0] = p_[0] + C_[0] * (u_star_ - u_[0]) * W;
     p_star_prime_[0] = 2.0 * C_[0] * std::pow(W, 3) / (1.0 + std::pow(W, 2));
 }
 
-void ExactSolver_t::right_shock() {
+void FVM::Solvers::ExactSolver_t::right_shock() {
     const double W = 0.25 * (gamma_[1] + 1.0) * (u_star_ - u_[1]) /a_[1] + std::sqrt(1.0 + std::pow(0.25 * (gamma_[1] + 1.0) * (u_star_ - u_[1]) /a_[1], 2));
 
     p_star_[1] = p_[1] + C_[1] * (u_star_ - u_[1]) * W;
     p_star_prime_[1] = 2.0 * C_[1] * std::pow(W, 3) / (1.0 + std::pow(W, 2));
 }
 
-void ExactSolver_t::left_rarefaction() {
+void FVM::Solvers::ExactSolver_t::left_rarefaction() {
     a_star_[0] = a_[0] - 0.5 * (gamma_[0] - 1.0) * (u_star_ - u_[0]);
     p_star_[0] = p_[0] * std::pow(a_star_[0]/a_[0], 2 * gamma_[0] / (gamma_[0] - 1.0));
     p_star_prime_[0] = -gamma_[0] * p_star_[0] / a_star_[0];
 }
 
-void ExactSolver_t::right_rarefaction() {
+void FVM::Solvers::ExactSolver_t::right_rarefaction() {
     a_star_[1] = a_[1] + 0.5 * (gamma_[1] - 1.0) * (u_star_ - u_[1]);
     p_star_[1] = p_[1] * std::pow(a_star_[1]/a_[1], 2 * gamma_[1] / (gamma_[1] - 1.0));
     p_star_prime_[1] = gamma_[1] * p_star_[1] / a_star_[1];
 }
 
-void ExactSolver_t::solve() {
+void FVM::Solvers::ExactSolver_t::solve() {
     constexpr double epsilon = 1.0e-6;
     double error = std::numeric_limits<double>::infinity();
     
@@ -59,7 +59,7 @@ void ExactSolver_t::solve() {
     while (std::abs(1.0 - p_star_[0]/p_star_[1]) >= epsilon);
 }
 
-void ExactSolver_t::calculate_a_star() {
+void FVM::Solvers::ExactSolver_t::calculate_a_star() {
     if (u_star_ <= u_[0]) { // left shock
         a_star_[0] = a_[0] * std::sqrt(((gamma_[0] + 1.0) + (gamma_[0] - 1.0) * p_star_[0]/p_[0]) / ((gamma_[0] + 1.0) + (gamma_[0] - 1.0) * p_[0]/p_star_[0]));
     }
@@ -75,7 +75,7 @@ void ExactSolver_t::calculate_a_star() {
     }
 }
 
-void ExactSolver_t::write_solution(std::string suffix /* = "" */) {
+void FVM::Solvers::ExactSolver_t::write_solution(std::string suffix /* = "" */) {
     calculate_a_star(); // Can't be sure it was calculated
 
     double wave_speed[2][2]; // {{left_start, left_end}, {right_start, right_end}}

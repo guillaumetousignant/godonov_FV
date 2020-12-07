@@ -8,7 +8,7 @@
 
 namespace fs = std::filesystem;
 
-Solver_t::Solver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double x_L, double x_R, double end_time, double discontinuity, int n_points, int problem_number) :
+FVM::Entities::Solver_t::Solver_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double x_L, double x_R, double end_time, double discontinuity, int n_points, int problem_number) :
         gamma_{1.4, 1.4},
         R_(8.31446261815324),
         a_{std::sqrt(gamma_[0] * p_L/rho_L), std::sqrt(gamma_[1] * p_R/rho_R)},
@@ -23,9 +23,9 @@ Solver_t::Solver_t(double rho_L, double rho_R, double u_L, double u_R, double p_
 
 }
 
-Solver_t::~Solver_t() {}
+FVM::Entities::Solver_t::~Solver_t() {}
 
-void Solver_t::write_file_data(int N_points, double time, const std::vector<double> &rho, const std::vector<double> &u, const std::vector<double> &p, const std::vector<double> &x, const std::vector<double> &mach, const std::vector<double> &T, int problem_number, std::string suffix, int N) {
+void FVM::Entities::Solver_t::write_file_data(int N_points, double time, const std::vector<double> &rho, const std::vector<double> &u, const std::vector<double> &p, const std::vector<double> &x, const std::vector<double> &mach, const std::vector<double> &T, int problem_number, std::string suffix, int N) {
     std::stringstream ss;
     std::ofstream file;
 

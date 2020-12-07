@@ -6,6 +6,12 @@
 #include <cmath>
 #include <algorithm>
 
+using FVM::Solvers::GodonovSolver_t;
+using FVM::Fluxes::ExactRiemannFlux_t;
+using FVM::Fluxes::RoeFlux_t;
+using FVM::Fluxes::RoeEntropyFlux_t;
+using FVM::Fluxes::HLLEFlux_t;
+
 template class GodonovSolver_t<ExactRiemannFlux_t>; // Like, I understand why I need this, but man is it crap.
 template class GodonovSolver_t<RoeFlux_t>;
 template class GodonovSolver_t<RoeEntropyFlux_t>;
