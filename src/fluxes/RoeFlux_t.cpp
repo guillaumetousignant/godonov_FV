@@ -1,7 +1,7 @@
 #include "fluxes/RoeFlux_t.h"
 #include <cmath>
 
-FVM::Fluxes::RoeFlux_t::RoeFlux_t(int n_faces) {}
+FVM::Fluxes::RoeFlux_t::RoeFlux_t() {}
 
 FVM::Fluxes::RoeFlux_t::~RoeFlux_t() {}
 

@@ -22,7 +22,7 @@ GodonovSolverHigherOrder_t<FluxCalculator>::GodonovSolverHigherOrder_t(double rh
         Solver_t(rho_L, rho_R, u_L, u_R, p_L, p_R, x_L, x_R, time, discontinuity, n_points, problem_number),
         mesh_(n_cells, (x_[1] - x_[0])/n_cells),
         cfl_(cfl),
-        flux_calculator_(n_cells + 1),
+        flux_calculator_(),
         u_hat_(n_cells + 2),
         a_hat_(n_cells + 2),
         p_hat_(n_cells + 2),

@@ -7,7 +7,7 @@
 namespace FVM { namespace Fluxes {
     class RoeEntropyFlux_t final : public FVM::Entities::FluxCalculator_t { 
         public: 
-            RoeEntropyFlux_t(int n_faces);
+            RoeEntropyFlux_t();
             virtual ~RoeEntropyFlux_t();
 
             void invert_matrix(const double (&input)[9], double (&output)[9]);

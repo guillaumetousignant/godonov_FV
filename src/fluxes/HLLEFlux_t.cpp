@@ -2,7 +2,7 @@
 #include <cmath>
 #include <algorithm>
 
-FVM::Fluxes::HLLEFlux_t::HLLEFlux_t(int n_faces) {}
+FVM::Fluxes::HLLEFlux_t::HLLEFlux_t() {}
 
 FVM::Fluxes::HLLEFlux_t::~HLLEFlux_t() {}
 

@@ -22,7 +22,7 @@ GodonovSolver_t<FluxCalculator>::GodonovSolver_t(double rho_L, double rho_R, dou
         Solver_t(rho_L, rho_R, u_L, u_R, p_L, p_R, x_L, x_R, time, discontinuity, n_points, problem_number),
         mesh_(n_cells, (x_[1] - x_[0])/n_cells),
         cfl_(cfl),
-        flux_calculator_(n_cells + 1) {
+        flux_calculator_() {
 
     mesh_.initial_conditions(a_[0], a_[1], u_[0], u_[1], p_[0], p_[1], x_[0], x_[1], gamma_[0], gamma_[1], discontinuity_);
 }

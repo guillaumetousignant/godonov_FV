@@ -57,14 +57,15 @@ void FVM::RiemannProblem::right_rarefaction(double a_R, double u_R, double p_R, 
     p_star_prime_R = gamma_R * p_star_R / a_star_R;
 }
 
-void FVM::RiemannProblem::solve_flux(double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double gamma_L, double gamma_R, double C_L, double C_R, double &u_star, double &a_star_L, double &a_star_R, double &p_star_L, double &p_star_R, double &p_star_prime_L, double &p_star_prime_R) {
+void FVM::RiemannProblem::solve_flux(double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double gamma_L, double gamma_R, double C_L, double C_R, double &u_star, double &a_star_L, double &a_star_R, double &p_star_L, double &p_star_R) {
     constexpr double epsilon = 1.0e-6;
     double error = std::numeric_limits<double>::infinity();
     
     // This will always calculate at least once, since p_star_ is not calculated before
     do {
+        double p_star_prime_L, p_star_prime_R;
         (u_star <= u_L) ?  left_shock(a_L, u_L, p_L, gamma_L, C_L, u_star, p_star_L, p_star_prime_L) :  left_rarefaction(a_L, u_L, p_L, gamma_L, u_star, a_star_L, p_star_L, p_star_prime_L);
-        (u_star >= u_R) ? right_shock(a_R, u_R, p_R, gamma_R, C_R, u_star, p_star_R, p_star_prime_R) : right_rarefaction(a_R, u_R, p_R, gamma_R, u_star, a_star_R, p_star_R,p_star_prime_R);
+        (u_star >= u_R) ? right_shock(a_R, u_R, p_R, gamma_R, C_R, u_star, p_star_R, p_star_prime_R) : right_rarefaction(a_R, u_R, p_R, gamma_R, u_star, a_star_R, p_star_R, p_star_prime_R);
 
         u_star -= (p_star_L - p_star_R)/(p_star_prime_L - p_star_prime_R);
     }

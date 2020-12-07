@@ -2,7 +2,7 @@
 #include <cmath>
 #include <algorithm>
 
-FVM::Fluxes::RoeEntropyFlux_t::RoeEntropyFlux_t(int n_faces) {}
+FVM::Fluxes::RoeEntropyFlux_t::RoeEntropyFlux_t() {}
 
 FVM::Fluxes::RoeEntropyFlux_t::~RoeEntropyFlux_t() {}
 
