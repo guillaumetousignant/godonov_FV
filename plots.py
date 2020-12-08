@@ -174,9 +174,9 @@ N = [100, 200, 500, 1000]
 
 result_exact = find_problem_files("exact")
 result_riemann = find_problem_files_N("riemann", N)
-#result_roe = find_problem_files_N("roe", N)
-#result_roe_entropy = find_problem_files_N("roe_entropy", N)
-#result_hlle = find_problem_files_N("hlle", N)
+result_roe = find_problem_files_N("roe", N)
+result_roe_entropy = find_problem_files_N("roe_entropy", N)
+result_hlle = find_problem_files_N("hlle", N)
 
 
 # Plotting
