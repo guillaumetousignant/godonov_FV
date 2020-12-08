@@ -109,9 +109,10 @@ void GodonovSolverHigherOrder_t<FluxCalculator, FluxLimiter>::write_solution(std
         for (int j = 0; j < n_points_; ++j) {
             // Watch out for integer division when lerping in c++
             x[offset + j] = (n_points_ == 1) ? mesh_.x_[i] : mesh_.x_[i] - mesh_.delta_x_/2 + j/(n_points_ - 1.0) * mesh_.delta_x_;
-            rho[offset + j] = mesh_.gamma_[i] * mesh_.p_[i]/std::pow(mesh_.a_[i], 2);
-            u[offset + j] = mesh_.u_[i];
-            p[offset + j] = mesh_.p_[i];
+            u[offset + j] = mesh_.u_[i] + du_dx_[i] * (x[offset + j] - mesh_.x_[i]);
+            p[offset + j] = mesh_.p_[i] + dp_dx_[i] * (x[offset + j] - mesh_.x_[i]);
+            const double a = mesh_.a_[i] + da_dx_[i] * (x[offset + j] - mesh_.x_[i]);
+            rho[offset + j] = mesh_.gamma_[i] * p[offset + j]/std::pow(a, 2);
             mach[offset + j] = u[offset + j] / std::sqrt(p[offset + j] / std::pow(rho[offset + j], mesh_.gamma_[i]));
             T[offset + j] = p[offset + j]/(rho[offset + j] * R_);
         }
