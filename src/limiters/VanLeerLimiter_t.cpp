@@ -19,12 +19,8 @@ void FVM::Limiters::VanLeerLimiter_t::calculate_derivatives(const std::vector<do
         const double a_p = (p[i] - p[i-1])/(delta_x_L);
         const double b_p = (p[i+1] - p[i])/(delta_x_R);
 
-        const double phi_u = (std::abs(a_u * b_u) + a_u * b_u)/(a_u + b_u + epsilon);
-        const double phi_a = (std::abs(a_a * b_a) + a_a * b_a)/(a_a + b_a + epsilon);
-        const double phi_p = (std::abs(a_p * b_p) + a_p * b_p)/(a_p + b_p + epsilon);
-
-        du_dx[i] = phi_u * (u[i+1] - u[i-1])/(delta_x_L + delta_x_R);
-        da_dx[i] = phi_a * (a[i+1] - a[i-1])/(delta_x_L + delta_x_R);
-        dp_dx[i] = phi_p * (p[i+1] - p[i-1])/(delta_x_L + delta_x_R);
+        du_dx[i] = (std::abs(a_u * b_u) + a_u * b_u)/(a_u + b_u + epsilon);
+        da_dx[i] = (std::abs(a_a * b_a) + a_a * b_a)/(a_a + b_a + epsilon);
+        dp_dx[i] = (std::abs(a_p * b_p) + a_p * b_p)/(a_p + b_p + epsilon);
     }
 }

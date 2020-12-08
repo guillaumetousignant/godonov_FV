@@ -20,12 +20,8 @@ void FVM::Limiters::VanAlbadaLimiter_t::calculate_derivatives(const std::vector<
         const double a_p = (p[i] - p[i-1])/(delta_x_L);
         const double b_p = (p[i+1] - p[i])/(delta_x_R);
 
-        const double phi_u = (a_u * b_u * (a_u + b_u))/(std::pow(a_u, 2) + std::pow(b_u, 2) + epsilon);
-        const double phi_a = (a_a * b_a * (a_a + b_a))/(std::pow(a_a, 2) + std::pow(b_a, 2) + epsilon);
-        const double phi_p = (a_p * b_p * (a_p + b_p))/(std::pow(a_p, 2) + std::pow(b_p, 2) + epsilon);
-
-        du_dx[i] = phi_u * (u[i+1] - u[i-1])/(delta_x_L + delta_x_R);
-        da_dx[i] = phi_a * (a[i+1] - a[i-1])/(delta_x_L + delta_x_R);
-        dp_dx[i] = phi_p * (p[i+1] - p[i-1])/(delta_x_L + delta_x_R);
+        du_dx[i] = (a_u * b_u * (a_u + b_u))/(std::pow(a_u, 2) + std::pow(b_u, 2) + epsilon);
+        da_dx[i] = (a_a * b_a * (a_a + b_a))/(std::pow(a_a, 2) + std::pow(b_a, 2) + epsilon);
+        dp_dx[i] = (a_p * b_p * (a_p + b_p))/(std::pow(a_p, 2) + std::pow(b_p, 2) + epsilon);
     }
 }
