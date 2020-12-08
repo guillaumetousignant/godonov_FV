@@ -98,3 +98,7 @@ void FVM::Fluxes::RoeEntropyFlux_t::calculate_fluxes(double delta_t, const std::
         F_3[i] = 0.5 * (F_3_R + F_3_L) - 0.5 * (R_hat[6] * (U_1_R - U_1_L) + R_hat[7] * (U_2_R - U_2_L) + R_hat[8] * (U_3_R - U_3_L));
     }
 }
+
+void FVM::Fluxes::RoeEntropyFlux_t::calculate_fluxes_higher_order(double delta_t, const std::vector<double> x, const std::vector<double> &gamma, const std::vector<double> &u, const std::vector<double> &a, const std::vector<double> &p, std::vector<double> &F_1, std::vector<double> &F_2, std::vector<double> &F_3, const std::vector<double> du_dx, const std::vector<double> da_dx, const std::vector<double> dp_dx) {
+
+}

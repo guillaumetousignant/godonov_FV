@@ -3,6 +3,10 @@
 #include "fluxes/RoeFlux_t.h"
 #include "fluxes/RoeEntropyFlux_t.h"
 #include "fluxes/HLLEFlux_t.h"
+#include "limiters/MinmodLimiter_t.h"
+#include "limiters/SuperbeeLimiter_t.h"
+#include "limiters/VanAlbadaLimiter_t.h"
+#include "limiters/VanLeerLimiter_t.h"
 #include <cmath>
 #include <algorithm>
 
@@ -11,11 +15,30 @@ using FVM::Fluxes::ExactRiemannFlux_t;
 using FVM::Fluxes::RoeFlux_t;
 using FVM::Fluxes::RoeEntropyFlux_t;
 using FVM::Fluxes::HLLEFlux_t;
+using FVM::Limiters::MinmodLimiter_t;
+using FVM::Limiters::SuperbeeLimiter_t;
+using FVM::Limiters::VanAlbadaLimiter_t;
+using FVM::Limiters::VanLeerLimiter_t;
 
-/*template class GodonovSolverHigherOrder_t<ExactRiemannFlux_t>; // Like, I understand why I need this, but man is it crap.
-template class GodonovSolverHigherOrder_t<RoeFlux_t>;
-template class GodonovSolverHigherOrder_t<RoeEntropyFlux_t>;
-template class GodonovSolverHigherOrder_t<HLLEFlux_t>;*/
+// Either that or we put the cpp in a .tpp file and include it from the .h.
+// Otherwise the functions won't be instanciated and we'll get a linker error.
+// Like, I understand why I need this, but man is it crap.
+template class GodonovSolverHigherOrder_t<ExactRiemannFlux_t, MinmodLimiter_t>; 
+template class GodonovSolverHigherOrder_t<RoeFlux_t, MinmodLimiter_t>;
+template class GodonovSolverHigherOrder_t<RoeEntropyFlux_t, MinmodLimiter_t>;
+template class GodonovSolverHigherOrder_t<HLLEFlux_t, MinmodLimiter_t>;
+template class GodonovSolverHigherOrder_t<ExactRiemannFlux_t, SuperbeeLimiter_t>; 
+template class GodonovSolverHigherOrder_t<RoeFlux_t, SuperbeeLimiter_t>;
+template class GodonovSolverHigherOrder_t<RoeEntropyFlux_t, SuperbeeLimiter_t>;
+template class GodonovSolverHigherOrder_t<HLLEFlux_t, SuperbeeLimiter_t>;
+template class GodonovSolverHigherOrder_t<ExactRiemannFlux_t, VanAlbadaLimiter_t>; 
+template class GodonovSolverHigherOrder_t<RoeFlux_t, VanAlbadaLimiter_t>;
+template class GodonovSolverHigherOrder_t<RoeEntropyFlux_t, VanAlbadaLimiter_t>;
+template class GodonovSolverHigherOrder_t<HLLEFlux_t, VanAlbadaLimiter_t>;
+template class GodonovSolverHigherOrder_t<ExactRiemannFlux_t, VanLeerLimiter_t>; 
+template class GodonovSolverHigherOrder_t<RoeFlux_t, VanLeerLimiter_t>;
+template class GodonovSolverHigherOrder_t<RoeEntropyFlux_t, VanLeerLimiter_t>;
+template class GodonovSolverHigherOrder_t<HLLEFlux_t, VanLeerLimiter_t>;
 
 template<typename FluxCalculator, typename FluxLimiter>
 GodonovSolverHigherOrder_t<FluxCalculator, FluxLimiter>::GodonovSolverHigherOrder_t(double rho_L, double rho_R, double u_L, double u_R, double p_L, double p_R, double x_L, double x_R, double time, double discontinuity, int n_points, int n_cells, int problem_number, double cfl) :
@@ -29,7 +52,13 @@ GodonovSolverHigherOrder_t<FluxCalculator, FluxLimiter>::GodonovSolverHigherOrde
         p_hat_(n_cells + 2),
         F_1_hat_(n_cells + 1),
         F_2_hat_(n_cells + 1),
-        F_3_hat_(n_cells + 1) {
+        F_3_hat_(n_cells + 1),
+        du_dx_(n_cells + 2),
+        da_dx_(n_cells + 2),
+        dp_dx_(n_cells + 2),
+        du_dx_hat_(n_cells + 2),
+        da_dx_hat_(n_cells + 2),
+        dp_dx_hat_(n_cells + 2) {
 
     mesh_.initial_conditions(a_[0], a_[1], u_[0], u_[1], p_[0], p_[1], x_[0], x_[1], gamma_[0], gamma_[1], discontinuity_);
 
@@ -54,11 +83,14 @@ void GodonovSolverHigherOrder_t<FluxCalculator, FluxLimiter>::solve() {
             delta_t = end_time_ - time;
         }
 
+        flux_limiter_.calculate_derivatives(mesh_.x_, mesh_.u_, mesh_.a_, mesh_.p_, du_dx_, da_dx_, dp_dx_);
         flux_calculator_.calculate_fluxes(delta_t, mesh_.gamma_, mesh_.u_, mesh_.a_, mesh_.p_, mesh_.F_1_, mesh_.F_2_, mesh_.F_3_);
         predictor(delta_t, mesh_.delta_x_, mesh_.gamma_, mesh_.u_, mesh_.a_, mesh_.p_, u_hat_, a_hat_, p_hat_, mesh_.F_1_, mesh_.F_2_, mesh_.F_3_);
 
+        flux_limiter_.calculate_derivatives(mesh_.x_, u_hat_, a_hat_, p_hat_, du_dx_hat_, da_dx_hat_, dp_dx_hat_);
         flux_calculator_.calculate_fluxes(delta_t, mesh_.gamma_, u_hat_, a_hat_, p_hat_, F_1_hat_, F_2_hat_, F_3_hat_);
         corrector(delta_t, mesh_.delta_x_, mesh_.gamma_, mesh_.u_, mesh_.a_, mesh_.p_, mesh_.F_1_, mesh_.F_2_, mesh_.F_3_, F_1_hat_, F_2_hat_, F_3_hat_);
+        
         time += delta_t;
     }
 }

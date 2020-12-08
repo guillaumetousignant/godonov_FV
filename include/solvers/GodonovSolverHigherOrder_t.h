@@ -23,6 +23,12 @@ namespace FVM { namespace Solvers {
             std::vector<double> F_1_hat_;
             std::vector<double> F_2_hat_;
             std::vector<double> F_3_hat_;
+            std::vector<double> du_dx_; // Limiter is included in this
+            std::vector<double> da_dx_; // Limiter is included in this
+            std::vector<double> dp_dx_hat_; // Limiter is included in this
+            std::vector<double> du_dx_hat_; // Limiter is included in this
+            std::vector<double> da_dx_hat_; // Limiter is included in this
+            std::vector<double> dp_dx_hat_; // Limiter is included in this
 
             virtual void solve();
             virtual void write_solution(std::string suffix = "");

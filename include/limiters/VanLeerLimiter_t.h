@@ -9,7 +9,7 @@ namespace FVM { namespace Limiters {
             VanLeerLimiter_t();
             virtual ~VanLeerLimiter_t();
 
-            virtual double phi(double a, double b);
+            virtual void calculate_derivatives(const std::vector<double> &x, const std::vector<double> &u, const std::vector<double> &a, const std::vector<double> &p, std::vector<double> &du_dx, std::vector<double> &da_dx, std::vector<double> &dp_dx);
     };
 }}
 #endif
