@@ -84,13 +84,13 @@ void GodonovSolverHigherOrder_t<FluxCalculator, FluxLimiter>::solve() {
         }
 
         flux_limiter_.calculate_derivatives(mesh_.x_, mesh_.u_, mesh_.a_, mesh_.p_, du_dx_, da_dx_, dp_dx_);
-        flux_calculator_.calculate_fluxes(delta_t, mesh_.gamma_, mesh_.u_, mesh_.a_, mesh_.p_, mesh_.F_1_, mesh_.F_2_, mesh_.F_3_);
+        flux_calculator_.calculate_fluxes_higher_order(delta_t, mesh_.x_, mesh_.gamma_, mesh_.u_, mesh_.a_, mesh_.p_, mesh_.F_1_, mesh_.F_2_, mesh_.F_3_, du_dx_, da_dx_, dp_dx_);
         predictor(delta_t, mesh_.delta_x_, mesh_.gamma_, mesh_.u_, mesh_.a_, mesh_.p_, u_hat_, a_hat_, p_hat_, mesh_.F_1_, mesh_.F_2_, mesh_.F_3_);
 
         flux_limiter_.calculate_derivatives(mesh_.x_, u_hat_, a_hat_, p_hat_, du_dx_hat_, da_dx_hat_, dp_dx_hat_);
-        flux_calculator_.calculate_fluxes(delta_t, mesh_.gamma_, u_hat_, a_hat_, p_hat_, F_1_hat_, F_2_hat_, F_3_hat_);
+        flux_calculator_.calculate_fluxes_higher_order(delta_t, mesh_.x_, mesh_.gamma_, u_hat_, a_hat_, p_hat_, F_1_hat_, F_2_hat_, F_3_hat_, du_dx_hat_, da_dx_hat_, dp_dx_hat_);
         corrector(delta_t, mesh_.delta_x_, mesh_.gamma_, mesh_.u_, mesh_.a_, mesh_.p_, mesh_.F_1_, mesh_.F_2_, mesh_.F_3_, F_1_hat_, F_2_hat_, F_3_hat_);
-        
+
         time += delta_t;
     }
 }
