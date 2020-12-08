@@ -27,9 +27,9 @@ int main(void) {
     constexpr double cfl = 0.5;
 
     const int n_cells[] = {100,
-                            200,
-                            500,
-                            1000};
+                           200,
+                           500,
+                           1000};
 
     const double rho[4][2] = {{2.281, 1.408},
                               {1.045, 3.483},
