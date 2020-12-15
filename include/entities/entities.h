@@ -14,6 +14,7 @@ namespace FVM {
 #include "FluxCalculator_t.h"
 #include "FluxLimiter_t.h"
 #include "Mesh1D_t.h"
+#include "Mesh2D_t.h"
 #include "Solver_t.h"
 
 #endif
