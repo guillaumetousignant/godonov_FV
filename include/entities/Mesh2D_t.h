@@ -2,6 +2,8 @@
 #define FVM_MESH2D_T_H
 
 #include <vector>
+#include <string>
+#include "entities/Vec2f.h"
 
 namespace FVM { namespace Entities {
     class Mesh2D_t { 
@@ -9,7 +11,10 @@ namespace FVM { namespace Entities {
             Mesh2D_t(int n_cells, double delta_x);
             ~Mesh2D_t();
 
+            int n_points_;
             int n_cells_;
+            std::vector<Vec2f> points_;
+
             std::vector<double> a_;
             std::vector<double> u_;
             std::vector<double> p_;
@@ -22,6 +27,9 @@ namespace FVM { namespace Entities {
             std::vector<double> F_3_; // u(γp/(γ-1) + ρu²/2)
 
             void initial_conditions(double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double x_L, double x_R, double gamma_L, double gamma_R, double discontinuity);
+
+        private:
+            void readSU2(const std::string &filename);
     };
 }}
 #endif
