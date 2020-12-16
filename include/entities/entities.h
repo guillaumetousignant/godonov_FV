@@ -16,5 +16,6 @@ namespace FVM {
 #include "Mesh1D_t.h"
 #include "Mesh2D_t.h"
 #include "Solver_t.h"
+#include "Vec2f.h"
 
 #endif

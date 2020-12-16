@@ -3,4 +3,5 @@ target_sources(FVM
         Mesh1D_t.cpp
         Mesh2D_t.cpp
         Solver_t.cpp
+        Vec2f.cpp
 )
