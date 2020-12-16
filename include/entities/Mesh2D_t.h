@@ -2,7 +2,7 @@
 #define FVM_MESH2D_T_H
 
 #include "entities/Vec2f.h"
-#include "entities/Element_t.h"
+#include "entities/Cell_t.h"
 #include <vector>
 #include <string>
 #include <filesystem>
@@ -15,8 +15,9 @@ namespace FVM { namespace Entities {
 
             size_t n_cells_;
             size_t n_boundary_;
-            std::vector<Vec2f> points_;
-            std::vector<Element_t> cells_;
+            std::vector<Vec2f> nodes_; // x, y
+            std::vector<Cell_t> cells_;
+            std::vector<std::vector<size_t>> node_to_cell_;
 
             std::vector<double> a_;
             std::vector<double> u_;
@@ -33,6 +34,8 @@ namespace FVM { namespace Entities {
 
         private:
             void readSU2(std::filesystem::path filename);
+            void build_node_to_cell();
+            void build_cell_to_cell();
     };
 }}
 #endif

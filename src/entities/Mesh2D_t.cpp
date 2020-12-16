@@ -9,6 +9,7 @@
 FVM::Entities::Mesh2D_t::Mesh2D_t(std::filesystem::path filename) {
     if (filename.extension().string() == ".su2") {
         readSU2(filename);
+        build_node_to_cell();
     }
     else {
         std::cerr << "Error: file '" << filename << "' has extension '" << filename.extension() << "'. Only su2 is supported for now. Exiting." << std::endl;
@@ -57,12 +58,12 @@ void FVM::Entities::Mesh2D_t::readSU2(std::filesystem::path filename){
     }
     while (token != "NPOIN=");
 
-    points_ = std::vector<Vec2f>(value);
+    nodes_ = std::vector<Vec2f>(value);
 
-    for (size_t i = 0; i < points_.size(); ++i) {
+    for (size_t i = 0; i < nodes_.size(); ++i) {
         std::getline(meshfile, line);
         std::istringstream liness2(line);
-        liness2 >> points_[i][0] >> points_[i][1];
+        liness2 >> nodes_[i][0] >> nodes_[i][1];
     }
 
     do {
@@ -75,7 +76,7 @@ void FVM::Entities::Mesh2D_t::readSU2(std::filesystem::path filename){
     }
     while (token != "NELEM=");
 
-    cells_ = std::vector<Element_t>(value);
+    cells_ = std::vector<Cell_t>(value);
     n_cells_ = value;
 
     for (size_t i = 0; i < cells_.size(); ++i) {
@@ -89,7 +90,7 @@ void FVM::Entities::Mesh2D_t::readSU2(std::filesystem::path filename){
             n_sides = 4;
             liness2 >> val[0] >> val[1] >> val[2] >> val[3];
 
-            cells_[i] = Element_t(n_sides);
+            cells_[i] = Cell_t(n_sides);
             for (int j = 0; j < n_sides; ++j) {
                 cells_[i].nodes_[j] = val[j] - 1;
             }
@@ -156,7 +157,7 @@ void FVM::Entities::Mesh2D_t::readSU2(std::filesystem::path filename){
 
             size_t val0, val1;
             liness6 >> val0 >> val1;
-            cells_.push_back(Element_t(2));
+            cells_.push_back(Cell_t(2));
             cells_[n_cells_ + j].nodes_[0] = val0 - 1;
             cells_[n_cells_ + j].nodes_[1] = val1 - 1;
         }
@@ -167,4 +168,22 @@ void FVM::Entities::Mesh2D_t::readSU2(std::filesystem::path filename){
     }
 
     meshfile.close();
+}
+
+void FVM::Entities::Mesh2D_t::build_node_to_cell() {
+    node_to_cell_ = std::vector<std::vector<size_t>>(nodes_.size());
+    for (size_t i = 0; i < nodes_.size(); ++i) {
+        for (size_t j = 0; j < cells_.size(); ++j) {
+            for (int k = 0; k < cells_[j].nodes_.size(); ++k) {
+                if (cells_[j].nodes_[k] == i) {
+                    node_to_cell_[i].push_back(j);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void FVM::Entities::Mesh2D_t::build_cell_to_cell() {
+
 }
