@@ -8,6 +8,14 @@
 #include <string>
 #include <filesystem>
 
+
+struct state { 
+    double a;
+    FVM::Entities::Vec2f u;
+    double p;
+    double gamma; 
+};
+
 namespace FVM { namespace Entities {
     class Mesh2D_t { 
         public: 
@@ -21,7 +29,7 @@ namespace FVM { namespace Entities {
             std::vector<std::vector<size_t>> node_to_cell_;
             std::vector<Face_t> faces_;
 
-            void initial_conditions(double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double x_L, double x_R, double gamma_L, double gamma_R, double discontinuity);
+            void initial_conditions(FVM::Entities::Vec2f center, const state& state_NW, const state& state_NE, const state& state_SE, const state& state_SW);
 
         private:
             void readSU2(std::filesystem::path filename);

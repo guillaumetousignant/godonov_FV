@@ -6,6 +6,8 @@
 #include <vector>
 #include <filesystem>
 
+using FVM::Entities::Vec2f;
+
 FVM::Entities::Mesh2D_t::Mesh2D_t(std::filesystem::path filename) {
     if (filename.extension().string() == ".su2") {
         readSU2(filename);
@@ -21,8 +23,14 @@ FVM::Entities::Mesh2D_t::Mesh2D_t(std::filesystem::path filename) {
 
 FVM::Entities::Mesh2D_t::~Mesh2D_t() {}
 
-void FVM::Entities::Mesh2D_t::initial_conditions(double a_L, double a_R, double u_L, double u_R, double p_L, double p_R, double x_L, double x_R, double gamma_L, double gamma_R, double discontinuity) {
-    
+void FVM::Entities::Mesh2D_t::initial_conditions(FVM::Entities::Vec2f center, const state& state_NW, const state& state_NE, const state& state_SE, const state& state_SW) {
+    for (size_t i = 0; i < n_cells_; ++i) {
+
+    }
+
+    for (size_t i = n_cells_; i < n_cells_ + n_boundary_; ++i) {
+        
+    }
 }
 
 void FVM::Entities::Mesh2D_t::readSU2(std::filesystem::path filename){
@@ -217,12 +225,14 @@ void FVM::Entities::Mesh2D_t::build_faces() {
                 if ((faces_[k].nodes_[0] == nodes[0] && faces_[k].nodes_[1] == nodes[1]) || (faces_[k].nodes_[0] == nodes[1] && faces_[k].nodes_[1] == nodes[0])) {
                     found = true;
                     faces_[k].cells_[1] = i;
+                    cells_[i].faces_[j] = k;
                     break;
                 }
 
             }
 
             if (!found) {
+                cells_[i].faces_[j] = faces_.size();
                 faces_.push_back(Face_t(nodes[0], nodes[1], i, -1));
             }
         }
@@ -232,12 +242,14 @@ void FVM::Entities::Mesh2D_t::build_faces() {
             if ((faces_[k].nodes_[0] == nodes[0] && faces_[k].nodes_[1] == nodes[1]) || (faces_[k].nodes_[0] == nodes[1] && faces_[k].nodes_[1] == nodes[0])) {
                 found = true;
                 faces_[k].cells_[1] = i;
+                cells_[i].faces_[cells_[i].nodes_.size() - 1] = k;
                 break;
             }
 
         }
 
         if (!found) {
+            cells_[i].faces_[cells_[i].nodes_.size() - 1] = faces_.size();
             faces_.push_back(Face_t(nodes[0], nodes[1], i, -1));
         }
     }

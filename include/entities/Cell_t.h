@@ -2,6 +2,7 @@
 #define FVM_CELL_T_H
 
 #include <vector>
+#include "entities/Vec2f.h"
 
 namespace FVM { namespace Entities {
     class Cell_t { 
@@ -12,6 +13,12 @@ namespace FVM { namespace Entities {
 
             std::vector<size_t> nodes_;
             std::vector<size_t> cells_;
+            std::vector<size_t> faces_;
+
+            double a_;
+            FVM::Entities::Vec2f u_;
+            double p_;
+            double gamma_;
     };
 }}
 #endif
