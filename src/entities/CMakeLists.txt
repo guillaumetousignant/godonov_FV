@@ -6,4 +6,5 @@ target_sources(FVM
         Vec2f.cpp
         Cell_t.cpp
         Face_t.cpp
+        Node_t.cpp
 )

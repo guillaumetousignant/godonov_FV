@@ -4,6 +4,7 @@
 #include "entities/Vec2f.h"
 #include "entities/Cell_t.h"
 #include "entities/Face_t.h"
+#include "entities/Node_t.h"
 #include <vector>
 #include <string>
 #include <filesystem>
@@ -24,9 +25,8 @@ namespace FVM { namespace Entities {
 
             size_t n_cells_;
             size_t n_boundary_;
-            std::vector<Vec2f> nodes_; // x, y
+            std::vector<Node_t> nodes_; // x, y
             std::vector<Cell_t> cells_;
-            std::vector<std::vector<size_t>> node_to_cell_;
             std::vector<Face_t> faces_;
 
             void initial_conditions(FVM::Entities::Vec2f center, const state& state_NE, const state& state_NW, const state& state_SW, const state& state_SE);

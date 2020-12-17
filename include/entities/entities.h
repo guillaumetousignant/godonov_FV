@@ -19,5 +19,6 @@ namespace FVM {
 #include "Vec2f.h"
 #include "Cell_t.h"
 #include "Face_t.h"
+#include "Node_t.h"
 
 #endif

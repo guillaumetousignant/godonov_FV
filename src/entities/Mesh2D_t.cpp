@@ -75,12 +75,12 @@ void FVM::Entities::Mesh2D_t::readSU2(std::filesystem::path filename){
     }
     while (token != "NPOIN=");
 
-    nodes_ = std::vector<Vec2f>(value);
+    nodes_ = std::vector<Node_t>(value);
 
     for (size_t i = 0; i < nodes_.size(); ++i) {
         std::getline(meshfile, line);
         std::istringstream liness2(line);
-        liness2 >> nodes_[i][0] >> nodes_[i][1];
+        liness2 >> nodes_[i].pos_[0] >> nodes_[i].pos_[1];
     }
 
     do {
@@ -188,12 +188,11 @@ void FVM::Entities::Mesh2D_t::readSU2(std::filesystem::path filename){
 }
 
 void FVM::Entities::Mesh2D_t::build_node_to_cell() {
-    node_to_cell_ = std::vector<std::vector<size_t>>(nodes_.size());
     for (size_t i = 0; i < nodes_.size(); ++i) {
         for (size_t j = 0; j < cells_.size(); ++j) {
             for (int k = 0; k < cells_[j].nodes_.size(); ++k) {
                 if (cells_[j].nodes_[k] == i) {
-                    node_to_cell_[i].push_back(j);
+                    nodes_[i].cells_.push_back(j);
                     break;
                 }
             }
@@ -204,11 +203,11 @@ void FVM::Entities::Mesh2D_t::build_node_to_cell() {
 void FVM::Entities::Mesh2D_t::build_cell_to_cell() {
     for (size_t i = 0; i < cells_.size(); ++i) {
         for (size_t j = 0; j < cells_[i].nodes_.size() - 1; ++j) {
-            for (size_t m = 0; m < node_to_cell_[cells_[i].nodes_[j]].size(); ++m) {
-                if (node_to_cell_[cells_[i].nodes_[j]][m] != i) {
-                    for (size_t n = 0; n < node_to_cell_[cells_[i].nodes_[j + 1]].size(); ++n) {
-                        if (node_to_cell_[cells_[i].nodes_[j]][m] == node_to_cell_[cells_[i].nodes_[j + 1]][n]) {
-                            cells_[i].cells_[j] = node_to_cell_[cells_[i].nodes_[j]][m];
+            for (size_t m = 0; m < nodes_[cells_[i].nodes_[j]].cells_.size(); ++m) {
+                if (nodes_[cells_[i].nodes_[j]].cells_[m] != i) {
+                    for (size_t n = 0; n < nodes_[cells_[i].nodes_[j + 1]].cells_.size(); ++n) {
+                        if (nodes_[cells_[i].nodes_[j]].cells_[m] == nodes_[cells_[i].nodes_[j + 1]].cell_[n]) {
+                            cells_[i].cells_[j] = nodes_[cells_[i].nodes_[j]].cells_[m];
                             goto endloop; // I hate this too don't worry
                         }
                     }
@@ -216,11 +215,11 @@ void FVM::Entities::Mesh2D_t::build_cell_to_cell() {
             }
             endloop: ;
         }
-        for (size_t m = 0; m < node_to_cell_[cells_[i].nodes_[cells_[i].nodes_.size() - 1]].size(); ++m) {
-            if (node_to_cell_[cells_[i].nodes_.size() - 1][m] != i) {
-                for (size_t n = 0; n < node_to_cell_[cells_[i].nodes_[0]].size(); ++n) {
-                    if (node_to_cell_[cells_[i].nodes_[cells_[i].nodes_.size() - 1]][m] == node_to_cell_[cells_[i].nodes_[0]][n]) {
-                        cells_[i].cells_[cells_[i].nodes_.size() - 1] = node_to_cell_[cells_[i].nodes_[cells_[i].nodes_.size() - 1]][m];
+        for (size_t m = 0; m < nodes_[cells_[i].nodes_[cells_[i].nodes_.size() - 1]].cells_.size(); ++m) {
+            if (nodes_[cells_[i].nodes_.size() - 1].cells_[m] != i) {
+                for (size_t n = 0; n < nodes_[cells_[i].nodes_[0]].cells_.size(); ++n) {
+                    if (nodes_[cells_[i].nodes_[cells_[i].nodes_.size() - 1]].cells_[m] == nodes_[cells_[i].nodes_[0]].cells_[n]) {
+                        cells_[i].cells_[cells_[i].nodes_.size() - 1] = nodes_[cells_[i].nodes_[cells_[i].nodes_.size() - 1]].cells_[m];
                         goto endloop2; // I hate this too don't worry
                     }
                 }
@@ -280,7 +279,7 @@ void FVM::Entities::Mesh2D_t::compute_cell_centers() {
     for (auto& cell: cells_) {
         cell.center_ = Vec2f();
         for (auto node: cell.nodes_) {
-            cell.center_ += nodes_[node];
+            cell.center_ += nodes_[node].pos_;
         }
         cell.center_ /= cell.nodes_.size();
     }
