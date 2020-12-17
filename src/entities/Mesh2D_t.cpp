@@ -197,7 +197,7 @@ void FVM::Entities::Mesh2D_t::build_cell_to_cell() {
                     }
                 }
             }
-            endloop:
+            endloop: ;
         }
         for (size_t m = 0; m < node_to_cell_[cells_[i].nodes_[cells_[i].nodes_.size() - 1]].size(); ++m) {
             for (size_t n = 0; n < node_to_cell_[cells_[i].nodes_[0]].size(); ++n) {
@@ -207,7 +207,7 @@ void FVM::Entities::Mesh2D_t::build_cell_to_cell() {
                 }
             }
         }
-        endloop2:
+        endloop2: ;
     }
 }
 
@@ -221,7 +221,7 @@ void FVM::Entities::Mesh2D_t::build_faces() {
 
     for (size_t i = 0; i < cells_.size(); ++i) {
         for (size_t j = 0; j < cells_[i].nodes_.size() - 1; ++j) {
-            size_t nodes[] = {cells_[i].nodes_[j], cells_[].nodes_[j + 1]};
+            size_t nodes[] = {cells_[i].nodes_[j], cells_[i].nodes_[j + 1]};
             bool found = false;
             for (size_t k = 0; k < faces_.size(); ++k) {
                 if ((faces_[k].nodes_[0] == nodes[0] && faces_[k].nodes_[1] == nodes[1]) || (faces_[k].nodes_[0] == nodes[1] && faces_[k].nodes_[1] == nodes[0])) {
