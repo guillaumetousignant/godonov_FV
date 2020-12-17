@@ -108,6 +108,16 @@ namespace FVM { namespace Entities {
             Vec2f operator/(const Vec2f &other) const;
 
             /**
+             * @brief Divides all components of the vector by a factor.
+             * 
+             * Returns (x1/a, y1/a).
+             * 
+             * @param scale Factor used to divide all components of the vector.
+             * @return Vec2f Resulting vector, (x1/a, y1/a).
+             */
+            Vec2f operator/(size_t scale) const;
+
+            /**
              * @brief Adds two vectors.
              * 
              * Returns (x1+x2, y1+y2).
@@ -194,6 +204,16 @@ namespace FVM { namespace Entities {
              * @return const Vec2f& Reference to the vector, used to chain operations.
              */
             const Vec2f &operator/=(double scale);
+
+            /**
+             * @brief In-place divides all components of the vector by a factor.
+             * 
+             * Becomes (x1/a, y1/a).
+             * 
+             * @param scale Factor used to divide all components of the vector.
+             * @return const Vec2f& Reference to the vector, used to chain operations.
+             */
+            const Vec2f &operator/=(size_t scale);
 
             /**
              * @brief In-place elements-wise division by the provided vector.

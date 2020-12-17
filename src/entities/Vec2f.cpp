@@ -31,6 +31,9 @@ Vec2f Vec2f::operator*(const Vec2f &other) const {
 Vec2f Vec2f::operator/(double scale) const {
     return Vec2f(v[0] / scale, v[1] / scale);
 } 
+Vec2f Vec2f::operator/(size_t scale) const {
+    return Vec2f(v[0] / scale, v[1] / scale);
+} 
 Vec2f Vec2f::operator/(const Vec2f &other) const {
     return Vec2f(v[0] / other[0], v[1] / other[1]);
 }
@@ -63,6 +66,11 @@ const Vec2f &Vec2f::operator*=(const Vec2f &other) {
     return *this;
 }
 const Vec2f &Vec2f::operator/=(double scale) {
+    v[0] /= scale;
+    v[1] /= scale;
+    return *this;
+} 
+const Vec2f &Vec2f::operator/=(size_t scale) {
     v[0] /= scale;
     v[1] /= scale;
     return *this;
