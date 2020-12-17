@@ -36,6 +36,7 @@ namespace FVM { namespace Entities {
             void build_node_to_cell();
             void build_cell_to_cell();
             void build_faces();
+            void compute_cell_centers();
     };
 }}
 #endif

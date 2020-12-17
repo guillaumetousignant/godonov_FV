@@ -14,6 +14,7 @@ FVM::Entities::Mesh2D_t::Mesh2D_t(std::filesystem::path filename) {
         build_node_to_cell();
         build_cell_to_cell();
         build_faces();
+        compute_cell_centers();
     }
     else {
         std::cerr << "Error: file '" << filename << "' has extension '" << filename.extension() << "'. Only su2 is supported for now. Exiting." << std::endl;
@@ -252,5 +253,15 @@ void FVM::Entities::Mesh2D_t::build_faces() {
             cells_[i].faces_[cells_[i].nodes_.size() - 1] = faces_.size();
             faces_.push_back(Face_t(nodes[0], nodes[1], i, -1));
         }
+    }
+}
+
+void FVM::Entities::Mesh2D_t::compute_cell_centers() {
+    for (auto& cell: cells_) {
+        cell.center_ = Vec2f();
+        for (auto node: cell.nodes_) {
+            cell.center_ += nodes_[node];
+        }
+        cell.center_ /= cell.nodes_.size();
     }
 }

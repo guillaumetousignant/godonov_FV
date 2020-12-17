@@ -19,6 +19,7 @@ namespace FVM { namespace Entities {
             FVM::Entities::Vec2f u_;
             double p_;
             double gamma_;
+            FVM::Entities::Vec2f center_;
     };
 }}
 #endif
