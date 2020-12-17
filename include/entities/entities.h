@@ -18,5 +18,6 @@ namespace FVM {
 #include "Solver_t.h"
 #include "Vec2f.h"
 #include "Cell_t.h"
+#include "Face_t.h"
 
 #endif

@@ -5,4 +5,5 @@ target_sources(FVM
         Solver_t.cpp
         Vec2f.cpp
         Cell_t.cpp
+        Face_t.cpp
 )

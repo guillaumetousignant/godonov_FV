@@ -3,6 +3,7 @@
 
 #include "entities/Vec2f.h"
 #include "entities/Cell_t.h"
+#include "entities/Face_t.h"
 #include <vector>
 #include <string>
 #include <filesystem>
@@ -18,6 +19,7 @@ namespace FVM { namespace Entities {
             std::vector<Vec2f> nodes_; // x, y
             std::vector<Cell_t> cells_;
             std::vector<std::vector<size_t>> node_to_cell_;
+            std::vector<Face_t> faces_;
 
             std::vector<double> a_;
             std::vector<double> u_;
@@ -36,6 +38,7 @@ namespace FVM { namespace Entities {
             void readSU2(std::filesystem::path filename);
             void build_node_to_cell();
             void build_cell_to_cell();
+            void build_faces();
     };
 }}
 #endif
