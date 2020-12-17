@@ -23,7 +23,10 @@ int main(int argc, char *argv[]) {
         filename = argv[1];
     }
 
-    FVM::Entities::Mesh2D_t mesh(std::filesystem::path(filename));
+    std::filesystem::path filepath(filename);
+
+    FVM::Entities::Mesh2D_t mesh(filepath);
+    std::cout << mesh.nodes_.size() << std::endl;
 
     return 0;
 }
