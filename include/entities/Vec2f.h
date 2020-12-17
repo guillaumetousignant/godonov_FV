@@ -532,6 +532,34 @@ namespace FVM { namespace Entities {
              * @return Vec2f& Reference to the vector, used to chain operations.
              */
             Vec2f &clamp(double minimum, double maximum);
+
+            /**
+             * @brief Returns the x component of the vector
+             * 
+             * @return double x component of the vector.
+             */
+            double x() const;
+            
+            /**
+             * @brief Returns the y component of the vector
+             * 
+             * @return double y component of the vector.
+             */
+            double y() const;
+
+            /**
+             * @brief Returns a reference to the x component of the vector
+             * 
+             * @return double Reference to the x component of the vector.
+             */
+            double& x();
+            
+            /**
+             * @brief Returns a reference to the y component of the vector
+             * 
+             * @return double Reference to the y component of the vector.
+             */
+            double& y();
     };
 }}
 

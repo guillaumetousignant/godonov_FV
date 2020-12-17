@@ -220,3 +220,15 @@ std::ostream &operator<<(std::ostream &output, const Vec2f &v) {
 Vec2f operator*(const double factor, const Vec2f &v) {
     return Vec2f(v[0] * factor, v[1] * factor);
 }
+double Vec2f::x() const {
+    return v[0];
+}
+double Vec2f::y() const {
+    return v[1];
+}
+double& Vec2f::x() {
+    return v[0];
+}
+double& Vec2f::y() {
+    return v[1];
+}

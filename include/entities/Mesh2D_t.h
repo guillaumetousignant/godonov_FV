@@ -29,7 +29,7 @@ namespace FVM { namespace Entities {
             std::vector<std::vector<size_t>> node_to_cell_;
             std::vector<Face_t> faces_;
 
-            void initial_conditions(FVM::Entities::Vec2f center, const state& state_NW, const state& state_NE, const state& state_SE, const state& state_SW);
+            void initial_conditions(FVM::Entities::Vec2f center, const state& state_NE, const state& state_NW, const state& state_SW, const state& state_SE);
 
         private:
             void readSU2(std::filesystem::path filename);

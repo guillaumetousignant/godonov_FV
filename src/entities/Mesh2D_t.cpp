@@ -24,13 +24,20 @@ FVM::Entities::Mesh2D_t::Mesh2D_t(std::filesystem::path filename) {
 
 FVM::Entities::Mesh2D_t::~Mesh2D_t() {}
 
-void FVM::Entities::Mesh2D_t::initial_conditions(FVM::Entities::Vec2f center, const state& state_NW, const state& state_NE, const state& state_SE, const state& state_SW) {
-    for (size_t i = 0; i < n_cells_; ++i) {
-
-    }
-
-    for (size_t i = n_cells_; i < n_cells_ + n_boundary_; ++i) {
-        
+void FVM::Entities::Mesh2D_t::initial_conditions(FVM::Entities::Vec2f center, const state& state_NE, const state& state_NW, const state& state_SW, const state& state_SE) {
+    for (auto& cell: cells) {
+        if (cell.center_.x() > center.x() && cell.center_.y() >= center.y()) {
+            state_NE
+        }
+        else if (cell.center_.x() <= center.x() && cell.center_.y() > center.y()) {
+            state_NW
+        }
+        else if (cell.center_.x() < center.x() && cell.center_.y() <= center.y()) {
+            state_SW
+        }
+        else {
+            state_SE
+        }
     }
 }
 
