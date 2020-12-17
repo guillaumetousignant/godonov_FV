@@ -10,7 +10,7 @@
 
 
 struct state { 
-    double a;
+    double rho;
     FVM::Entities::Vec2f u;
     double p;
     double gamma; 

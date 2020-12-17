@@ -15,11 +15,12 @@ namespace FVM { namespace Entities {
             std::vector<size_t> cells_;
             std::vector<size_t> faces_;
 
+            FVM::Entities::Vec2f center_;
+
             double a_;
             FVM::Entities::Vec2f u_;
             double p_;
             double gamma_;
-            FVM::Entities::Vec2f center_;
     };
 }}
 #endif

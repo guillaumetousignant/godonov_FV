@@ -5,6 +5,7 @@
 #include <sstream>
 #include <vector>
 #include <filesystem>
+#include <cmath>
 
 using FVM::Entities::Vec2f;
 
@@ -25,18 +26,30 @@ FVM::Entities::Mesh2D_t::Mesh2D_t(std::filesystem::path filename) {
 FVM::Entities::Mesh2D_t::~Mesh2D_t() {}
 
 void FVM::Entities::Mesh2D_t::initial_conditions(FVM::Entities::Vec2f center, const state& state_NE, const state& state_NW, const state& state_SW, const state& state_SE) {
-    for (auto& cell: cells) {
+    for (auto& cell: cells_) {
         if (cell.center_.x() > center.x() && cell.center_.y() >= center.y()) {
-            state_NE
+            cell.a_ = std::sqrt(state_NE.gamma * state_NE.p / state_NE.rho);
+            cell.u_ = state_NE.u;
+            cell.p_ = state_NE.p;
+            cell.gamma_ = state_NE.gamma;
         }
         else if (cell.center_.x() <= center.x() && cell.center_.y() > center.y()) {
-            state_NW
+            cell.a_ = std::sqrt(state_NW.gamma * state_NW.p / state_NW.rho);
+            cell.u_ = state_NW.u;
+            cell.p_ = state_NW.p;
+            cell.gamma_ = state_NW.gamma;
         }
         else if (cell.center_.x() < center.x() && cell.center_.y() <= center.y()) {
-            state_SW
+            cell.a_ = std::sqrt(state_SW.gamma * state_SW.p / state_SW.rho);
+            cell.u_ = state_SW.u;
+            cell.p_ = state_SW.p;
+            cell.gamma_ = state_SW.gamma;
         }
         else {
-            state_SE
+            cell.a_ = std::sqrt(state_SE.gamma * state_SE.p / state_SE.rho);
+            cell.u_ = state_SE.u;
+            cell.p_ = state_SE.p;
+            cell.gamma_ = state_SE.gamma;
         }
     }
 }
