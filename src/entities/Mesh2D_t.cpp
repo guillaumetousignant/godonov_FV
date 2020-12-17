@@ -190,20 +190,24 @@ void FVM::Entities::Mesh2D_t::build_cell_to_cell() {
     for (size_t i = 0; i < cells_.size(); ++i) {
         for (size_t j = 0; j < cells_[i].nodes_.size() - 1; ++j) {
             for (size_t m = 0; m < node_to_cell_[cells_[i].nodes_[j]].size(); ++m) {
-                for (size_t n = 0; n < node_to_cell_[cells_[i].nodes_[j + 1]].size(); ++n) {
-                    if (node_to_cell_[cells_[i].nodes_[j]][m] == node_to_cell_[cells_[i].nodes_[j + 1]][n]) {
-                        cells_[i].cells_[j] = node_to_cell_[cells_[i].nodes_[j]][m];
-                        goto endloop; // I hate this too don't worry
+                if (node_to_cell_[cells_[i].nodes_[j]][m] != i) {
+                    for (size_t n = 0; n < node_to_cell_[cells_[i].nodes_[j + 1]].size(); ++n) {
+                        if (node_to_cell_[cells_[i].nodes_[j]][m] == node_to_cell_[cells_[i].nodes_[j + 1]][n]) {
+                            cells_[i].cells_[j] = node_to_cell_[cells_[i].nodes_[j]][m];
+                            goto endloop; // I hate this too don't worry
+                        }
                     }
                 }
             }
             endloop: ;
         }
         for (size_t m = 0; m < node_to_cell_[cells_[i].nodes_[cells_[i].nodes_.size() - 1]].size(); ++m) {
-            for (size_t n = 0; n < node_to_cell_[cells_[i].nodes_[0]].size(); ++n) {
-                if (node_to_cell_[cells_[i].nodes_[cells_[i].nodes_.size() - 1]][m] == node_to_cell_[cells_[i].nodes_[0]][n]) {
-                    cells_[i].cells_[cells_[i].nodes_.size() - 1] = node_to_cell_[cells_[i].nodes_[cells_[i].nodes_.size() - 1]][m];
-                    goto endloop2; // I hate this too don't worry
+            if (node_to_cell_[cells_[i].nodes_[j]][m] != i) {
+                for (size_t n = 0; n < node_to_cell_[cells_[i].nodes_[0]].size(); ++n) {
+                    if (node_to_cell_[cells_[i].nodes_[cells_[i].nodes_.size() - 1]][m] == node_to_cell_[cells_[i].nodes_[0]][n]) {
+                        cells_[i].cells_[cells_[i].nodes_.size() - 1] = node_to_cell_[cells_[i].nodes_[cells_[i].nodes_.size() - 1]][m];
+                        goto endloop2; // I hate this too don't worry
+                    }
                 }
             }
         }
