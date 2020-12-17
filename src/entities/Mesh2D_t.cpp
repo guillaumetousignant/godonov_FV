@@ -52,7 +52,7 @@ void FVM::Entities::Mesh2D_t::readSU2(std::filesystem::path filename){
 
     do {
         std::getline(meshfile, line);
-        if (~line.empty()) {
+        if (!line.empty()) {
             std::istringstream liness(line);
             liness >> token;
             liness >> value;
@@ -70,7 +70,7 @@ void FVM::Entities::Mesh2D_t::readSU2(std::filesystem::path filename){
 
     do {
         std::getline(meshfile, line);
-        if (~line.empty()) {
+        if (!line.empty()) {
             std::istringstream liness(line);
             liness >> token;
             liness >> value;
@@ -106,7 +106,7 @@ void FVM::Entities::Mesh2D_t::readSU2(std::filesystem::path filename){
     int n_markers;
     do {
         std::getline(meshfile, line);
-        if (~line.empty()) {
+        if (!line.empty()) {
             std::istringstream liness(line);
             liness >> token;
             liness >> n_markers;
@@ -124,7 +124,7 @@ void FVM::Entities::Mesh2D_t::readSU2(std::filesystem::path filename){
     std::string type;
     do {
         std::getline(meshfile, line);
-        if (~line.empty()) {
+        if (!line.empty()) {
             std::istringstream liness(line);
             liness >> token;
             liness >> type;
@@ -135,7 +135,7 @@ void FVM::Entities::Mesh2D_t::readSU2(std::filesystem::path filename){
     if (type == "farfield") {
         do {
             std::getline(meshfile, line);
-            if (~line.empty()) {
+            if (!line.empty()) {
                 std::istringstream liness(line);
                 liness >> token;
                 liness >> value;
