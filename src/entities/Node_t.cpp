@@ -2,4 +2,4 @@
 
 FVM::Entities::Node_t::Node_t() {}
 
-FVM::Entities::Face_t::~Face_t() {}
+FVM::Entities::Node_t::~Node_t() {}
