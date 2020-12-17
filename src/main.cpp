@@ -42,15 +42,15 @@ int main(int argc, char *argv[]) {
                 1.4
             },
             state{
-                0.30625,
-                Vec2f(0.0, 0.0),
-                25.33125e3,
-                1.4
-            },
-            state{
                 1.225,
                 Vec2f(0.0, 0.0),
                 101.325e3,
+                1.4
+            },
+            state{
+                0.30625,
+                Vec2f(0.0, 0.0),
+                25.33125e3,
                 1.4
             },
             state{
@@ -123,7 +123,6 @@ int main(int argc, char *argv[]) {
     for (size_t i = 0; i < initial_conditions.size(); ++i) {
         meshes[i].initial_conditions(centers[i], initial_conditions[i][0], initial_conditions[i][1], initial_conditions[i][2], initial_conditions[i][3]);
     }
-
 
     return 0;
 }
