@@ -6,6 +6,7 @@
 namespace FVM { namespace Entities {
     class Cell_t { 
         public: 
+            Cell_t(); // For use in vectors
             Cell_t(int n_sides);
             ~Cell_t();
 
