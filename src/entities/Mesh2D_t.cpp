@@ -12,10 +12,10 @@ using FVM::Entities::Vec2f;
 FVM::Entities::Mesh2D_t::Mesh2D_t(std::filesystem::path filename) {
     if (filename.extension().string() == ".su2") {
         readSU2(filename);
+        compute_cell_geometry();
         build_node_to_cell();
         build_cell_to_cell();
         build_faces();
-        compute_cell_centers();
     }
     else {
         std::cerr << "Error: file '" << filename << "' has extension '" << filename.extension() << "'. Only su2 is supported for now. Exiting." << std::endl;
@@ -275,12 +275,27 @@ void FVM::Entities::Mesh2D_t::build_faces() {
     }
 }
 
-void FVM::Entities::Mesh2D_t::compute_cell_centers() {
+void FVM::Entities::Mesh2D_t::compute_cell_geometry() {
     for (auto& cell: cells_) {
         cell.center_ = Vec2f();
         for (auto node: cell.nodes_) {
             cell.center_ += nodes_[node].pos_;
         }
         cell.center_ /= cell.nodes_.size();
+
+        // Area is calculated by triangularisation, concave shapes will generally NOT work.
+        cell.area_ = 0; 
+        for (size_t i = 0; i < cell.nodes_.size() - 2; ++i) {
+            const Vec2f points[] = {nodes_[cell.nodes_[0]].pos_,
+                                    nodes_[cell.nodes_[i + 1]].pos_,
+                                    nodes_[cell.nodes_[i + 2]].pos_};
+            cell.area_ += std::abs(points[0].x() * (points[1].y() - points[2].y()) + points[1].x() * (points[2].y() - points[0].y()) + points[2].x() * (points[0].y() - points[1].y())) * 0.5;
+        }
+    }
+}
+
+void FVM::Entities::Mesh2D_t::compute_face_normals() {
+    for (auto& face: faces_) {
+
     }
 }

@@ -10,8 +10,11 @@ namespace FVM { namespace Entities {
             Node_t();
             ~Node_t();
 
-            FVM::Entities::Vec2f pos_;
+            // Connectivity
             std::vector<size_t> cells_;
+
+            // Geometry
+            FVM::Entities::Vec2f pos_;
     };
 }}
 #endif

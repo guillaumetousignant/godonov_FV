@@ -11,12 +11,16 @@ namespace FVM { namespace Entities {
             Cell_t(int n_sides);
             ~Cell_t();
 
+            // Connectivity
             std::vector<size_t> nodes_;
             std::vector<size_t> cells_;
             std::vector<size_t> faces_;
 
+            // Geometry
             FVM::Entities::Vec2f center_;
+            double area_;
 
+            // State
             double a_;
             FVM::Entities::Vec2f u_;
             double p_;
