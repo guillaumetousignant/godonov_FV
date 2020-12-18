@@ -1,6 +1,6 @@
-# MCG 5136 Assignment 3
+# MCG 5136 Assignment 5
 # Guillaume Tousignant, 0300151859
-# November 27th, 2020
+# December 11th, 2020
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -185,9 +185,9 @@ save_path.mkdir(parents=True, exist_ok=True)
 
 # Plotting everything at the same time will stack overflow.
 generate_figures(save_path, result_exact, result_riemann, "Riemann problem", "riemann")
-#generate_figures(save_path, result_exact, result_roe, "Roe", "roe")
-#generate_figures(save_path, result_exact, result_roe_entropy, "Roe entropy fix", "roe_entropy")
-#generate_figures(save_path, result_exact, result_hlle, "HLLE", "hlle")
+generate_figures(save_path, result_exact, result_roe, "Roe", "roe")
+generate_figures(save_path, result_exact, result_roe_entropy, "Roe entropy fix", "roe_entropy")
+generate_figures(save_path, result_exact, result_hlle, "HLLE", "hlle")
 
 # If you uncomment this, generate only one of the 4 cases at the time, otherwise it overflows
-plt.show()
+#plt.show()
