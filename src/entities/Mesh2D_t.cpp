@@ -16,6 +16,7 @@ FVM::Entities::Mesh2D_t::Mesh2D_t(std::filesystem::path filename) {
         build_node_to_cell();
         build_cell_to_cell();
         build_faces();
+        compute_face_geometry();
     }
     else {
         std::cerr << "Error: file '" << filename << "' has extension '" << filename.extension() << "'. Only su2 is supported for now. Exiting." << std::endl;
@@ -294,8 +295,15 @@ void FVM::Entities::Mesh2D_t::compute_cell_geometry() {
     }
 }
 
-void FVM::Entities::Mesh2D_t::compute_face_normals() {
+void FVM::Entities::Mesh2D_t::compute_face_geometry() {
     for (auto& face: faces_) {
+        face.tangent_ = (face.points_[1] - face.points_[0]).normalize(); // CHECK should be normalized or not?
+        face.normal_ = Vec2f(face.tangent_.y(), -face.tangent_.x()); 
 
+        const Vec2f center = (face.points_[0] + face.points_[1]) * 0.5;
+        const Vec2f delta = center - cells_[face.cells_[0]].center_;
+        const double sign = std::copysign(1.0, face.normal_.dot(delta));
+        face.normal_ *= sign;
+        face.tangent_ *= sign;
     }
 }
