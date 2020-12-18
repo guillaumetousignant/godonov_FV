@@ -13,5 +13,6 @@ namespace FVM {
 #include "ExactSolver_t.h"
 #include "GodonovSolver_t.h"
 #include "GodonovSolverHigherOrder_t.h"
+#include "GodonovSolver2D_t.h"
 
 #endif
