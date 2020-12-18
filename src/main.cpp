@@ -1,6 +1,6 @@
-// MCG 5136 - Finite-Volume Methods Assignment 3
+// MCG 5136 - Finite-Volume Methods Assignment 5
 // Guillaume Tousignant, 0300151859
-// November 27th, 2020
+// December 11th, 2020
 
 #include "FVM.h"
 #include <chrono>
