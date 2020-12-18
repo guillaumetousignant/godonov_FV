@@ -30,6 +30,7 @@ namespace FVM { namespace Entities {
             std::vector<Face_t> faces_;
 
             void initial_conditions(FVM::Entities::Vec2f center, const state& state_NE, const state& state_NW, const state& state_SW, const state& state_SE);
+            void boundary_conditions();
 
         private:
             void readSU2(std::filesystem::path filename);

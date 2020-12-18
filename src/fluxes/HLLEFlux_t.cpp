@@ -120,3 +120,7 @@ void FVM::Fluxes::HLLEFlux_t::calculate_fluxes_higher_order(double delta_t, cons
         }
     }
 }
+
+void FVM::Fluxes::HLLEFlux_t::calculate_fluxes(double delta_t, FVM::Entities::Mesh2D_t &mesh) {
+    
+}

@@ -55,6 +55,16 @@ void FVM::Entities::Mesh2D_t::initial_conditions(FVM::Entities::Vec2f center, co
     }
 }
 
+void FVM::Entities::Mesh2D_t::boundary_conditions() {
+    for (size_t i = n_cells_; i < n_cells_ + n_boundary_; ++i) {
+        // CHECK this will not work with 2nd order
+        cells_[i].a_ = cells_[i].cells_[0].a_; // Both cell to cell links point to the cell inside the domain for boundary line elements.
+        cells_[i].u_ = cells_[i].cells_[0].u_;
+        cells_[i].p_ = cells_[i].cells_[0].p_;
+        cells_[i].gamma_ = cells_[i].cells_[0].gamma_;
+    }
+}
+
 void FVM::Entities::Mesh2D_t::readSU2(std::filesystem::path filename){
     std::string line;
     std::string token;

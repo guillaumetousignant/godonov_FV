@@ -174,3 +174,7 @@ void FVM::Fluxes::RoeEntropyFlux_t::calculate_fluxes_higher_order(double delta_t
         F_3[i] = 0.5 * (F_3_R + F_3_L) - 0.5 * (R_hat[6] * (U_1_R - U_1_L) + R_hat[7] * (U_2_R - U_2_L) + R_hat[8] * (U_3_R - U_3_L));
     }
 }
+
+void FVM::Fluxes::RoeEntropyFlux_t::calculate_fluxes(double delta_t, FVM::Entities::Mesh2D_t &mesh) {
+    
+}

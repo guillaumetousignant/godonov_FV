@@ -25,7 +25,7 @@ template<typename FluxCalculator>
 GodonovSolver2D_t<FluxCalculator>::~GodonovSolver2D_t() {}
 
 template<typename FluxCalculator>
-void GodonovSolver2D_t<FluxCalculator>::solve(double time, double cfl) {
+void GodonovSolver2D_t<FluxCalculator>::solve(double time, double cfl, FVM::Entities::Mesh2D_t& mesh) {
     double time = 0.0;
 
     while (time < end_time_) {
@@ -34,7 +34,8 @@ void GodonovSolver2D_t<FluxCalculator>::solve(double time, double cfl) {
             delta_t = end_time_ - time;
         }
 
-        flux_calculator_.calculate_fluxes(delta_t, mesh_.gamma_, mesh_.u_, mesh_.a_, mesh_.p_, mesh_.F_1_, mesh_.F_2_, mesh_.F_3_);
+        mesh.boundary_conditions();
+        flux_calculator_.calculate_fluxes(delta_t, mesh);
         timestep(delta_t, mesh_.delta_x_, mesh_.gamma_, mesh_.u_, mesh_.a_, mesh_.p_, mesh_.F_1_, mesh_.F_2_, mesh_.F_3_);
         time += delta_t;
     }
