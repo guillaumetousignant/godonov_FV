@@ -21,7 +21,6 @@ namespace FVM { namespace Entities {
     class Mesh2D_t { 
         public: 
             Mesh2D_t(std::filesystem::path filename);
-            ~Mesh2D_t();
 
             size_t n_cells_;
             size_t n_boundary_;

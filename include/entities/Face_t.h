@@ -9,7 +9,6 @@ namespace FVM { namespace Entities {
         public: 
             Face_t();
             Face_t(size_t node_0, size_t node_1, size_t cell_0, size_t cell_1);
-            ~Face_t();
 
             // Connectivity
             size_t nodes_[2];

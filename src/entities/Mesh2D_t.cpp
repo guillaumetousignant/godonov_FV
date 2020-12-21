@@ -26,8 +26,6 @@ FVM::Entities::Mesh2D_t::Mesh2D_t(std::filesystem::path filename) {
     }
 }
 
-FVM::Entities::Mesh2D_t::~Mesh2D_t() {}
-
 void FVM::Entities::Mesh2D_t::initial_conditions(FVM::Entities::Vec2f center, const state& state_NE, const state& state_NW, const state& state_SW, const state& state_SE) {
     for (auto& cell: cells_) {
         if (cell.center_.x() > center.x() && cell.center_.y() >= center.y()) {

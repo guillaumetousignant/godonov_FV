@@ -9,7 +9,6 @@ namespace FVM { namespace Entities {
         public: 
             Cell_t(); // For use in vectors
             Cell_t(int n_sides);
-            ~Cell_t();
 
             // Connectivity
             std::vector<size_t> nodes_;

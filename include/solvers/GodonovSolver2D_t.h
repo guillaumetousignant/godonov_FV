@@ -10,7 +10,6 @@ namespace FVM { namespace Solvers {
     class GodonovSolver2D_t { 
         public: 
             GodonovSolver2D_t();
-            ~GodonovSolver2D_t();
 
             FluxCalculator flux_calculator_;
 
