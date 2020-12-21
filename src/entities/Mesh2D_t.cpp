@@ -333,6 +333,7 @@ void FVM::Entities::Mesh2D_t::build_faces() {
                 faces_.push_back(Face_t(nodes[0], nodes[1], i, -1));
             }
         }
+    }
 }
 
 void FVM::Entities::Mesh2D_t::compute_cell_geometry() {
