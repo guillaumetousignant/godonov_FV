@@ -141,6 +141,7 @@ int main(int argc, char *argv[]) {
     };
 
     for (int i = 0; i < n_problems; ++i) {
+        std::cout << "Processing problem #" << problem_numbers[i] << std::endl;
         meshes[i].initial_conditions(centers[i], initial_conditions[i][0], initial_conditions[i][1], initial_conditions[i][2], initial_conditions[i][3]);
     }
 
