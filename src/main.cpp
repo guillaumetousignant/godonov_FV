@@ -135,7 +135,7 @@ int main(int argc, char *argv[]) {
         3
     };
 
-    std::cout << "Creating mesh...";
+    std::cout << "Creating mesh... ";
     auto t_start_mesh = std::chrono::high_resolution_clock::now();
     FVM::Entities::Mesh2D_t mesh {filepath};
     auto t_end_mesh = std::chrono::high_resolution_clock::now();
@@ -148,7 +148,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < n_problems; ++i) {
         std::cout << "Processing problem #" << problem_numbers[i] << std::endl;
 
-        std::cout << '\t' << "Setting initial conditions...";
+        std::cout << '\t' << "Setting initial conditions... ";
         auto t_start_init = std::chrono::high_resolution_clock::now();
         mesh.initial_conditions(centers[i], initial_conditions[i][0], initial_conditions[i][1], initial_conditions[i][2], initial_conditions[i][3]);
         auto t_end_init = std::chrono::high_resolution_clock::now();
@@ -156,7 +156,7 @@ int main(int argc, char *argv[]) {
             << std::chrono::duration<double, std::milli>(t_end_init - t_start_init).count()/1000.0 
             << "s." << std::endl;
 
-        std::cout << '\t' << "Solving...";
+        std::cout << '\t' << "Solving... ";
         auto t_start_solve = std::chrono::high_resolution_clock::now();
         solver.solve(t_end[i], cfl, mesh);
         auto t_end_solve = std::chrono::high_resolution_clock::now();
@@ -164,7 +164,7 @@ int main(int argc, char *argv[]) {
             << std::chrono::duration<double, std::milli>(t_end_solve - t_start_solve).count()/1000.0 
             << "s." << std::endl;
 
-        std::cout << '\t' << "Writing output file...";
+        std::cout << '\t' << "Writing output file... ";
         auto t_start_write = std::chrono::high_resolution_clock::now();
         mesh.write_tecplot(output_paths[i], problem_numbers[i], t_end[i]);
         auto t_end_write = std::chrono::high_resolution_clock::now();
