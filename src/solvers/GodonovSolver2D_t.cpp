@@ -45,7 +45,7 @@ template<typename FluxCalculator>
 double GodonovSolver2D_t<FluxCalculator>::calculate_delta_t(double cfl, FVM::Entities::Mesh2D_t& mesh) {
     double min_dt = std::numeric_limits<double>::infinity();
     for (size_t i = 0; i < mesh.n_cells_; ++i) {
-        min_dt = std::min(min_dt, cfl * std::sqrt(mesh.cells_[i].area_) / std::abs(mesh.cells_[i].u_.magnitude() + mesh.a_[i]));
+        min_dt = std::min(min_dt, cfl * std::sqrt(mesh.cells_[i].area_) / std::abs(mesh.cells_[i].u_.magnitude() + mesh.cells_[i].a_));
     }
     return min_dt;
 }
@@ -53,7 +53,7 @@ double GodonovSolver2D_t<FluxCalculator>::calculate_delta_t(double cfl, FVM::Ent
 template<typename FluxCalculator>
 void GodonovSolver2D_t<FluxCalculator>::timestep(double delta_t, FVM::Entities::Mesh2D_t& mesh) {
     for (size_t i = 0; i < mesh.n_cells_; ++i) {
-        const FVM::Entities::Cell_t& cell =  mesh.cells_[i];
+        FVM::Entities::Cell_t& cell =  mesh.cells_[i];
 
         double F_1 = 0;
         double F_2 = 0;
@@ -72,7 +72,7 @@ void GodonovSolver2D_t<FluxCalculator>::timestep(double delta_t, FVM::Entities::
         const double U_3 = cell.gamma_ * cell.p_ * cell.u_.y()/std::pow(cell.a_, 2) - delta_t * F_3/cell.area_;
         const double U_4 = cell.p_/(cell.gamma_ - 1) + cell.gamma_ * cell.p_ * cell.u_.magnitudeSquared() * 0.5/std::pow(cell.a_, 2) - delta_t * F_4/cell.area_;
 
-        cell.u_ = Vec2f(U_2/U_1, U_3/U_1);
+        cell.u_ = FVM::Entities::Vec2f(U_2/U_1, U_3/U_1);
         cell.p_ = (cell.gamma_ - 1) * (U_4 - 0.5 * (U_2 * cell.u_.x() + U_3 * cell.u_.y()));
         cell.a_ = std::sqrt(cell.gamma_ * cell.p_ /U_1);
     }
