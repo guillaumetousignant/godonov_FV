@@ -134,21 +134,13 @@ int main(int argc, char *argv[]) {
         3
     };
 
-    FVM::Entities::Mesh2D_t meshes[3] {
-        filepath,
-        filepath,
-        filepath
-    };
-
-    for (int i = 0; i < n_problems; ++i) {
-        std::cout << "Setting initial conditions for problem #" << problem_numbers[i] << std::endl;
-        meshes[i].initial_conditions(centers[i], initial_conditions[i][0], initial_conditions[i][1], initial_conditions[i][2], initial_conditions[i][3]);
-    }
+    FVM::Entities::Mesh2D_t mesh {filepath};
 
     for (int i = 0; i < n_problems; ++i) {
         std::cout << "Processing problem #" << problem_numbers[i] << std::endl;
-        meshes[i].write_tecplot(output_paths[i], problem_numbers[i], t_end[i]);
-    };
+        mesh.initial_conditions(centers[i], initial_conditions[i][0], initial_conditions[i][1], initial_conditions[i][2], initial_conditions[i][3]);
+        mesh.write_tecplot(output_paths[i], problem_numbers[i], t_end[i]);
+    }
 
     return 0;
 }
