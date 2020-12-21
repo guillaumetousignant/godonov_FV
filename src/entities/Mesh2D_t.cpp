@@ -9,9 +9,11 @@
 
 using FVM::Entities::Vec2f;
 
+constexpr double R = 8.31446261815324;
+
 FVM::Entities::Mesh2D_t::Mesh2D_t(std::filesystem::path filename) {
     if (filename.extension().string() == ".su2") {
-        readSU2(filename);
+        read_su2(filename);
         compute_cell_geometry();
         build_node_to_cell();
         build_cell_to_cell();
@@ -58,14 +60,74 @@ void FVM::Entities::Mesh2D_t::initial_conditions(FVM::Entities::Vec2f center, co
 void FVM::Entities::Mesh2D_t::boundary_conditions() {
     for (size_t i = n_cells_; i < n_cells_ + n_boundary_; ++i) {
         // CHECK this will not work with 2nd order
-        cells_[i].a_ = cells_[i].cells_[0].a_; // Both cell to cell links point to the cell inside the domain for boundary line elements.
-        cells_[i].u_ = cells_[i].cells_[0].u_;
-        cells_[i].p_ = cells_[i].cells_[0].p_;
-        cells_[i].gamma_ = cells_[i].cells_[0].gamma_;
+        cells_[i].a_ = cells_[cells_[i].cells_[0]].a_; // Both cell to cell links point to the cell inside the domain for boundary line elements.
+        cells_[i].u_ = cells_[cells_[i].cells_[0]].u_;
+        cells_[i].p_ = cells_[cells_[i].cells_[0]].p_;
+        cells_[i].gamma_ = cells_[cells_[i].cells_[0]].gamma_;
     }
 }
 
-void FVM::Entities::Mesh2D_t::readSU2(std::filesystem::path filename){
+void FVM::Entities::Mesh2D_t::write_tecplot(std::filesystem::path filename, int problem_number, double time) {
+    std::ofstream file;
+
+    file.open(filename);
+
+    file << "TITLE = \"Problem " << problem_number << " at t= " << time << "\"" << std::endl;
+    file << "VARIABLES = \"X\", \"Y\", \"U_x\", \"U_y\", \"rho\", \"p\", \"mach\", \"T\"" << std::endl;
+    file << "ZONE T=\"Zone     1\", ZONETYPE=FEPOLYGON, NODES=" << nodes_.size() << ", ELEMENTS=" << n_cells_ << ", DATAPACKING=BLOCK, VARLOCATION=([1,2]=nodal,[3,4,5,6,7,8]=cellcentered), SOLUTIONTIME=" << time << std::endl;
+
+    for (const auto& node: nodes_) {
+        file << std::setw(12) << node.pos_.x() << " ";
+    }
+    file << std::endl;
+
+    for (const auto& node: nodes_) {
+        file << std::setw(12) << node.pos_.y() << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].u_.x() << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].u_.y() << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].gamma_ * cells_[i].p_/std::pow(cells_[i].a_, 2) << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].p_ << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << std::sqrt(std::pow(cells_[i].u_.x(), 2) + std::pow(cells_[i].u_.y(), 2)) / std::sqrt(cells_[i].p_ / std::pow(cells_[i].gamma_ * cells_[i].p_/std::pow(cells_[i].a_, 2), cells_[i].gamma_)) << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].p_/(cells_[i].gamma_ * cells_[i].p_/std::pow(cells_[i].a_, 2) * R) << " ";
+    }
+    file << std::endl;
+
+    // Connectivity
+    for (int i = 0; i < n_cells_; ++i) {
+        for (int j = 0; j < cells_[i].nodes_.size(); ++j) {
+            file << cells_[i].nodes_[j] + 1 << " ";
+        }
+        file << std::endl;
+    }
+
+    file.close();
+}
+
+void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
     std::string line;
     std::string token;
     size_t value;
@@ -307,10 +369,10 @@ void FVM::Entities::Mesh2D_t::compute_cell_geometry() {
 
 void FVM::Entities::Mesh2D_t::compute_face_geometry() {
     for (auto& face: faces_) {
-        face.tangent_ = (face.points_[1] - face.points_[0]).normalize(); // CHECK should be normalized or not?
+        face.tangent_ = (face.nodes_[1] - face.nodes_[0]).normalize(); // CHECK should be normalized or not?
         face.normal_ = Vec2f(face.tangent_.y(), -face.tangent_.x()); 
 
-        const Vec2f center = (face.points_[0] + face.points_[1]) * 0.5;
+        const Vec2f center = (face.nodes_[0] + face.nodes_[1]) * 0.5;
         const Vec2f delta = center - cells_[face.cells_[0]].center_;
         const double sign = std::copysign(1.0, face.normal_.dot(delta));
         face.normal_ *= sign;
