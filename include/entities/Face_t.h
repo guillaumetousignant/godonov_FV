@@ -20,6 +20,12 @@ namespace FVM { namespace Entities {
             FVM::Entities::Vec2f tangent_;
             double length_;
 
+            // State
+            FVM::Entities::Vec2f F_1_;
+            FVM::Entities::Vec2f F_2_;
+            FVM::Entities::Vec2f F_3_;
+            FVM::Entities::Vec2f F_4_;
+
     };
 }}
 #endif
