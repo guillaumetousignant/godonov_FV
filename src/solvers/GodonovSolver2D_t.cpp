@@ -28,10 +28,10 @@ template<typename FluxCalculator>
 void GodonovSolver2D_t<FluxCalculator>::solve(double end_time, double cfl, FVM::Entities::Mesh2D_t& mesh) {
     double time = 0.0;
 
-    while (time < end_time_) {
+    while (time < end_time) {
         double delta_t = calculate_delta_t(cfl, mesh);
-        if (time + delta_t > end_time_) {
-            delta_t = end_time_ - time;
+        if (time + delta_t > end_time) {
+            delta_t = end_time - time;
         }
 
         mesh.boundary_conditions();
@@ -45,7 +45,7 @@ template<typename FluxCalculator>
 double GodonovSolver2D_t<FluxCalculator>::calculate_delta_t(double cfl, FVM::Entities::Mesh2D_t& mesh) {
     double min_dt = std::numeric_limits<double>::infinity();
     for (size_t i = 0; i < mesh.n_cells_; ++i) {
-        min_dt = std::min(min_dt, cfl * std::sqrt(mesh.cells_[i].area_) / std::abs(std::sqrt(std::pow(mesh.cells_[i].u_.x(), 2), std::pow(mesh.cells_[i].u_.y(), 2)) + mesh_.a_[i]));
+        min_dt = std::min(min_dt, cfl * std::sqrt(mesh.cells_[i].area_) / std::abs(mesh.cells_[i].u_.magnitude() + mesh.a_[i]));
     }
     return min_dt;
 }

@@ -109,7 +109,7 @@ void FVM::Entities::Mesh2D_t::write_tecplot(std::filesystem::path filename, int 
     file << std::endl;
 
     for (int i = 0; i < n_cells_; ++i) {
-        file << std::setw(12) << cells_[i].u_.magnitudeSquared() / std::sqrt(cells_[i].p_ / std::pow(cells_[i].gamma_ * cells_[i].p_/std::pow(cells_[i].a_, 2), cells_[i].gamma_)) << " ";
+        file << std::setw(12) << cells_[i].u_.magnitude() / std::sqrt(cells_[i].p_ / std::pow(cells_[i].gamma_ * cells_[i].p_/std::pow(cells_[i].a_, 2), cells_[i].gamma_)) << " ";
     }
     file << std::endl;
 
