@@ -314,41 +314,25 @@ void FVM::Entities::Mesh2D_t::build_faces() {
     faces_.reserve(total_edges/2); // This is not exact
 
     for (size_t i = 0; i < cells_.size(); ++i) {
-        for (size_t j = 0; j < cells_[i].nodes_.size() - 1; ++j) {
-            size_t nodes[] = {cells_[i].nodes_[j], cells_[i].nodes_[j + 1]};
+        for (size_t j = 0; j < cells_[i].nodes_.size(); ++j) {
+            size_t nodes[] = {cells_[i].nodes_[j], (j < cells_[i].nodes_.size() - 1) ? cells_[i].nodes_[j + 1] : cells_[i].nodes_[0]};
             bool found = false;
-            for (size_t k = 0; k < faces_.size(); ++k) {
-                if ((faces_[k].nodes_[0] == nodes[0] && faces_[k].nodes_[1] == nodes[1]) || (faces_[k].nodes_[0] == nodes[1] && faces_[k].nodes_[1] == nodes[0])) {
+            for (auto face_index: nodes_[nodes[0]].faces_) {
+                if (faces_[face_index].nodes_[0] == nodes[1] || faces_[face_index].nodes_[1] == nodes[1] ) {
                     found = true;
-                    faces_[k].cells_[1] = i;
-                    cells_[i].faces_[j] = k;
+                    faces_[face_index].cells_[1] = i;
+                    cells_[i].faces_[j] = face_index;
                     break;
                 }
-
             }
 
             if (!found) {
                 cells_[i].faces_[j] = faces_.size();
+                nodes_[nodes[0]].faces_.push_back(faces_.size());
+                nodes_[nodes[1]].faces_.push_back(faces_.size());
                 faces_.push_back(Face_t(nodes[0], nodes[1], i, -1));
             }
         }
-        size_t nodes[] = {cells_[i].nodes_[cells_[i].nodes_.size() - 1], cells_[i].nodes_[0]};
-        bool found = false;
-        for (size_t k = 0; k < faces_.size(); ++k) {
-            if ((faces_[k].nodes_[0] == nodes[0] && faces_[k].nodes_[1] == nodes[1]) || (faces_[k].nodes_[0] == nodes[1] && faces_[k].nodes_[1] == nodes[0])) {
-                found = true;
-                faces_[k].cells_[1] = i;
-                cells_[i].faces_[cells_[i].nodes_.size() - 1] = k;
-                break;
-            }
-
-        }
-
-        if (!found) {
-            cells_[i].faces_[cells_[i].nodes_.size() - 1] = faces_.size();
-            faces_.push_back(Face_t(nodes[0], nodes[1], i, -1));
-        }
-    }
 }
 
 void FVM::Entities::Mesh2D_t::compute_cell_geometry() {

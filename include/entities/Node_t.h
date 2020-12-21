@@ -12,6 +12,7 @@ namespace FVM { namespace Entities {
 
             // Connectivity
             std::vector<size_t> cells_;
+            std::vector<size_t> faces_;
 
             // Geometry
             FVM::Entities::Vec2f pos_;
