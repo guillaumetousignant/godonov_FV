@@ -269,14 +269,9 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
 }
 
 void FVM::Entities::Mesh2D_t::build_node_to_cell() {
-    for (size_t i = 0; i < nodes_.size(); ++i) {
-        for (size_t j = 0; j < cells_.size(); ++j) {
-            for (int k = 0; k < cells_[j].nodes_.size(); ++k) {
-                if (cells_[j].nodes_[k] == i) {
-                    nodes_[i].cells_.push_back(j);
-                    break;
-                }
-            }
+    for (size_t j = 0; j < cells_.size(); ++j) {
+        for (auto node_index: cells_[j].nodes_) {
+            nodes_[node_index].cells_.push_back(j);
         }
     }
 }
