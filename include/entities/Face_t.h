@@ -18,6 +18,7 @@ namespace FVM { namespace Entities {
             // Geometry
             FVM::Entities::Vec2f normal_;
             FVM::Entities::Vec2f tangent_;
+            double length_;
 
     };
 }}

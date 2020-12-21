@@ -377,7 +377,9 @@ void FVM::Entities::Mesh2D_t::compute_cell_geometry() {
 
 void FVM::Entities::Mesh2D_t::compute_face_geometry() {
     for (auto& face: faces_) {
-        face.tangent_ = (nodes_[face.nodes_[1]].pos_ - nodes_[face.nodes_[0]].pos_).normalize_inplace(); // CHECK should be normalized or not?
+        face.tangent_ = nodes_[face.nodes_[1]].pos_ - nodes_[face.nodes_[0]].pos_; 
+        face.length_ = face.tangent_.magnitude();
+        face.tangent_ /= face.length_; // CHECK should be normalized or not?
         face.normal_ = Vec2f(face.tangent_.y(), -face.tangent_.x()); 
 
         const Vec2f center = (nodes_[face.nodes_[0]].pos_ + nodes_[face.nodes_[1]].pos_) * 0.5;
