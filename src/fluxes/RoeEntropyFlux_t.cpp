@@ -176,5 +176,7 @@ void FVM::Fluxes::RoeEntropyFlux_t::calculate_fluxes_higher_order(double delta_t
 }
 
 void FVM::Fluxes::RoeEntropyFlux_t::calculate_fluxes(double delta_t, FVM::Entities::Mesh2D_t &mesh) {
-    
+    for (int i = 0; i < mesh.faces_.size(); ++i) {
+
+    }
 }
