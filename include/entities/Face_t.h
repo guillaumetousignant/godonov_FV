@@ -16,8 +16,8 @@ namespace FVM { namespace Entities {
             size_t cells_[2];
 
             // Geometry
-            FVM::Entities::Vec2f normal_;
-            FVM::Entities::Vec2f tangent_;
+            FVM::Entities::Vec2f normal_; // Not normalized, norm is the area
+            FVM::Entities::Vec2f tangent_; // Not normalized, norm is the area
 
     };
 }}
