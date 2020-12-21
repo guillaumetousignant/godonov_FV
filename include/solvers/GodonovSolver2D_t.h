@@ -15,7 +15,6 @@ namespace FVM { namespace Solvers {
             FluxCalculator flux_calculator_;
 
             void solve(double time, double cfl, FVM::Entities::Mesh2D_t& mesh);
-            void write_solution(int problem_number, std::string suffix = "");
 
         private:
             double calculate_delta_t();

@@ -70,6 +70,8 @@ void FVM::Entities::Mesh2D_t::boundary_conditions() {
 void FVM::Entities::Mesh2D_t::write_tecplot(std::filesystem::path filename, int problem_number, double time) {
     std::ofstream file;
 
+    (std::filesystem::create_directory(filename.parent_path());
+
     file.open(filename);
 
     file << "TITLE = \"Problem " << problem_number << " at t= " << time << "\"" << std::endl;
