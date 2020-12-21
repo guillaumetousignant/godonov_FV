@@ -14,7 +14,7 @@ namespace FVM { namespace Solvers {
 
             FluxCalculator flux_calculator_;
 
-            void solve(double time, double cfl, FVM::Entities::Mesh2D_t& mesh);
+            void solve(double end_time, double cfl, FVM::Entities::Mesh2D_t& mesh);
 
         private:
             double calculate_delta_t(double cfl, FVM::Entities::Mesh2D_t& mesh);
