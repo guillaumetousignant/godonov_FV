@@ -275,7 +275,8 @@ void FVM::Entities::Mesh2D_t::build_node_to_cell() {
 }
 
 void FVM::Entities::Mesh2D_t::build_cell_to_cell() {
-    for (size_t i = 0; i < cells_.size(); ++i) {
+    //#pragma omp parallel for schedule(guided)
+    for (long long i = 0; i < cells_.size(); ++i) {
         for (size_t j = 0; j < cells_[i].nodes_.size() - 1; ++j) {
             for (size_t m = 0; m < nodes_[cells_[i].nodes_[j]].cells_.size(); ++m) {
                 if (nodes_[cells_[i].nodes_[j]].cells_[m] != i) {
@@ -335,7 +336,9 @@ void FVM::Entities::Mesh2D_t::build_faces() {
 }
 
 void FVM::Entities::Mesh2D_t::compute_cell_geometry() {
-    for (auto& cell: cells_) {
+    //#pragma omp parallel for schedule(guided)
+    for (long long i = 0; i < cells_.size(); ++i) {
+        FVM::Entities::Cell_t& cell = cells_[i];
         cell.center_ = Vec2f();
         for (auto node: cell.nodes_) {
             cell.center_ += nodes_[node].pos_;
@@ -354,7 +357,9 @@ void FVM::Entities::Mesh2D_t::compute_cell_geometry() {
 }
 
 void FVM::Entities::Mesh2D_t::compute_face_geometry() {
-    for (auto& face: faces_) {
+    //#pragma omp parallel for schedule(guided)
+    for (long long i = 0; i < faces_.size(); ++i) {
+        FVM::Entities::Face_t& face = faces_[i];
         face.tangent_ = nodes_[face.nodes_[1]].pos_ - nodes_[face.nodes_[0]].pos_; 
         face.length_ = face.tangent_.magnitude();
         face.tangent_ /= face.length_; // CHECK should be normalized or not?

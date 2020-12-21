@@ -49,7 +49,7 @@ double GodonovSolver2D_t<FluxCalculator>::calculate_delta_t(double cfl, FVM::Ent
 
 template<typename FluxCalculator>
 void GodonovSolver2D_t<FluxCalculator>::timestep(double delta_t, FVM::Entities::Mesh2D_t& mesh) {
-    #pragma omp parallel for schedule(guided)
+    //#pragma omp parallel for schedule(guided)
     for (long long i = 0; i < mesh.n_cells_; ++i) { // Because msvc openmp wants a signed index, so no size_t :(
         FVM::Entities::Cell_t& cell =  mesh.cells_[i];
 

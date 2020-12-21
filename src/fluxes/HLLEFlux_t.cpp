@@ -124,7 +124,7 @@ void FVM::Fluxes::HLLEFlux_t::calculate_fluxes_higher_order(double delta_t, cons
 }
 
 void FVM::Fluxes::HLLEFlux_t::calculate_fluxes(double delta_t, FVM::Entities::Mesh2D_t &mesh) {
-    #pragma omp parallel for schedule(guided)
+    //#pragma omp parallel for schedule(guided)
     for (long long i = 0; i < mesh.faces_.size(); ++i) { // Because msvc openmp wants a signed index, so no size_t :(
         FVM::Entities::Face_t& face = mesh.faces_[i];
 
