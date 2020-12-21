@@ -70,13 +70,13 @@ void FVM::Entities::Mesh2D_t::boundary_conditions() {
 void FVM::Entities::Mesh2D_t::write_tecplot(std::filesystem::path filename, int problem_number, double time) {
     std::ofstream file;
 
-    (std::filesystem::create_directory(filename.parent_path());
+    std::filesystem::create_directory(filename.parent_path());
 
     file.open(filename);
 
     file << "TITLE = \"Problem " << problem_number << " at t= " << time << "\"" << std::endl;
     file << "VARIABLES = \"X\", \"Y\", \"U_x\", \"U_y\", \"rho\", \"p\", \"mach\", \"T\"" << std::endl;
-    file << "ZONE T=\"Zone     1\", ZONETYPE=FEPOLYGON, NODES=" << nodes_.size() << ", ELEMENTS=" << n_cells_ << ", DATAPACKING=BLOCK, VARLOCATION=([1,2]=nodal,[3,4,5,6,7,8]=cellcentered), SOLUTIONTIME=" << time << std::endl;
+    file << "ZONE T=\"Zone 1\", ZONETYPE==FEQUADRILATERAL, NODES=" << nodes_.size() << ", ELEMENTS=" << n_cells_ << ", DATAPACKING=BLOCK, VARLOCATION=([1,2]=nodal,[3,4,5,6,7,8]=cellcentered), SOLUTIONTIME=" << time << std::endl;
 
     for (const auto& node: nodes_) {
         file << std::setw(12) << node.pos_.x() << " ";
@@ -119,7 +119,13 @@ void FVM::Entities::Mesh2D_t::write_tecplot(std::filesystem::path filename, int 
     file << std::endl;
 
     // Connectivity
+    file << std::endl;
     for (int i = 0; i < n_cells_; ++i) {
+        if (cells_[i].nodes_.size() < 4) {
+            for (int j = 0; j < 4 - cells_[i].nodes_.size(); ++j) {
+                file << cells_[i].nodes_[0] + 1 << " ";
+            }
+        }
         for (int j = 0; j < cells_[i].nodes_.size(); ++j) {
             file << cells_[i].nodes_[j] + 1 << " ";
         }
