@@ -141,11 +141,12 @@ int main(int argc, char *argv[]) {
     };
 
     for (int i = 0; i < n_problems; ++i) {
-        std::cout << "Processing problem #" << problem_numbers[i] << std::endl;
+        std::cout << "Setting initial conditions for problem #" << problem_numbers[i] << std::endl;
         meshes[i].initial_conditions(centers[i], initial_conditions[i][0], initial_conditions[i][1], initial_conditions[i][2], initial_conditions[i][3]);
     }
 
     for (int i = 0; i < n_problems; ++i) {
+        std::cout << "Processing problem #" << problem_numbers[i] << std::endl;
         meshes[i].write_tecplot(output_paths[i], problem_numbers[i], t_end[i]);
     };
 
