@@ -30,12 +30,15 @@ void GodonovSolver2D_t<FluxCalculator>::solve(double time, double cfl, FVM::Enti
 }
 
 template<typename FluxCalculator>
-double GodonovSolver2D_t<FluxCalculator>::calculate_delta_t() {
-
-    return 0;
+double GodonovSolver2D_t<FluxCalculator>::calculate_delta_t(double cfl, FVM::Entities::Mesh2D_t& mesh) {
+    double min_dt = std::numeric_limits<double>::infinity();
+    for (int i = 0; i <= mesh.n_cells_; ++i) {
+        min_dt = std::min(min_dt, cfl * std::sqrt(mesh.cells_[i].area_) / std::abs(std::sqrt(std::pow(mesh.cells_[i].u_.x(), 2), std::pow(mesh.cells_[i].u_.y(), 2)) + mesh_.a_[i]));
+    }
+    return min_dt;
 }
 
 template<typename FluxCalculator>
 void GodonovSolver2D_t<FluxCalculator>::timestep(double delta_t, double delta_x, const std::vector<double> &gamma, std::vector<double> &u, std::vector<double> &a, std::vector<double> &p, const std::vector<double> F_1, const std::vector<double> F_2, const std::vector<double> F_3) {
-
+    
 }

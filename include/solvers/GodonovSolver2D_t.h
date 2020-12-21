@@ -17,7 +17,7 @@ namespace FVM { namespace Solvers {
             void solve(double time, double cfl, FVM::Entities::Mesh2D_t& mesh);
 
         private:
-            double calculate_delta_t();
+            double calculate_delta_t(double cfl, FVM::Entities::Mesh2D_t& mesh);
             void timestep(double delta_t, double delta_x, const std::vector<double> &gamma, std::vector<double> &u, std::vector<double> &a, std::vector<double> &p, const std::vector<double> F_1, const std::vector<double> F_2, const std::vector<double> F_3);
     };
 }}
