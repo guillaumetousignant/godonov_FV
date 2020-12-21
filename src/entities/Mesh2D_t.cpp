@@ -76,7 +76,7 @@ void FVM::Entities::Mesh2D_t::write_tecplot(std::filesystem::path filename, int 
 
     file << "TITLE = \"Problem " << problem_number << " at t= " << time << "\"" << std::endl;
     file << "VARIABLES = \"X\", \"Y\", \"U_x\", \"U_y\", \"rho\", \"p\", \"mach\", \"T\"" << std::endl;
-    file << "ZONE T=\"Zone 1\", ZONETYPE==FEQUADRILATERAL, NODES=" << nodes_.size() << ", ELEMENTS=" << n_cells_ << ", DATAPACKING=BLOCK, VARLOCATION=([1,2]=nodal,[3,4,5,6,7,8]=cellcentered), SOLUTIONTIME=" << time << std::endl;
+    file << "ZONE T=\"Zone 1\", ZONETYPE=FEQUADRILATERAL, NODES=" << nodes_.size() << ", ELEMENTS=" << n_cells_ << ", DATAPACKING=BLOCK, VARLOCATION=([1,2]=nodal,[3,4,5,6,7,8]=cellcentered), SOLUTIONTIME=" << time << std::endl;
 
     for (const auto& node: nodes_) {
         file << std::setw(12) << node.pos_.x() << " ";
