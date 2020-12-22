@@ -22,7 +22,7 @@ FVM::Entities::Mesh2D_t::Mesh2D_t(std::filesystem::path filename) {
     }
     else {
         std::cerr << "Error: file '" << filename << "' has extension '" << filename.extension() << "'. Only su2 is supported for now. Exiting." << std::endl;
-        return; 
+        exit(5); 
     }
 }
 
