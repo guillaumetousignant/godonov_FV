@@ -59,10 +59,12 @@ void GodonovSolver2D_t<FluxCalculator>::timestep(double delta_t, FVM::Entities::
         double F_4 = 0;
         for (auto face_index: cell.faces_) {
             const FVM::Entities::Face_t& face = mesh.faces_[face_index];
-            F_1 += face.F_1_.dot(face.normal_) * face.length_; // CHECK do this when computing fluxes, it's computed twice as it is now.
-            F_2 += face.F_2_.dot(face.normal_) * face.length_;
-            F_3 += face.F_3_.dot(face.normal_) * face.length_;
-            F_4 += face.F_4_.dot(face.normal_) * face.length_;
+            const FVM::Entities::Vec2f delta = face.center_ - cell.center_;
+            const double sign = std::copysign(1.0, delta.dot(face.normal_));
+            F_1 += face.F_1_.dot(face.normal_) * face.length_ * sign; // CHECK do this when computing fluxes, it's computed twice as it is now.
+            F_2 += face.F_2_.dot(face.normal_) * face.length_ * sign;
+            F_3 += face.F_3_.dot(face.normal_) * face.length_ * sign;
+            F_4 += face.F_4_.dot(face.normal_) * face.length_ * sign;
         }
 
         const double U_1 = cell.gamma_ * cell.p_ /std::pow(cell.a_, 2) - delta_t * F_1/cell.area_;
