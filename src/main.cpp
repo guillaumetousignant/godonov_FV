@@ -31,9 +31,9 @@ int main(int argc, char *argv[]) {
     constexpr double cfl = 0.5;
 
     double t_end[3] {
-        0.75e-3, // NANs at about 0.35e-3
-        2.53e-3,
-        1.9e-3
+        0.75e-3/10, // NANs at about 0.35e-3
+        2.53e-3/20,
+        1.9e-3/40
     };
 
     Vec2f centers[3] {
