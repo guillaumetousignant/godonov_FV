@@ -153,14 +153,14 @@ void FVM::Fluxes::HLLEFlux_t::calculate_fluxes(double delta_t, FVM::Entities::Me
         const Vec2f F_3_R = Vec2f(u_prime_R.x() * u_prime_R.y() * cell_R.gamma_ * cell_R.p_/std::pow(cell_R.a_, 2), cell_R.gamma_ * cell_R.p_ * std::pow(u_prime_R.y(), 2)/std::pow(cell_R.a_, 2) + cell_R.p_);
         const Vec2f F_4_R = u_prime_R * (cell_R.gamma_ * cell_R.p_ /(cell_R.gamma_ - 1) + cell_R.gamma_ * cell_R.p_ * (std::pow(cell_R.u_.x(), 2) + std::pow(cell_R.u_.y(), 2)) * 0.5 /std::pow(cell_R.a_, 2));
 
-        const double rho_p_L = std::sqrt(cell_L.gamma_ * cell_L.p_); // We need it like 4 times. I assume it would have been optimized by the compiler anyway?
-        const double rho_p_R = std::sqrt(cell_R.gamma_ * cell_R.p_); // We need it like 4 times. I assume it would have been optimized by the compiler anyway?
+        const double gamma_p_L = std::sqrt(cell_L.gamma_ * cell_L.p_); // We need it like 4 times. I assume it would have been optimized by the compiler anyway?
+        const double gamma_p_R = std::sqrt(cell_R.gamma_ * cell_R.p_); // We need it like 4 times. I assume it would have been optimized by the compiler anyway?
 
-        const double u_hat = ((rho_p_L * u_prime_L.x()/cell_L.a_) + (rho_p_R * u_prime_R.x()/cell_R.a_)) / 
-                                ((rho_p_L / cell_L.a_) + (rho_p_R / cell_R.a_));
-        const double h_hat = (rho_p_L * (std::pow(cell_L.a_, 2) / (cell_L.gamma_ - 1) + std::pow(u_prime_L.x(), 2) * 0.5) /cell_L.a_
-                                + rho_p_R * (std::pow(cell_R.a_, 2) / (cell_R.gamma_ - 1) + std::pow(u_prime_R.x(), 2) * 0.5) /cell_R.a_)
-                                / ((rho_p_L / cell_L.a_) + (rho_p_R / cell_R.a_));
+        const double u_hat = ((gamma_p_L * u_prime_L.x()/cell_L.a_) + (gamma_p_R * u_prime_R.x()/cell_R.a_)) / 
+                                ((gamma_p_L / cell_L.a_) + (gamma_p_R / cell_R.a_));
+        const double h_hat = (gamma_p_L * (std::pow(cell_L.a_, 2) / (cell_L.gamma_ - 1) + std::pow(u_prime_L.x(), 2) * 0.5) /cell_L.a_
+                                + gamma_p_R * (std::pow(cell_R.a_, 2) / (cell_R.gamma_ - 1) + std::pow(u_prime_R.x(), 2) * 0.5) /cell_R.a_)
+                                / ((gamma_p_L / cell_L.a_) + (gamma_p_R / cell_R.a_));
         //const double rho_hat = std::sqrt(gamma[i] * p[i] * gamma[i+1] * p[i+1])/(a[i] * a[i+1]);
         const double gamma_hat = (cell_L.gamma_ + cell_R.gamma_) * 0.5; // Not sure, with an equation for this we could solve for a_hat directly.
 
@@ -169,17 +169,21 @@ void FVM::Fluxes::HLLEFlux_t::calculate_fluxes(double delta_t, FVM::Entities::Me
         const double lambda_minus = std::min(u_prime_L.x() - cell_L.a_, u_hat - a_hat); // Not sure about those
         const double lambda_plus = std::max(u_prime_R.x() + cell_R.a_, u_hat + a_hat); // Not sure about those
 
+        const double invdet = 1/(face.normal_.x() * face.tangent_.y() - face.normal_.y() * face.tangent_.x());
+        const Vec2f normal_inv = invdet * Vec2f(face.tangent_.y(), -face.normal_.y());
+        const Vec2f tangent_inv = invdet * Vec2f(-face.tangent_.x(), face.normal_.x());
+
         if (lambda_minus > 0) {
-            face.F_1_ = Vec2f(F_1_L.dot(face.tangent_), F_1_L.dot(-face.normal_));
-            face.F_2_ = Vec2f(F_2_L.dot(face.tangent_), F_2_L.dot(-face.normal_));
-            face.F_3_ = Vec2f(F_3_L.dot(face.tangent_), F_3_L.dot(-face.normal_));
-            face.F_4_ = Vec2f(F_4_L.dot(face.tangent_), F_4_L.dot(-face.normal_));
+            face.F_1_ = Vec2f(F_1_L.dot(normal_inv), F_1_L.dot(tangent_inv));
+            face.F_2_ = Vec2f(F_2_L.dot(normal_inv), F_2_L.dot(tangent_inv));
+            face.F_3_ = Vec2f(F_3_L.dot(normal_inv), F_3_L.dot(tangent_inv));
+            face.F_4_ = Vec2f(F_4_L.dot(normal_inv), F_4_L.dot(tangent_inv));
         }
         else if (lambda_plus < 0) {
-            face.F_1_ = Vec2f(F_1_R.dot(face.tangent_), F_1_R.dot(-face.normal_));
-            face.F_2_ = Vec2f(F_2_R.dot(face.tangent_), F_2_R.dot(-face.normal_));
-            face.F_3_ = Vec2f(F_3_R.dot(face.tangent_), F_3_R.dot(-face.normal_));
-            face.F_4_ = Vec2f(F_4_R.dot(face.tangent_), F_4_R.dot(-face.normal_));
+            face.F_1_ = Vec2f(F_1_R.dot(normal_inv), F_1_R.dot(tangent_inv));
+            face.F_2_ = Vec2f(F_2_R.dot(normal_inv), F_2_R.dot(tangent_inv));
+            face.F_3_ = Vec2f(F_3_R.dot(normal_inv), F_3_R.dot(tangent_inv));
+            face.F_4_ = Vec2f(F_4_R.dot(normal_inv), F_4_R.dot(tangent_inv));
         }
         else {
             const Vec2f F_1 = (lambda_plus * F_1_L - lambda_minus * F_1_R)/(lambda_plus - lambda_minus) + lambda_plus * lambda_minus * (U_1_R - U_1_L)/(lambda_plus - lambda_minus);
@@ -187,10 +191,10 @@ void FVM::Fluxes::HLLEFlux_t::calculate_fluxes(double delta_t, FVM::Entities::Me
             const Vec2f F_3 = (lambda_plus * F_3_L - lambda_minus * F_3_R)/(lambda_plus - lambda_minus) + lambda_plus * lambda_minus * (U_3_R - U_3_L)/(lambda_plus - lambda_minus);
             const Vec2f F_4 = (lambda_plus * F_4_L - lambda_minus * F_4_R)/(lambda_plus - lambda_minus) + lambda_plus * lambda_minus * (U_4_R - U_4_L)/(lambda_plus - lambda_minus);
 
-            face.F_1_ = Vec2f(F_1.dot(face.tangent_), F_1.dot(-face.normal_));
-            face.F_2_ = Vec2f(F_2.dot(face.tangent_), F_2.dot(-face.normal_));
-            face.F_3_ = Vec2f(F_3.dot(face.tangent_), F_3.dot(-face.normal_));
-            face.F_4_ = Vec2f(F_4.dot(face.tangent_), F_4.dot(-face.normal_));
+            face.F_1_ = Vec2f(F_1.dot(normal_inv), F_1.dot(tangent_inv));
+            face.F_2_ = Vec2f(F_2.dot(normal_inv), F_2.dot(tangent_inv));
+            face.F_3_ = Vec2f(F_3.dot(normal_inv), F_3.dot(tangent_inv));
+            face.F_4_ = Vec2f(F_4.dot(normal_inv), F_4.dot(tangent_inv));
         }
     }
 }

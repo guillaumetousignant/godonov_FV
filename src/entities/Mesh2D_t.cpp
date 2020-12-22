@@ -365,8 +365,8 @@ void FVM::Entities::Mesh2D_t::compute_face_geometry() {
         face.tangent_ /= face.length_; // CHECK should be normalized or not?
         face.normal_ = Vec2f(face.tangent_.y(), -face.tangent_.x()); 
 
-        const Vec2f center = (nodes_[face.nodes_[0]].pos_ + nodes_[face.nodes_[1]].pos_) * 0.5;
-        const Vec2f delta = center - cells_[face.cells_[0]].center_;
+        face.center_ = (nodes_[face.nodes_[0]].pos_ + nodes_[face.nodes_[1]].pos_) * 0.5;
+        const Vec2f delta = face.center_ - cells_[face.cells_[0]].center_;
         const double sign = std::copysign(1.0, face.normal_.dot(delta));
         face.normal_ *= sign;
         face.tangent_ *= sign;
