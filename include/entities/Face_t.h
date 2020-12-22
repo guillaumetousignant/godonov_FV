@@ -18,6 +18,7 @@ namespace FVM { namespace Entities {
             FVM::Entities::Vec2f normal_;
             FVM::Entities::Vec2f tangent_;
             double length_;
+            FVM::Entities::Vec2f center_;
 
             // State
             FVM::Entities::Vec2f F_1_;
