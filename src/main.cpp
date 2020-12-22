@@ -31,9 +31,9 @@ int main(int argc, char *argv[]) {
     constexpr double cfl = 0.5;
 
     double t_end[3] {
-        0.75e-3,
-        2.53e-3,
-        1.9e-3
+        0.0075e-3,
+        0.0253e-3,
+        0.019e-3
     };
 
     Vec2f centers[3] {
@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
 
     std::cout << "Creating mesh... ";
     auto timer_start_mesh = std::chrono::high_resolution_clock::now();
-    FVM::Entities::Mesh2D_t mesh {filepath};
+    FVM::Entities::Mesh2D_t mesh(filepath);
     auto timer_end_mesh = std::chrono::high_resolution_clock::now();
         std::cout << "Took " 
             << std::chrono::duration<double, std::milli>(timer_end_mesh - timer_start_mesh).count()/1000.0 
