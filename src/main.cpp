@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
     constexpr double cfl = 0.5;
 
     double t_end[3] {
-        0.075e-3,
+        0.35e-3, // NANs at about 0.35e-3
         0.0253e-3,
         0.019e-3
     };
