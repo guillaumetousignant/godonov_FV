@@ -169,17 +169,21 @@ void FVM::Fluxes::HLLEFlux_t::calculate_fluxes(double delta_t, FVM::Entities::Me
         const double lambda_minus = std::min(u_prime_L.x() - cell_L.a_, u_hat - a_hat); // Not sure about those
         const double lambda_plus = std::max(u_prime_R.x() + cell_R.a_, u_hat + a_hat); // Not sure about those
 
+        const double invdet = 1/(face.normal_.x() * face.tangent_.y() - face.normal_.y() * face.tangent_.x());
+        const Vec2f normal_inv = invdet * Vec2f(face.tangent_.y(), -face.normal_.y());
+        const Vec2f tangent_inv = invdet * Vec2f(-face.tangent_.x(), face.normal_.x());
+
         if (lambda_minus > 0) {
-            face.F_1_ = Vec2f(F_1_L.dot(face.tangent_), F_1_L.dot(-face.normal_));
-            face.F_2_ = Vec2f(F_2_L.dot(face.tangent_), F_2_L.dot(-face.normal_));
-            face.F_3_ = Vec2f(F_3_L.dot(face.tangent_), F_3_L.dot(-face.normal_));
-            face.F_4_ = Vec2f(F_4_L.dot(face.tangent_), F_4_L.dot(-face.normal_));
+            face.F_1_ = Vec2f(F_1_L.dot(normal_inv), F_1_L.dot(tangent_inv));
+            face.F_2_ = Vec2f(F_2_L.dot(normal_inv), F_2_L.dot(tangent_inv));
+            face.F_3_ = Vec2f(F_3_L.dot(normal_inv), F_3_L.dot(tangent_inv));
+            face.F_4_ = Vec2f(F_4_L.dot(normal_inv), F_4_L.dot(tangent_inv));
         }
         else if (lambda_plus < 0) {
-            face.F_1_ = Vec2f(F_1_R.dot(face.tangent_), F_1_R.dot(-face.normal_));
-            face.F_2_ = Vec2f(F_2_R.dot(face.tangent_), F_2_R.dot(-face.normal_));
-            face.F_3_ = Vec2f(F_3_R.dot(face.tangent_), F_3_R.dot(-face.normal_));
-            face.F_4_ = Vec2f(F_4_R.dot(face.tangent_), F_4_R.dot(-face.normal_));
+            face.F_1_ = Vec2f(F_1_R.dot(normal_inv), F_1_R.dot(tangent_inv));
+            face.F_2_ = Vec2f(F_2_R.dot(normal_inv), F_2_R.dot(tangent_inv));
+            face.F_3_ = Vec2f(F_3_R.dot(normal_inv), F_3_R.dot(tangent_inv));
+            face.F_4_ = Vec2f(F_4_R.dot(normal_inv), F_4_R.dot(tangent_inv));
         }
         else {
             const Vec2f F_1 = (lambda_plus * F_1_L - lambda_minus * F_1_R)/(lambda_plus - lambda_minus) + lambda_plus * lambda_minus * (U_1_R - U_1_L)/(lambda_plus - lambda_minus);
@@ -187,10 +191,10 @@ void FVM::Fluxes::HLLEFlux_t::calculate_fluxes(double delta_t, FVM::Entities::Me
             const Vec2f F_3 = (lambda_plus * F_3_L - lambda_minus * F_3_R)/(lambda_plus - lambda_minus) + lambda_plus * lambda_minus * (U_3_R - U_3_L)/(lambda_plus - lambda_minus);
             const Vec2f F_4 = (lambda_plus * F_4_L - lambda_minus * F_4_R)/(lambda_plus - lambda_minus) + lambda_plus * lambda_minus * (U_4_R - U_4_L)/(lambda_plus - lambda_minus);
 
-            face.F_1_ = Vec2f(F_1.dot(face.tangent_), F_1.dot(face.normal_)); // It's those dirty boys
-            face.F_2_ = Vec2f(F_2.dot(face.tangent_), F_2.dot(face.normal_));
-            face.F_3_ = Vec2f(F_3.dot(face.tangent_), F_3.dot(face.normal_));
-            face.F_4_ = Vec2f(F_4.dot(face.tangent_), F_4.dot(face.normal_));
+            face.F_1_ = Vec2f(F_1.dot(normal_inv), F_1.dot(tangent_inv));
+            face.F_2_ = Vec2f(F_2.dot(normal_inv), F_2.dot(tangent_inv));
+            face.F_3_ = Vec2f(F_3.dot(normal_inv), F_3.dot(tangent_inv));
+            face.F_4_ = Vec2f(F_4.dot(normal_inv), F_4.dot(tangent_inv));
         }
     }
 }
