@@ -153,14 +153,14 @@ void FVM::Fluxes::HLLEFlux_t::calculate_fluxes(double delta_t, FVM::Entities::Me
         const Vec2f F_3_R = Vec2f(u_prime_R.x() * u_prime_R.y() * cell_R.gamma_ * cell_R.p_/std::pow(cell_R.a_, 2), cell_R.gamma_ * cell_R.p_ * std::pow(u_prime_R.y(), 2)/std::pow(cell_R.a_, 2) + cell_R.p_);
         const Vec2f F_4_R = u_prime_R * (cell_R.gamma_ * cell_R.p_ /(cell_R.gamma_ - 1) + cell_R.gamma_ * cell_R.p_ * (std::pow(cell_R.u_.x(), 2) + std::pow(cell_R.u_.y(), 2)) * 0.5 /std::pow(cell_R.a_, 2));
 
-        const double rho_p_L = std::sqrt(cell_L.gamma_ * cell_L.p_); // We need it like 4 times. I assume it would have been optimized by the compiler anyway?
-        const double rho_p_R = std::sqrt(cell_R.gamma_ * cell_R.p_); // We need it like 4 times. I assume it would have been optimized by the compiler anyway?
+        const double gamma_p_L = std::sqrt(cell_L.gamma_ * cell_L.p_); // We need it like 4 times. I assume it would have been optimized by the compiler anyway?
+        const double gamma_p_R = std::sqrt(cell_R.gamma_ * cell_R.p_); // We need it like 4 times. I assume it would have been optimized by the compiler anyway?
 
-        const double u_hat = ((rho_p_L * u_prime_L.x()/cell_L.a_) + (rho_p_R * u_prime_R.x()/cell_R.a_)) / 
-                                ((rho_p_L / cell_L.a_) + (rho_p_R / cell_R.a_));
-        const double h_hat = (rho_p_L * (std::pow(cell_L.a_, 2) / (cell_L.gamma_ - 1) + std::pow(u_prime_L.x(), 2) * 0.5) /cell_L.a_
-                                + rho_p_R * (std::pow(cell_R.a_, 2) / (cell_R.gamma_ - 1) + std::pow(u_prime_R.x(), 2) * 0.5) /cell_R.a_)
-                                / ((rho_p_L / cell_L.a_) + (rho_p_R / cell_R.a_));
+        const double u_hat = ((gamma_p_L * u_prime_L.x()/cell_L.a_) + (gamma_p_R * u_prime_R.x()/cell_R.a_)) / 
+                                ((gamma_p_L / cell_L.a_) + (gamma_p_R / cell_R.a_));
+        const double h_hat = (gamma_p_L * (std::pow(cell_L.a_, 2) / (cell_L.gamma_ - 1) + std::pow(u_prime_L.x(), 2) * 0.5) /cell_L.a_
+                                + gamma_p_R * (std::pow(cell_R.a_, 2) / (cell_R.gamma_ - 1) + std::pow(u_prime_R.x(), 2) * 0.5) /cell_R.a_)
+                                / ((gamma_p_L / cell_L.a_) + (gamma_p_R / cell_R.a_));
         //const double rho_hat = std::sqrt(gamma[i] * p[i] * gamma[i+1] * p[i+1])/(a[i] * a[i+1]);
         const double gamma_hat = (cell_L.gamma_ + cell_R.gamma_) * 0.5; // Not sure, with an equation for this we could solve for a_hat directly.
 
