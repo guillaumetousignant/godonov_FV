@@ -33,7 +33,7 @@ namespace FVM { namespace Entities {
              * 
              * @param x Value given to the two components of the vector.
              */
-            Vec2f(double x); 
+            explicit Vec2f(double x); 
 
             /**
              * @brief Accesses the selected component of the vector, returning a reference.
