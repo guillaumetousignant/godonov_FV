@@ -17,8 +17,8 @@ namespace FVM { namespace Solvers {
             double cfl_;
             FluxCalculator flux_calculator_;
 
-            virtual void solve();
-            virtual void write_solution(std::string suffix = "");
+            virtual void solve() override;
+            virtual void write_solution(std::string suffix = "") override;
 
         private:
             double calculate_delta_t();

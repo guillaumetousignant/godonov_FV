@@ -30,8 +30,8 @@ namespace FVM { namespace Solvers {
             std::vector<double> da_dx_hat_; // Limiter is included in this
             std::vector<double> dp_dx_hat_; // Limiter is included in this
 
-            virtual void solve();
-            virtual void write_solution(std::string suffix = "");
+            virtual void solve() override;
+            virtual void write_solution(std::string suffix = "") override;
 
         private:
             double calculate_delta_t();

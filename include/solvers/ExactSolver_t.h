@@ -21,9 +21,9 @@ namespace FVM { namespace Solvers {
             void right_shock();
             void left_rarefaction();
             void right_rarefaction();
-            virtual void solve();
+            virtual void solve() override;
             void calculate_a_star();
-            virtual void write_solution(std::string suffix = "");
+            virtual void write_solution(std::string suffix = "") override;
     };
 }}
 #endif
