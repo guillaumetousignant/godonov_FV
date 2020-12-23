@@ -155,41 +155,44 @@ void FVM::Fluxes::HLLEFlux_t::calculate_fluxes(double delta_t, FVM::Entities::Me
         const Vec2f tangent_inv = invdet * Vec2f(-face.tangent_.x(), face.normal_.x());
 
         const double U_1_L = cell_L.gamma_ * cell_L.p_ /std::pow(cell_L.a_, 2); // Those should probably be cached somewhere, they are computed twice.
-        const double U_2_L = cell_L.gamma_ * cell_L.p_ * cell_L.u_.x()/std::pow(cell_L.a_, 2);
-        const double U_3_L = cell_L.gamma_ * cell_L.p_ * cell_L.u_.y()/std::pow(cell_L.a_, 2);
-        const double U_4_L = cell_L.p_/(cell_L.gamma_ - 1) + cell_L.gamma_ * cell_L.p_ * cell_L.u_.magnitudeSquared() * 0.5/std::pow(cell_L.a_, 2);
+        const double U_2_L = cell_L.gamma_ * cell_L.p_ * u_prime_L.x()/std::pow(cell_L.a_, 2);
+        const double U_3_L = cell_L.gamma_ * cell_L.p_ * u_prime_L.y()/std::pow(cell_L.a_, 2);
+        const double U_4_L = cell_L.p_/(cell_L.gamma_ - 1) + cell_L.gamma_ * cell_L.p_ * u_prime_L.magnitudeSquared() * 0.5/std::pow(cell_L.a_, 2);
         const double U_1_R = cell_R.gamma_ * cell_R.p_ /std::pow(cell_R.a_, 2); // Those should probably be cached somewhere, they are computed twice.
-        const double U_2_R = cell_R.gamma_ * cell_R.p_ * cell_R.u_.x()/std::pow(cell_R.a_, 2);
-        const double U_3_R = cell_R.gamma_ * cell_R.p_ * cell_R.u_.y()/std::pow(cell_R.a_, 2);
-        const double U_4_R = cell_R.p_/(cell_R.gamma_ - 1) + cell_R.gamma_ * cell_R.p_ * cell_R.u_.magnitudeSquared() * 0.5/std::pow(cell_R.a_, 2);
+        const double U_2_R = cell_R.gamma_ * cell_R.p_ * u_prime_R.x()/std::pow(cell_R.a_, 2);
+        const double U_3_R = cell_R.gamma_ * cell_R.p_ * u_prime_R.y()/std::pow(cell_R.a_, 2);
+        const double U_4_R = cell_R.p_/(cell_R.gamma_ - 1) + cell_R.gamma_ * cell_R.p_ * u_prime_R.magnitudeSquared() * 0.5/std::pow(cell_R.a_, 2);
 
         // This would be all better if I stored those in the mesh, but that would not be drop-in replacable with the Riemann problem fluxes.
-        const Vec2f F_1_L = cell_L.u_ * cell_L.gamma_ * cell_L.p_ /(std::pow(cell_L.a_, 2)); // Those should probably be cached somewhere, they are computed twice.
-        const Vec2f F_2_L = Vec2f(cell_L.gamma_ * cell_L.p_ * std::pow(cell_L.u_.x(), 2)/std::pow(cell_L.a_, 2) + cell_L.p_, cell_L.u_.x() * cell_L.u_.y() * cell_L.gamma_ * cell_L.p_/std::pow(cell_L.a_, 2));
-        const Vec2f F_3_L = Vec2f(cell_L.u_.x() * cell_L.u_.y() * cell_L.gamma_ * cell_L.p_/std::pow(cell_L.a_, 2), cell_L.gamma_ * cell_L.p_ * std::pow(cell_L.u_.y(), 2)/std::pow(cell_L.a_, 2) + cell_L.p_);
-        const Vec2f F_4_L = cell_L.u_ * (cell_L.gamma_ * cell_L.p_ /(cell_L.gamma_ - 1) + cell_L.gamma_ * cell_L.p_ * (std::pow(cell_L.u_.x(), 2) + std::pow(cell_L.u_.y(), 2)) * 0.5 /std::pow(cell_L.a_, 2));
-        const Vec2f F_1_R = cell_R.u_ * cell_R.gamma_ * cell_R.p_ /(std::pow(cell_R.a_, 2)); // Those should probably be cached somewhere, they are computed twice.
-        const Vec2f F_2_R = Vec2f(cell_R.gamma_ * cell_R.p_ * std::pow(cell_R.u_.x(), 2)/std::pow(cell_R.a_, 2) + cell_R.p_, cell_R.u_.x() * cell_R.u_.y() * cell_R.gamma_ * cell_R.p_/std::pow(cell_R.a_, 2));
-        const Vec2f F_3_R = Vec2f(cell_R.u_.x() * cell_R.u_.y() * cell_R.gamma_ * cell_R.p_/std::pow(cell_R.a_, 2), cell_R.gamma_ * cell_R.p_ * std::pow(cell_R.u_.y(), 2)/std::pow(cell_R.a_, 2) + cell_R.p_);
-        const Vec2f F_4_R = cell_R.u_ * (cell_R.gamma_ * cell_R.p_ /(cell_R.gamma_ - 1) + cell_R.gamma_ * cell_R.p_ * (std::pow(cell_R.u_.x(), 2) + std::pow(cell_R.u_.y(), 2)) * 0.5 /std::pow(cell_R.a_, 2));
+        const double F_1_L = u_prime_L.x() * cell_L.gamma_ * cell_L.p_ /(std::pow(cell_L.a_, 2)); // Those should probably be cached somewhere, they are computed twice.
+        const double F_2_L = cell_L.gamma_ * cell_L.p_ * std::pow(u_prime_L.x(), 2)/std::pow(cell_L.a_, 2) + cell_L.p_;
+        const double F_3_L = u_prime_L.x() * u_prime_L.y() * cell_L.gamma_ * cell_L.p_/std::pow(cell_L.a_, 2);
+        const double F_4_L = u_prime_L.x() * (cell_L.gamma_ * cell_L.p_ /(cell_L.gamma_ - 1) + cell_L.gamma_ * cell_L.p_ * (std::pow(u_prime_L.x(), 2) + std::pow(u_prime_L.y(), 2)) * 0.5 /std::pow(cell_L.a_, 2));
+        const double F_1_R = u_prime_R.x() * cell_R.gamma_ * cell_R.p_ /(std::pow(cell_R.a_, 2)); // Those should probably be cached somewhere, they are computed twice.
+        const double F_2_R = cell_R.gamma_ * cell_R.p_ * std::pow(u_prime_R.x(), 2)/std::pow(cell_R.a_, 2) + cell_R.p_;
+        const double F_3_R = u_prime_R.x() * u_prime_R.y() * cell_R.gamma_ * cell_R.p_/std::pow(cell_R.a_, 2);
+        const double F_4_R = u_prime_R.x() * (cell_R.gamma_ * cell_R.p_ /(cell_R.gamma_ - 1) + cell_R.gamma_ * cell_R.p_ * (std::pow(u_prime_R.x(), 2) + std::pow(u_prime_R.y(), 2)) * 0.5 /std::pow(cell_R.a_, 2));
 
 
         if (lambda_minus > 0) {
             face.F_1_ = F_1_L;
-            face.F_2_ = F_2_L;
-            face.F_3_ = F_3_L;
+            face.F_2_ = face.normal_.dot({F_2_L, F_3_L});
+            face.F_3_ = face.tangent_.dot({F_2_L, F_3_L});
             face.F_4_ = F_4_L;
         }
         else if (lambda_plus < 0) {
             face.F_1_ = F_1_R;
-            face.F_2_ = F_2_R;
-            face.F_3_ = F_3_R;
+            face.F_2_ = face.normal_.dot({F_2_R, F_3_R});
+            face.F_3_ = face.tangent_.dot({F_2_R, F_3_R});
             face.F_4_ = F_4_R;
         }
         else {
+            const double F_2 = (lambda_plus * F_2_L - lambda_minus * F_2_R)/(lambda_plus - lambda_minus) + lambda_plus * lambda_minus * (U_2_R - U_2_L)/(lambda_plus - lambda_minus);
+            const double F_3 = (lambda_plus * F_3_L - lambda_minus * F_3_R)/(lambda_plus - lambda_minus) + lambda_plus * lambda_minus * (U_3_R - U_3_L)/(lambda_plus - lambda_minus);
+
             face.F_1_ = (lambda_plus * F_1_L - lambda_minus * F_1_R)/(lambda_plus - lambda_minus) + lambda_plus * lambda_minus * (U_1_R - U_1_L)/(lambda_plus - lambda_minus);
-            face.F_2_ = (lambda_plus * F_2_L - lambda_minus * F_2_R)/(lambda_plus - lambda_minus) + lambda_plus * lambda_minus * (U_2_R - U_2_L)/(lambda_plus - lambda_minus);
-            face.F_3_ = (lambda_plus * F_3_L - lambda_minus * F_3_R)/(lambda_plus - lambda_minus) + lambda_plus * lambda_minus * (U_3_R - U_3_L)/(lambda_plus - lambda_minus);
+            face.F_2_ = face.normal_.dot({F_2, F_3});
+            face.F_3_ = face.tangent_.dot({F_2, F_3});
             face.F_4_ = (lambda_plus * F_4_L - lambda_minus * F_4_R)/(lambda_plus - lambda_minus) + lambda_plus * lambda_minus * (U_4_R - U_4_L)/(lambda_plus - lambda_minus);
         }
     }

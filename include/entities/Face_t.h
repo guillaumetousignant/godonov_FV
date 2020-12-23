@@ -21,10 +21,10 @@ namespace FVM { namespace Entities {
             FVM::Entities::Vec2f center_;
 
             // State
-            FVM::Entities::Vec2f F_1_;
-            FVM::Entities::Vec2f F_2_;
-            FVM::Entities::Vec2f F_3_;
-            FVM::Entities::Vec2f F_4_;
+            double F_1_;
+            double F_2_;
+            double F_3_;
+            double F_4_;
 
     };
 }}

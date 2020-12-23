@@ -79,9 +79,9 @@ void FVM::Fluxes::ExactRiemannFlux_t::calculate_fluxes(double delta_t, FVM::Enti
         FVM::RiemannProblem::get_boundary_state(a_face, u_face, p_face, gamma_face, delta_t, cell_L.a_, cell_R.a_, u_prime_L.x(), u_prime_R.x(), cell_L.p_, cell_R.p_, cell_L.gamma_, cell_R.gamma_, u_star, a_star_L, a_star_R, p_star_L, p_star_R);
 
         const FVM::Entities::Vec2f uv_face(u_face * face.normal_.x(), u_face * face.tangent_.x());
-        face.F_1_ = uv_face * gamma_face * p_face /(std::pow(a_face, 2)); // Those should probably be cached somewhere, they are computed twice.
-        face.F_2_ = FVM::Entities::Vec2f(gamma_face * p_face * std::pow(uv_face.x(), 2)/std::pow(a_face, 2) + p_face, uv_face.x() * uv_face.y() * gamma_face * p_face/std::pow(a_face, 2));
-        face.F_3_ = FVM::Entities::Vec2f(uv_face.x() * uv_face.y() * gamma_face * p_face/std::pow(a_face, 2), gamma_face * p_face * std::pow(uv_face.y(), 2)/std::pow(a_face, 2) + p_face);
-        face.F_4_ = uv_face * (gamma_face * p_face /(gamma_face - 1) + gamma_face * p_face * (std::pow(uv_face.x(), 2) + std::pow(uv_face.y(), 2)) * 0.5 /std::pow(a_face, 2));
+        face.F_1_ = u_face * gamma_face * p_face /(std::pow(a_face, 2)); // Those should probably be cached somewhere, they are computed twice.
+        face.F_2_ = gamma_face * p_face * std::pow(uv_face.x(), 2)/std::pow(a_face, 2) + p_face;
+        face.F_3_ = uv_face.x() * uv_face.y() * gamma_face * p_face/std::pow(a_face, 2);
+        face.F_4_ = u_face * (gamma_face * p_face /(gamma_face - 1) + gamma_face * p_face * (std::pow(uv_face.x(), 2) + std::pow(uv_face.y(), 2)) * 0.5 /std::pow(a_face, 2));
     }
 }
