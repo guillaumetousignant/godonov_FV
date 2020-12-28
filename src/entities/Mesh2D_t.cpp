@@ -363,12 +363,19 @@ void FVM::Entities::Mesh2D_t::compute_face_geometry() {
         face.tangent_ = nodes_[face.nodes_[1]].pos_ - nodes_[face.nodes_[0]].pos_; 
         face.length_ = face.tangent_.magnitude();
         face.tangent_ /= face.length_; // CHECK should be normalized or not?
-        face.normal_ = Vec2f(face.tangent_.y(), -face.tangent_.x()); 
+        face.normal_ = Vec2f(face.tangent_.y(), -face.tangent_.x());         
 
         face.center_ = (nodes_[face.nodes_[0]].pos_ + nodes_[face.nodes_[1]].pos_) * 0.5;
-        const Vec2f delta = face.center_ - cells_[face.cells_[0]].center_;
+        const Vec2f delta = face.center_ - cells_[face.cells_[0]].center_; // CHECK doesn't work with ghost cells
         const double sign = std::copysign(1.0, face.normal_.dot(delta));
         face.normal_ *= sign;
         face.tangent_ *= sign;
+
+        // REMOVE wanna see the most illegal thing I own?
+        if (face.normal_.dot({1.0, -1.0}) < 0.0) {
+            face.tangent_ *= -1;
+            face.normal_ *= -1;
+            std::swap(face.cells_[0], face.cells_[1]);
+        }
     }
 }
