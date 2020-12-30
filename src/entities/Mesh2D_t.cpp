@@ -62,6 +62,10 @@ void FVM::Entities::Mesh2D_t::boundary_conditions() {
         cells_[i].u_ = cells_[cells_[i].cells_[0]].u_;
         cells_[i].p_ = cells_[cells_[i].cells_[0]].p_;
         cells_[i].gamma_ = cells_[cells_[i].cells_[0]].gamma_;
+        cells_[i].a_derivative_ = 0;
+        cells_[i].u_derivative_ = {0, 0};
+        cells_[i].p_derivative_ = 0;
+        cells_[i].gamma_derivative_ = 0;
     }
 }
 
@@ -264,6 +268,13 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
     }
 
     meshfile.close();
+}
+
+void FVM::Entities::Mesh2D_t::reconstruction() {
+    //#pragma omp parallel for schedule(guided)
+    for (long long i = 0; i < n_cells_; ++i) {
+
+    }
 }
 
 void FVM::Entities::Mesh2D_t::build_node_to_cell() {
