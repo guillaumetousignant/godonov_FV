@@ -383,12 +383,5 @@ void FVM::Entities::Mesh2D_t::compute_face_geometry() {
         const double sign = std::copysign(1.0, face.normal_.dot(delta));
         face.normal_ *= sign;
         face.tangent_ *= sign;
-
-        // REMOVE wanna see the most illegal thing I own?
-        if (face.normal_.dot({1.0, -1.0}) < 0.0) {
-            face.tangent_ *= -1;
-            face.normal_ *= -1;
-            std::swap(face.cells_[0], face.cells_[1]);
-        }
     }
 }

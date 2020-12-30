@@ -150,9 +150,8 @@ void FVM::Fluxes::HLLEFlux_t::calculate_fluxes(double delta_t, FVM::Entities::Me
         const double lambda_minus = std::min(u_prime_L.x() - cell_L.a_, u_hat - a_hat); // Not sure about those
         const double lambda_plus = std::max(u_prime_R.x() + cell_R.a_, u_hat + a_hat); // Not sure about those
 
-        const double invdet = 1/(face.normal_.x() * face.tangent_.y() - face.normal_.y() * face.tangent_.x());
-        const Vec2f normal_inv = invdet * Vec2f(face.tangent_.y(), -face.normal_.y());
-        const Vec2f tangent_inv = invdet * Vec2f(-face.tangent_.x(), face.normal_.x());
+        const Vec2f normal_inv = Vec2f(face.normal_[0], face.tangent_[0]);
+        const Vec2f tangent_inv = Vec2f(face.normal_[1], face.tangent_[1]);
 
         const double U_1_L = cell_L.gamma_ * cell_L.p_ /std::pow(cell_L.a_, 2); // Those should probably be cached somewhere, they are computed twice.
         const double U_2_L = cell_L.gamma_ * cell_L.p_ * u_prime_L.x()/std::pow(cell_L.a_, 2);
@@ -176,14 +175,14 @@ void FVM::Fluxes::HLLEFlux_t::calculate_fluxes(double delta_t, FVM::Entities::Me
 
         if (lambda_minus > 0) {
             face.F_1_ = F_1_L;
-            face.F_2_ = face.normal_.dot({F_2_L, F_3_L});
-            face.F_3_ = face.tangent_.dot({F_2_L, F_3_L});
+            face.F_2_ = normal_inv.dot({F_2_L, F_3_L}); //
+            face.F_3_ = tangent_inv.dot({F_2_L, F_3_L});
             face.F_4_ = F_4_L;
         }
         else if (lambda_plus < 0) {
             face.F_1_ = F_1_R;
-            face.F_2_ = face.normal_.dot({F_2_R, F_3_R});
-            face.F_3_ = face.tangent_.dot({F_2_R, F_3_R});
+            face.F_2_ = normal_inv.dot({F_2_R, F_3_R});
+            face.F_3_ = tangent_inv.dot({F_2_R, F_3_R});
             face.F_4_ = F_4_R;
         }
         else {
@@ -191,8 +190,8 @@ void FVM::Fluxes::HLLEFlux_t::calculate_fluxes(double delta_t, FVM::Entities::Me
             const double F_3 = (lambda_plus * F_3_L - lambda_minus * F_3_R)/(lambda_plus - lambda_minus) + lambda_plus * lambda_minus * (U_3_R - U_3_L)/(lambda_plus - lambda_minus);
 
             face.F_1_ = (lambda_plus * F_1_L - lambda_minus * F_1_R)/(lambda_plus - lambda_minus) + lambda_plus * lambda_minus * (U_1_R - U_1_L)/(lambda_plus - lambda_minus);
-            face.F_2_ = face.normal_.dot({F_2, F_3});
-            face.F_3_ = face.tangent_.dot({F_2, F_3});
+            face.F_2_ = normal_inv.dot({F_2, F_3});
+            face.F_3_ = tangent_inv.dot({F_2, F_3});
             face.F_4_ = (lambda_plus * F_4_L - lambda_minus * F_4_R)/(lambda_plus - lambda_minus) + lambda_plus * lambda_minus * (U_4_R - U_4_L)/(lambda_plus - lambda_minus);
         }
     }
