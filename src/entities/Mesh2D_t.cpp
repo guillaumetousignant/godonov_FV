@@ -273,7 +273,9 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
 void FVM::Entities::Mesh2D_t::reconstruction() {
     //#pragma omp parallel for schedule(guided)
     for (long long i = 0; i < n_cells_; ++i) {
-
+        double delta_x2 = 0;
+        double delta_y2 = 0;
+        double delta_xy = 0;
     }
 }
 
