@@ -67,7 +67,10 @@ void FVM::Entities::Mesh2D_t::boundary_conditions() {
         cells_[i].ux_derivative_ = {0, 0};
         cells_[i].p_derivative_ = {0, 0};
         cells_[i].gamma_derivative_ = {0, 0};
-        cells_[i].phi_ = 0;
+        cells_[i].phi_a_ = 0;
+        cells_[i].phi_u_ = {0, 0};
+        cells_[i].phi_p_ = 0;
+        cells_[i].phi_gamma_ = 0;
     }
 }
 

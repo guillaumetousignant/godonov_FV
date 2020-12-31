@@ -286,7 +286,7 @@ namespace FVM { namespace Entities {
             Vec2f &min(double other);
 
             /**
-             * @brief ets the components of the vector to the maximum of its components and the other's.
+             * @brief Sets the components of the vector to the maximum of its components and the other's.
              * 
              * Becomes (max(x1, x2), max(y1, y2))
              * 
