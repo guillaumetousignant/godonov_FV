@@ -1,4 +1,4 @@
-# assignment_3
+# godonov_fv
 
 Installation:
 
