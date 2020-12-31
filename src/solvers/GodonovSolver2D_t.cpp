@@ -26,7 +26,7 @@ template class GodonovSolver2D_t<RoeEntropyFlux_t, VenkatakrishnanLimiter_t>;
 template class GodonovSolver2D_t<HLLEFlux_t, VenkatakrishnanLimiter_t>;
 
 template<typename FluxCalculator, typename FluxLimiter>
-GodonovSolver2D_t<FluxCalculator, FluxLimiter>::GodonovSolver2D_t() : {}
+GodonovSolver2D_t<FluxCalculator, FluxLimiter>::GodonovSolver2D_t() {}
 
 template<typename FluxCalculator, typename FluxLimiter>
 void GodonovSolver2D_t<FluxCalculator, FluxLimiter>::solve(double end_time, double cfl, FVM::Entities::Mesh2D_t& mesh) {
