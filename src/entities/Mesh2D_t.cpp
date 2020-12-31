@@ -62,10 +62,11 @@ void FVM::Entities::Mesh2D_t::boundary_conditions() {
         cells_[i].u_ = cells_[cells_[i].cells_[0]].u_;
         cells_[i].p_ = cells_[cells_[i].cells_[0]].p_;
         cells_[i].gamma_ = cells_[cells_[i].cells_[0]].gamma_;
-        cells_[i].a_derivative_ = 0;
-        cells_[i].u_derivative_ = {0, 0};
-        cells_[i].p_derivative_ = 0;
-        cells_[i].gamma_derivative_ = 0;
+        cells_[i].a_derivative_ = {0, 0};
+        cells_[i].ux_derivative_ = {0, 0};
+        cells_[i].ux_derivative_ = {0, 0};
+        cells_[i].p_derivative_ = {0, 0};
+        cells_[i].gamma_derivative_ = {0, 0};
     }
 }
 
@@ -273,9 +274,55 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
 void FVM::Entities::Mesh2D_t::reconstruction() {
     //#pragma omp parallel for schedule(guided)
     for (long long i = 0; i < n_cells_; ++i) {
+        FVM::Entities::Cell_t& cell = cells_[i];
+
         double delta_x2 = 0;
         double delta_y2 = 0;
         double delta_xy = 0;
+
+        double delta_ax = 0;
+        double delta_ay = 0;
+        double delta_uxx = 0;
+        double delta_uxy = 0;
+        double delta_uyx = 0;
+        double delta_uyy = 0;
+        double delta_px = 0;
+        double delta_py = 0;
+        double delta_gammax = 0; // CHECK how to do those?
+        double delta_gammay = 0;
+        
+        for (auto cell_index: cell.cells_) {
+            FVM::Entities::Cell_t& cell_k = cells_[cell_index];
+
+            const double delta_x = cell_k.center_.x() - cell.center_.x();
+            const double delta_y = cell_k.center_.y() - cell.center_.y();
+
+            delta_x2 += std::pow(delta_x, 2);
+            delta_y2 += std::pow(delta_y, 2);
+            delta_xy += delta_x * delta_y;
+
+            delta_ax += (cell_k.a_ - cell.a_) * delta_x;
+            delta_ay += (cell_k.a_ - cell.a_) * delta_y;
+            delta_uxx += (cell_k.u_.x() - cell.u_.x()) * delta_x;
+            delta_uxy += (cell_k.u_.x() - cell.u_.x()) * delta_y;
+            delta_uyx += (cell_k.u_.y() - cell.u_.y()) * delta_x;
+            delta_uyy += (cell_k.u_.y() - cell.u_.y()) * delta_y;
+            delta_px += (cell_k.p_ - cell.p_) * delta_x;
+            delta_py += (cell_k.p_ - cell.p_) * delta_y;
+            delta_gammax += (cell_k.gamma_ - cell.gamma_) * delta_x;
+            delta_gammay += (cell_k.gamma_ - cell.gamma_) * delta_y;
+        }
+
+        cell.a_derivative_[1] = delta_ay/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_ax * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
+        cell.a_derivative_[0] = -delta_ax/delta_x2 - cell.a_derivative_[1] * delta_xy/delta_x2;
+        cell.ux_derivative_[1] = delta_uxy/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_uxx * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
+        cell.ux_derivative_[0] = -delta_uxx/delta_x2 - cell.a_derivative_[1] * delta_xy/delta_x2;
+        cell.uy_derivative_[1] = delta_uyy/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_uyx * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
+        cell.uy_derivative_[0] = -delta_uyx/delta_x2 - cell.a_derivative_[1] * delta_xy/delta_x2;
+        cell.p_derivative_[1] = delta_py/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_px * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
+        cell.p_derivative_[0] = -delta_px/delta_x2 - cell.a_derivative_[1] * delta_xy/delta_x2;
+        cell.gamma_derivative_[1] = delta_gammay/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_gammax * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
+        cell.gamma_derivative_[0] = -delta_gammax/delta_x2 - cell.a_derivative_[1] * delta_xy/delta_x2;
     }
 }
 
