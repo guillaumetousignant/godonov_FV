@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
             << std::chrono::duration<double, std::milli>(timer_end_mesh - timer_start_mesh).count()/1000.0 
             << "s." << std::endl;
 
-    FVM::Solvers::GodonovSolver2D_t<FVM::Fluxes::HLLEFlux_t> solver;
+    FVM::Solvers::GodonovSolver2D_t<FVM::Fluxes::HLLEFlux_t, FVM::Limiters::VenkatakrishnanLimiter_t> solver;
 
     for (int i = 0; i < n_problems; ++i) {
         std::cout << "Processing problem #" << problem_numbers[i] << std::endl;
