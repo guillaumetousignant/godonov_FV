@@ -4,4 +4,6 @@ target_sources(FVM
         SuperbeeLimiter_t.cpp
         VanAlbadaLimiter_t.cpp
         VanLeerLimiter_t.cpp
+        BarthJespersenLimiter_t.cpp
+        Venkatakrishnan_t.cpp
 )

@@ -14,5 +14,7 @@ namespace FVM {
 #include "SuperbeeLimiter_t.h"
 #include "VanAlbadaLimiter_t.h"
 #include "VanLeerLimiter_t.h"
+#include "BarthJespersenLimiter_t.h"
+#include "VenkatakrishnanLimiter_t.h"
 
 #endif
