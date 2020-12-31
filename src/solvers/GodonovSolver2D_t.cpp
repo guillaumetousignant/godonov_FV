@@ -3,6 +3,8 @@
 #include "fluxes/RoeFlux_t.h"
 #include "fluxes/RoeEntropyFlux_t.h"
 #include "fluxes/HLLEFlux_t.h"
+#include "limiters/BarthJespersenLimiter_t.h"
+#include "limiters/VenkatakrishnanLimiter_t.h"
 #include <cmath>
 #include <algorithm>
 
@@ -11,18 +13,24 @@ using FVM::Fluxes::ExactRiemannFlux_t;
 using FVM::Fluxes::RoeFlux_t;
 using FVM::Fluxes::RoeEntropyFlux_t;
 using FVM::Fluxes::HLLEFlux_t;
+using FVM::Limiters::BarthJespersenLimiter_t;
+using FVM::Limiters::VenkatakrishnanLimiter_t;
 
-template class GodonovSolver2D_t<ExactRiemannFlux_t>; // Like, I understand why I need this, but man is it crap.
-template class GodonovSolver2D_t<RoeFlux_t>;
-template class GodonovSolver2D_t<RoeEntropyFlux_t>;
-template class GodonovSolver2D_t<HLLEFlux_t>;
+template class GodonovSolver2D_t<ExactRiemannFlux_t, BarthJespersenLimiter_t>; // Like, I understand why I need this, but man is it crap.
+template class GodonovSolver2D_t<RoeFlux_t, BarthJespersenLimiter_t>;
+template class GodonovSolver2D_t<RoeEntropyFlux_t, BarthJespersenLimiter_t>;
+template class GodonovSolver2D_t<HLLEFlux_t, BarthJespersenLimiter_t>;
+template class GodonovSolver2D_t<ExactRiemannFlux_t, VenkatakrishnanLimiter_t>;
+template class GodonovSolver2D_t<RoeFlux_t, VenkatakrishnanLimiter_t>;
+template class GodonovSolver2D_t<RoeEntropyFlux_t, VenkatakrishnanLimiter_t>;
+template class GodonovSolver2D_t<HLLEFlux_t, VenkatakrishnanLimiter_t>;
 
-template<typename FluxCalculator>
-GodonovSolver2D_t<FluxCalculator>::GodonovSolver2D_t() :
+template<typename FluxCalculator, typename FluxLimiter>
+GodonovSolver2D_t<FluxCalculator, FluxLimiter>::GodonovSolver2D_t() :
         flux_calculator_() {}
 
-template<typename FluxCalculator>
-void GodonovSolver2D_t<FluxCalculator>::solve(double end_time, double cfl, FVM::Entities::Mesh2D_t& mesh) {
+template<typename FluxCalculator, typename FluxLimiter>
+void GodonovSolver2D_t<FluxCalculator, FluxLimiter>::solve(double end_time, double cfl, FVM::Entities::Mesh2D_t& mesh) {
     double time = 0.0;
 
     while (time < end_time) {
@@ -38,8 +46,8 @@ void GodonovSolver2D_t<FluxCalculator>::solve(double end_time, double cfl, FVM::
     }
 }
 
-template<typename FluxCalculator>
-double GodonovSolver2D_t<FluxCalculator>::calculate_delta_t(double cfl, FVM::Entities::Mesh2D_t& mesh) {
+template<typename FluxCalculator, typename FluxLimiter>
+double GodonovSolver2D_t<FluxCalculator, FluxLimiter>::calculate_delta_t(double cfl, FVM::Entities::Mesh2D_t& mesh) {
     double min_dt = std::numeric_limits<double>::infinity();
     for (size_t i = 0; i < mesh.n_cells_; ++i) {
         min_dt = std::min(min_dt, cfl * std::sqrt(mesh.cells_[i].area_) / std::abs(mesh.cells_[i].u_.magnitude() + mesh.cells_[i].a_));
@@ -47,8 +55,8 @@ double GodonovSolver2D_t<FluxCalculator>::calculate_delta_t(double cfl, FVM::Ent
     return min_dt;
 }
 
-template<typename FluxCalculator>
-void GodonovSolver2D_t<FluxCalculator>::timestep(double delta_t, FVM::Entities::Mesh2D_t& mesh) {
+template<typename FluxCalculator, typename FluxLimiter>
+void GodonovSolver2D_t<FluxCalculator, FluxLimiter>::timestep(double delta_t, FVM::Entities::Mesh2D_t& mesh) {
     //#pragma omp parallel for schedule(guided)
     for (long long i = 0; i < mesh.n_cells_; ++i) { // Because msvc openmp wants a signed index, so no size_t :(
         FVM::Entities::Cell_t& cell =  mesh.cells_[i];

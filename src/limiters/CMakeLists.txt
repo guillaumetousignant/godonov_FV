@@ -5,5 +5,5 @@ target_sources(FVM
         VanAlbadaLimiter_t.cpp
         VanLeerLimiter_t.cpp
         BarthJespersenLimiter_t.cpp
-        Venkatakrishnan_t.cpp
+        VenkatakrishnanLimiter_t.cpp
 )

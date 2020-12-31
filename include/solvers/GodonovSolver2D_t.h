@@ -6,12 +6,13 @@
 #include <string>
 
 namespace FVM { namespace Solvers {
-    template<typename FluxCalculator>
+    template<typename FluxCalculator, typename FluxLimiter>
     class GodonovSolver2D_t { 
         public: 
             GodonovSolver2D_t();
 
             FluxCalculator flux_calculator_;
+            FluxLimiter flux_limiter_;
 
             void solve(double end_time, double cfl, FVM::Entities::Mesh2D_t& mesh);
 
