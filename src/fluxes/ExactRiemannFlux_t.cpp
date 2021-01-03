@@ -89,3 +89,7 @@ void FVM::Fluxes::ExactRiemannFlux_t::calculate_fluxes(double delta_t, FVM::Enti
 void FVM::Fluxes::ExactRiemannFlux_t::calculate_fluxes_higher_order(double delta_t, FVM::Entities::Mesh2D_t &mesh) {
 
 }
+
+void FVM::Fluxes::ExactRiemannFlux_t::calculate_fluxes_higher_order_hat(double delta_t, FVM::Entities::Mesh2D_t &mesh) {
+
+}

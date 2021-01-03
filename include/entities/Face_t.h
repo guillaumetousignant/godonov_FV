@@ -25,6 +25,10 @@ namespace FVM { namespace Entities {
             double F_2_;
             double F_3_;
             double F_4_;
+            double F_1_hat_;
+            double F_2_hat_;
+            double F_3_hat_;
+            double F_4_hat_;
 
     };
 }}

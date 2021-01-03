@@ -30,8 +30,10 @@ namespace FVM { namespace Entities {
 
             void initial_conditions(FVM::Entities::Vec2f center, const state& state_NE, const state& state_NW, const state& state_SW, const state& state_SE);
             void boundary_conditions();
+            void boundary_conditions_hat();
             void write_tecplot(std::filesystem::path filename, int problem_number, double time);
             void reconstruction();
+            void reconstruction_hat();
 
         private:
             void read_su2(std::filesystem::path filename);

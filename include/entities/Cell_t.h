@@ -29,6 +29,10 @@ namespace FVM { namespace Entities {
             FVM::Entities::Vec2f uy_derivative_;
             FVM::Entities::Vec2f p_derivative_;
             FVM::Entities::Vec2f gamma_derivative_;
+            double a_hat_;
+            FVM::Entities::Vec2f u_hat_;
+            double p_hat_;
+            double gamma_hat_;
     };
 }}
 #endif

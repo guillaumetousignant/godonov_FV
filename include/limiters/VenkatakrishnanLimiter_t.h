@@ -10,6 +10,7 @@ namespace FVM { namespace Limiters {
             ~VenkatakrishnanLimiter_t();
 
             void calculate_derivatives(FVM::Entities::Mesh2D_t &mesh);
+            void calculate_derivatives_hat(FVM::Entities::Mesh2D_t &mesh);
     };
 }}
 #endif
