@@ -85,3 +85,7 @@ void FVM::Fluxes::ExactRiemannFlux_t::calculate_fluxes(double delta_t, FVM::Enti
         face.F_4_ = u_face * (gamma_face * p_face /(gamma_face - 1) + gamma_face * p_face * (std::pow(uv_face.x(), 2) + std::pow(uv_face.y(), 2)) * 0.5 /std::pow(a_face, 2));
     }
 }
+
+void FVM::Fluxes::ExactRiemannFlux_t::calculate_fluxes_higher_order(double delta_t, FVM::Entities::Mesh2D_t &mesh) {
+
+}

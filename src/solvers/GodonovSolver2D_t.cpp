@@ -41,7 +41,7 @@ void GodonovSolver2D_t<FluxCalculator, FluxLimiter>::solve(double end_time, doub
         mesh.boundary_conditions();
         mesh.reconstruction();
         flux_limiter_.calculate_derivatives(mesh);
-        flux_calculator_.calculate_fluxes(delta_t, mesh);
+        flux_calculator_.calculate_fluxes_higher_order(delta_t, mesh);
         timestep(delta_t, mesh);
         time += delta_t;
     }

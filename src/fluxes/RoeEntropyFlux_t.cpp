@@ -180,3 +180,7 @@ void FVM::Fluxes::RoeEntropyFlux_t::calculate_fluxes(double delta_t, FVM::Entiti
 
     }
 }
+
+void FVM::Fluxes::RoeEntropyFlux_t::calculate_fluxes_higher_order(double delta_t, FVM::Entities::Mesh2D_t &mesh) {
+
+}
