@@ -150,10 +150,10 @@ void GodonovSolver2D_t<FluxCalculator, FluxLimiter>::corrector(double delta_t, F
         const double U_3 = cell.gamma_ * cell.p_ * cell.u_.y()/std::pow(cell.a_, 2) - delta_t * F_3 * 0.5/cell.area_;
         const double U_4 = cell.p_/(cell.gamma_ - 1) + cell.gamma_ * cell.p_ * cell.u_.magnitudeSquared() * 0.5/std::pow(cell.a_, 2) - delta_t * F_4 * 0.5/cell.area_;
 
-        cell.u_hat_ = FVM::Entities::Vec2f(U_2/U_1, U_3/U_1);
-        cell.p_hat_ = (cell.gamma_ - 1) * (U_4 - 0.5 * (U_2 * cell.u_.x() + U_3 * cell.u_.y()));
-        cell.a_hat_ = std::sqrt(cell.gamma_ * cell.p_ /U_1);
-        cell.gamma_hat_ = cell.gamma_;
+        cell.u_ = FVM::Entities::Vec2f(U_2/U_1, U_3/U_1);
+        cell.p_ = (cell.gamma_ - 1) * (U_4 - 0.5 * (U_2 * cell.u_.x() + U_3 * cell.u_.y()));
+        cell.a_ = std::sqrt(cell.gamma_ * cell.p_ /U_1);
+        cell.gamma_ = cell.gamma_;
     }
 }
 
