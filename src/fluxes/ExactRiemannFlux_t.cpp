@@ -58,7 +58,7 @@ void FVM::Fluxes::ExactRiemannFlux_t::calculate_fluxes_higher_order(double delta
 }
 
 void FVM::Fluxes::ExactRiemannFlux_t::calculate_fluxes(double delta_t, FVM::Entities::Mesh2D_t &mesh) {
-    //#pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(guided)
     for (int i = 0; i < mesh.faces_.size(); ++i) {
         FVM::Entities::Face_t& face = mesh.faces_[i];
         const FVM::Entities::Cell_t& cell_L = mesh.cells_[face.cells_[0]];

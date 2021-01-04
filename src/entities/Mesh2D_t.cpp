@@ -27,7 +27,9 @@ FVM::Entities::Mesh2D_t::Mesh2D_t(std::filesystem::path filename) {
 }
 
 void FVM::Entities::Mesh2D_t::initial_conditions(FVM::Entities::Vec2f center, const state& state_NE, const state& state_NW, const state& state_SW, const state& state_SE) {
-    for (auto& cell: cells_) {
+    #pragma omp parallel for schedule(guided)
+    for (long long i = 0; i < cells_.size(); ++i) {
+        FVM::Entities::Cell_t &cell = cells_[i];
         if (cell.center_.x() > center.x() && cell.center_.y() >= center.y()) {
             cell.a_ = std::sqrt(state_NE.gamma * state_NE.p / state_NE.rho);
             cell.u_ = state_NE.u;
@@ -56,7 +58,8 @@ void FVM::Entities::Mesh2D_t::initial_conditions(FVM::Entities::Vec2f center, co
 }
 
 void FVM::Entities::Mesh2D_t::boundary_conditions() {
-    for (size_t i = n_cells_; i < n_cells_ + n_boundary_; ++i) {
+    #pragma omp parallel for schedule(guided)
+    for (long long i = n_cells_; i < n_cells_ + n_boundary_; ++i) {
         // CHECK this will not work with 2nd order
         cells_[i].a_ = cells_[cells_[i].cells_[0]].a_; // Both cell to cell links point to the cell inside the domain for boundary line elements.
         cells_[i].u_ = cells_[cells_[i].cells_[0]].u_;
@@ -71,7 +74,8 @@ void FVM::Entities::Mesh2D_t::boundary_conditions() {
 }
 
 void FVM::Entities::Mesh2D_t::boundary_conditions_hat() {
-    for (size_t i = n_cells_; i < n_cells_ + n_boundary_; ++i) {
+    #pragma omp parallel for schedule(guided)
+    for (long long i = n_cells_; i < n_cells_ + n_boundary_; ++i) {
         // CHECK this will not work with 2nd order
         cells_[i].a_hat_ = cells_[cells_[i].cells_[0]].a_hat_; // Both cell to cell links point to the cell inside the domain for boundary line elements.
         cells_[i].u_hat_ = cells_[cells_[i].cells_[0]].u_hat_;
@@ -287,7 +291,7 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
 }
 
 void FVM::Entities::Mesh2D_t::reconstruction() {
-    //#pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(guided)
     for (long long i = 0; i < n_cells_; ++i) {
         FVM::Entities::Cell_t& cell = cells_[i];
 
@@ -342,7 +346,7 @@ void FVM::Entities::Mesh2D_t::reconstruction() {
 }
 
 void FVM::Entities::Mesh2D_t::reconstruction_hat() {
-    //#pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(guided)
     for (long long i = 0; i < n_cells_; ++i) {
         FVM::Entities::Cell_t& cell = cells_[i];
 
@@ -405,7 +409,7 @@ void FVM::Entities::Mesh2D_t::build_node_to_cell() {
 }
 
 void FVM::Entities::Mesh2D_t::build_cell_to_cell() {
-    //#pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(guided)
     for (long long i = 0; i < cells_.size(); ++i) {
         for (size_t j = 0; j < cells_[i].nodes_.size() - 1; ++j) {
             for (size_t m = 0; m < nodes_[cells_[i].nodes_[j]].cells_.size(); ++m) {
@@ -466,7 +470,7 @@ void FVM::Entities::Mesh2D_t::build_faces() {
 }
 
 void FVM::Entities::Mesh2D_t::compute_cell_geometry() {
-    //#pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(guided)
     for (long long i = 0; i < cells_.size(); ++i) {
         FVM::Entities::Cell_t& cell = cells_[i];
         cell.center_ = Vec2f();
@@ -487,7 +491,7 @@ void FVM::Entities::Mesh2D_t::compute_cell_geometry() {
 }
 
 void FVM::Entities::Mesh2D_t::compute_face_geometry() {
-    //#pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(guided)
     for (long long i = 0; i < faces_.size(); ++i) {
         FVM::Entities::Face_t& face = faces_[i];
         face.tangent_ = nodes_[face.nodes_[1]].pos_ - nodes_[face.nodes_[0]].pos_; 

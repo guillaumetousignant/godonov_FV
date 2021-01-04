@@ -65,7 +65,7 @@ double GodonovSolver2D_t<FluxCalculator, FluxLimiter>::calculate_delta_t(double 
 
 template<typename FluxCalculator, typename FluxLimiter>
 void GodonovSolver2D_t<FluxCalculator, FluxLimiter>::timestep(double delta_t, FVM::Entities::Mesh2D_t& mesh) {
-    //#pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(guided)
     for (long long i = 0; i < mesh.n_cells_; ++i) { // Because msvc openmp wants a signed index, so no size_t :(
         FVM::Entities::Cell_t& cell =  mesh.cells_[i];
 
@@ -96,7 +96,7 @@ void GodonovSolver2D_t<FluxCalculator, FluxLimiter>::timestep(double delta_t, FV
 
 template<typename FluxCalculator, typename FluxLimiter>
 void GodonovSolver2D_t<FluxCalculator, FluxLimiter>::predictor(double delta_t, FVM::Entities::Mesh2D_t& mesh) {
-    //#pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(guided)
     for (long long i = 0; i < mesh.n_cells_; ++i) { // Because msvc openmp wants a signed index, so no size_t :(
         FVM::Entities::Cell_t& cell =  mesh.cells_[i];
 
@@ -127,7 +127,7 @@ void GodonovSolver2D_t<FluxCalculator, FluxLimiter>::predictor(double delta_t, F
 }
 template<typename FluxCalculator, typename FluxLimiter>
 void GodonovSolver2D_t<FluxCalculator, FluxLimiter>::corrector(double delta_t, FVM::Entities::Mesh2D_t& mesh) {
-    //#pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(guided)
     for (long long i = 0; i < mesh.n_cells_; ++i) { // Because msvc openmp wants a signed index, so no size_t :(
         FVM::Entities::Cell_t& cell =  mesh.cells_[i];
 
