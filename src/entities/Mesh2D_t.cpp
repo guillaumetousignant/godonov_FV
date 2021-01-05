@@ -59,10 +59,31 @@ void FVM::Entities::Mesh2D_t::initial_conditions(FVM::Entities::Vec2f center, co
 
 void FVM::Entities::Mesh2D_t::boundary_conditions() {
     #pragma omp parallel for schedule(static)
-    for (long long i = n_cells_; i < n_cells_ + n_boundary_; ++i) {
+    for (long long i = n_cells_; i < n_cells_ + n_farfield_; ++i) {
         // CHECK this will not work with 2nd order
         cells_[i].a_ = cells_[cells_[i].cells_[0]].a_; // Both cell to cell links point to the cell inside the domain for boundary line elements.
         cells_[i].u_ = cells_[cells_[i].cells_[0]].u_;
+        cells_[i].p_ = cells_[cells_[i].cells_[0]].p_;
+        cells_[i].gamma_ = cells_[cells_[i].cells_[0]].gamma_;
+        cells_[i].a_derivative_ = {0, 0};
+        cells_[i].ux_derivative_ = {0, 0};
+        cells_[i].uy_derivative_ = {0, 0};
+        cells_[i].p_derivative_ = {0, 0};
+        cells_[i].gamma_derivative_ = {0, 0};
+    }
+
+    #pragma omp parallel for schedule(static)
+    for (long long i = n_cells_ + n_farfield_; i < n_cells_ + n_farfield_ + n_wall_; ++i) {
+        // CHECK this doesn't work with higher-order, as the velocity used to compute the flux are interpolated to the boundary using the derivative
+        Vec2f u_prime(cells_[cells_[i].cells_[0]].u_.dot(faces_[cells_[i].faces_[0]].normal_), cells_[cells_[i].cells_[0]].u_.dot(faces_[cells_[i].faces_[0]].tangent_));
+        u_prime.x() = -u_prime.x();
+
+        const Vec2f normal_inv = Vec2f(faces_[cells_[i].faces_[0]].normal_.x(), faces_[cells_[i].faces_[0]].tangent_.x());
+        const Vec2f tangent_inv = Vec2f(faces_[cells_[i].faces_[0]].normal_.y(), faces_[cells_[i].faces_[0]].tangent_.y());
+
+        // CHECK this will not work with 2nd order
+        cells_[i].a_ = cells_[cells_[i].cells_[0]].a_; // Both cell to cell links point to the cell inside the domain for boundary line elements.
+        cells_[i].u_ = {normal_inv.dot(u_prime), tangent_inv.dot(u_prime)};
         cells_[i].p_ = cells_[cells_[i].cells_[0]].p_;
         cells_[i].gamma_ = cells_[cells_[i].cells_[0]].gamma_;
         cells_[i].a_derivative_ = {0, 0};
@@ -75,10 +96,31 @@ void FVM::Entities::Mesh2D_t::boundary_conditions() {
 
 void FVM::Entities::Mesh2D_t::boundary_conditions_hat() {
     #pragma omp parallel for schedule(static)
-    for (long long i = n_cells_; i < n_cells_ + n_boundary_; ++i) {
+    for (long long i = n_cells_; i < n_cells_ + n_farfield_; ++i) {
         // CHECK this will not work with 2nd order
         cells_[i].a_hat_ = cells_[cells_[i].cells_[0]].a_hat_; // Both cell to cell links point to the cell inside the domain for boundary line elements.
         cells_[i].u_hat_ = cells_[cells_[i].cells_[0]].u_hat_;
+        cells_[i].p_hat_ = cells_[cells_[i].cells_[0]].p_hat_;
+        cells_[i].gamma_hat_ = cells_[cells_[i].cells_[0]].gamma_hat_;
+        cells_[i].a_derivative_hat_ = {0, 0};
+        cells_[i].ux_derivative_hat_ = {0, 0};
+        cells_[i].uy_derivative_hat_ = {0, 0};
+        cells_[i].p_derivative_hat_ = {0, 0};
+        cells_[i].gamma_derivative_hat_ = {0, 0};
+    }
+
+    #pragma omp parallel for schedule(static)
+    for (long long i = n_cells_ + n_farfield_; i < n_cells_ + n_farfield_ + n_wall_; ++i) {
+        // CHECK this doesn't work with higher-order, as the velocity used to compute the flux are interpolated to the boundary using the derivative
+        Vec2f u_prime(cells_[cells_[i].cells_[0]].u_hat_.dot(faces_[cells_[i].faces_[0]].normal_), cells_[cells_[i].cells_[0]].u_hat_.dot(faces_[cells_[i].faces_[0]].tangent_));
+        u_prime.x() = -u_prime.x();
+
+        const Vec2f normal_inv = Vec2f(faces_[cells_[i].faces_[0]].normal_.x(), faces_[cells_[i].faces_[0]].tangent_.x());
+        const Vec2f tangent_inv = Vec2f(faces_[cells_[i].faces_[0]].normal_.y(), faces_[cells_[i].faces_[0]].tangent_.y());
+
+        // CHECK this will not work with 2nd order
+        cells_[i].a_hat_ = cells_[cells_[i].cells_[0]].a_hat_; // Both cell to cell links point to the cell inside the domain for boundary line elements.
+        cells_[i].u_hat_ = {normal_inv.dot(u_prime), tangent_inv.dot(u_prime)};
         cells_[i].p_hat_ = cells_[cells_[i].cells_[0]].p_hat_;
         cells_[i].gamma_hat_ = cells_[cells_[i].cells_[0]].gamma_hat_;
         cells_[i].a_derivative_hat_ = {0, 0};
@@ -312,62 +354,99 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
     }
     while (token != "NMARK=");
 
-    
+    std::vector<Cell_t> farfield;
+    std::vector<Cell_t> wall;
+    n_farfield_ = 0;
+    n_wall_ = 0;
 
-    if (n_markers != 1) {
-        std::cerr << "Error: expected 1 boundary, found '" << n_markers << "'. Exiting." << std::endl;
-        return;
-    }
-
-    std::string type;
-    do {
-        std::getline(meshfile, line);
-        if (!line.empty()) {
-            std::istringstream liness(line);
-            liness >> token;
-            liness >> type;
-        }   
-    }
-    while (token != "MARKER_TAG=");
-
-    if (type == "farfield") {
+    for (int i = 0; i < n_markers; ++i) {
+        std::string type;
         do {
             std::getline(meshfile, line);
             if (!line.empty()) {
                 std::istringstream liness(line);
                 liness >> token;
-                liness >> value;
+                liness >> type;
             }   
         }
-        while (token != "MARKER_ELEMS=");
+        while (token != "MARKER_TAG=");
+        std::transform(type.begin(), type.end(), type.begin(),
+            [](unsigned char c){ return std::tolower(c); });
 
-        n_boundary_ = value;
-        cells_.reserve(n_cells_ + n_boundary_);
-
-        for (size_t j = 0; j < n_boundary_; ++j) {
-
-            std::getline(meshfile, line);
-            std::istringstream liness6(line);
-
-            liness6 >> token;
-            if (token != "3") {
-                std::cerr << "Error: expected token '3', found '" << token << "'. Exiting." << std::endl;
-                return;
+        if (type == "farfield") {
+            do {
+                std::getline(meshfile, line);
+                if (!line.empty()) {
+                    std::istringstream liness(line);
+                    liness >> token;
+                    liness >> value;
+                }   
             }
+            while (token != "MARKER_ELEMS=");
 
-            size_t val0, val1;
-            liness6 >> val0 >> val1;
-            cells_.push_back(Cell_t(2));
-            cells_[n_cells_ + j].nodes_[0] = val0 - 1;
-            cells_[n_cells_ + j].nodes_[1] = val1 - 1;
+            n_farfield_ += value;
+            farfield.reserve(n_farfield_);
+
+            for (size_t j = 0; j < value; ++j) {
+
+                std::getline(meshfile, line);
+                std::istringstream liness6(line);
+
+                liness6 >> token;
+                if (token != "3") {
+                    std::cerr << "Error: expected token '3', found '" << token << "'. Exiting." << std::endl;
+                    return;
+                }
+
+                size_t val0, val1;
+                liness6 >> val0 >> val1;
+                farfield.push_back(Cell_t(2));
+                farfield[farfield.size() - 1].nodes_[0] = val0 - 1;
+                farfield[farfield.size() - 1].nodes_[1] = val1 - 1;
+            }
         }
-    }
-    else {
-        std::cerr << "Error: expected marker tag 'farfield', found '" << type << "'. Exiting." << std::endl;
-        return;
+        else if (type == "wall") {
+            do {
+                std::getline(meshfile, line);
+                if (!line.empty()) {
+                    std::istringstream liness(line);
+                    liness >> token;
+                    liness >> value;
+                }   
+            }
+            while (token != "MARKER_ELEMS=");
+
+            n_wall_ += value;
+            wall.reserve(n_wall_);
+
+            for (size_t j = 0; j < value; ++j) {
+
+                std::getline(meshfile, line);
+                std::istringstream liness6(line);
+
+                liness6 >> token;
+                if (token != "3") {
+                    std::cerr << "Error: expected token '3', found '" << token << "'. Exiting." << std::endl;
+                    return;
+                }
+
+                size_t val0, val1;
+                liness6 >> val0 >> val1;
+                wall.push_back(Cell_t(2));
+                wall[wall.size() - 1].nodes_[0] = val0 - 1;
+                wall[wall.size() - 1].nodes_[1] = val1 - 1;
+            }
+        }
+        else {
+            std::cerr << "Error: expected marker tag 'farfield' or 'wall', found '" << type << "'. Exiting." << std::endl;
+            exit(6);
+        }
     }
 
     meshfile.close();
+
+    cells_.insert(std::end(cells_), std::begin(farfield), std::end(farfield));
+    cells_.insert(std::end(cells_), std::begin(wall), std::end(wall));
 }
 
 void FVM::Entities::Mesh2D_t::reconstruction() {

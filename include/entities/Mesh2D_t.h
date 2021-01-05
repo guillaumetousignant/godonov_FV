@@ -23,7 +23,8 @@ namespace FVM { namespace Entities {
             Mesh2D_t(std::filesystem::path filename);
 
             size_t n_cells_;
-            size_t n_boundary_;
+            size_t n_farfield_;
+            size_t n_wall_;
             std::vector<Node_t> nodes_; // x, y
             std::vector<Cell_t> cells_;
             std::vector<Face_t> faces_;
