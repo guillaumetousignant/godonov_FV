@@ -140,6 +140,46 @@ void FVM::Entities::Mesh2D_t::write_tecplot(std::filesystem::path filename, int 
     }
     file << std::endl;
 
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].a_derivative_.x() << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].a_derivative_.y() << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].ux_derivative_.x() << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].ux_derivative_.y() << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].uy_derivative_.x() << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].uy_derivative_.y() << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].p_derivative_.x() << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].p_derivative_.y() << " ";
+    }
+    file << std::endl;
+
     // Connectivity
     file << std::endl;
     for (int i = 0; i < n_cells_; ++i) {
