@@ -9,7 +9,7 @@ FVM::Fluxes::HLLEFlux_t::HLLEFlux_t() {}
 FVM::Fluxes::HLLEFlux_t::~HLLEFlux_t() {}
 
 void FVM::Fluxes::HLLEFlux_t::calculate_fluxes(double delta_t, const std::vector<double> &gamma, const std::vector<double> &u, const std::vector<double> &a, const std::vector<double> &p, std::vector<double> &F_1, std::vector<double> &F_2, std::vector<double> &F_3) {
-    #pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(static)
     for (int i = 0; i < F_1.size(); ++i) {
         // This would be all better if I stored those in the mesh, but that would not be drop-in replacable with the Riemann problem fluxes.
         const double F_1_L = gamma[i] * p[i] * u[i] /(std::pow(a[i], 2)); // Those should probably be cached somewhere, they are computed twice.
@@ -61,7 +61,7 @@ void FVM::Fluxes::HLLEFlux_t::calculate_fluxes(double delta_t, const std::vector
 }
 
 void FVM::Fluxes::HLLEFlux_t::calculate_fluxes_higher_order(double delta_t, const std::vector<double> x, const std::vector<double> &gamma, const std::vector<double> &u, const std::vector<double> &a, const std::vector<double> &p, std::vector<double> &F_1, std::vector<double> &F_2, std::vector<double> &F_3, const std::vector<double> du_dx, const std::vector<double> da_dx, const std::vector<double> dp_dx) {
-    #pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(static)
     for (int i = 0; i < F_1.size(); ++i) {
         const double delta_x = (x[i+1] - x[i])/2; // CHECK this won't work with non-uniform meshes! Use (x - x_i)
 
@@ -124,7 +124,7 @@ void FVM::Fluxes::HLLEFlux_t::calculate_fluxes_higher_order(double delta_t, cons
 }
 
 void FVM::Fluxes::HLLEFlux_t::calculate_fluxes(double delta_t, FVM::Entities::Mesh2D_t &mesh) {
-    #pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(static)
     for (long long i = 0; i < mesh.faces_.size(); ++i) { // Because msvc openmp wants a signed index, so no size_t :(
         FVM::Entities::Face_t& face = mesh.faces_[i];
         const FVM::Entities::Cell_t& cell_L = mesh.cells_[face.cells_[0]];
@@ -197,7 +197,7 @@ void FVM::Fluxes::HLLEFlux_t::calculate_fluxes(double delta_t, FVM::Entities::Me
 }
 
 void FVM::Fluxes::HLLEFlux_t::calculate_fluxes_higher_order(double delta_t, FVM::Entities::Mesh2D_t &mesh) {
-    #pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(static)
     for (long long i = 0; i < mesh.faces_.size(); ++i) { // Because msvc openmp wants a signed index, so no size_t :(
         FVM::Entities::Face_t& face = mesh.faces_[i];
         const FVM::Entities::Cell_t& cell_L = mesh.cells_[face.cells_[0]];
@@ -282,7 +282,7 @@ void FVM::Fluxes::HLLEFlux_t::calculate_fluxes_higher_order(double delta_t, FVM:
 }
 
 void FVM::Fluxes::HLLEFlux_t::calculate_fluxes_higher_order_hat(double delta_t, FVM::Entities::Mesh2D_t &mesh) {
-    #pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(static)
     for (long long i = 0; i < mesh.faces_.size(); ++i) { // Because msvc openmp wants a signed index, so no size_t :(
         FVM::Entities::Face_t& face = mesh.faces_[i];
         const FVM::Entities::Cell_t& cell_L = mesh.cells_[face.cells_[0]];

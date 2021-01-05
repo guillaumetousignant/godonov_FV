@@ -7,7 +7,7 @@ FVM::Fluxes::ExactRiemannFlux_t::ExactRiemannFlux_t() {}
 FVM::Fluxes::ExactRiemannFlux_t::~ExactRiemannFlux_t() {}
 
 void FVM::Fluxes::ExactRiemannFlux_t::calculate_fluxes(double delta_t, const std::vector<double> &gamma, const std::vector<double> &u, const std::vector<double> &a, const std::vector<double> &p, std::vector<double> &F_1, std::vector<double> &F_2, std::vector<double> &F_3) {
-    #pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(static)
     for (int i = 0; i < F_1.size(); ++i) {
         double a_star_L, a_star_R;
         double p_star_L, p_star_R;
@@ -27,7 +27,7 @@ void FVM::Fluxes::ExactRiemannFlux_t::calculate_fluxes(double delta_t, const std
 }
 
 void FVM::Fluxes::ExactRiemannFlux_t::calculate_fluxes_higher_order(double delta_t, const std::vector<double> x, const std::vector<double> &gamma, const std::vector<double> &u, const std::vector<double> &a, const std::vector<double> &p, std::vector<double> &F_1, std::vector<double> &F_2, std::vector<double> &F_3, const std::vector<double> du_dx, const std::vector<double> da_dx, const std::vector<double> dp_dx) {
-    #pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(static)
     for (int i = 0; i < F_1.size(); ++i) {
         double a_star_L, a_star_R;
         double p_star_L, p_star_R;
@@ -58,7 +58,7 @@ void FVM::Fluxes::ExactRiemannFlux_t::calculate_fluxes_higher_order(double delta
 }
 
 void FVM::Fluxes::ExactRiemannFlux_t::calculate_fluxes(double delta_t, FVM::Entities::Mesh2D_t &mesh) {
-    #pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(static)
     for (int i = 0; i < mesh.faces_.size(); ++i) {
         FVM::Entities::Face_t& face = mesh.faces_[i];
         const FVM::Entities::Cell_t& cell_L = mesh.cells_[face.cells_[0]];

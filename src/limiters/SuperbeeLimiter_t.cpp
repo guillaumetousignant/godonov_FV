@@ -8,7 +8,7 @@ FVM::Limiters::SuperbeeLimiter_t::SuperbeeLimiter_t() {}
 FVM::Limiters::SuperbeeLimiter_t::~SuperbeeLimiter_t() {}
 
 void FVM::Limiters::SuperbeeLimiter_t::calculate_derivatives(const std::vector<double> &x, const std::vector<double> &u, const std::vector<double> &a, const std::vector<double> &p, std::vector<double> &du_dx, std::vector<double> &da_dx, std::vector<double> &dp_dx) {
-    #pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(static)
     for (int i = 1; i <= x.size() - 2; ++i) {
         const double delta_x_L = x[i] - x[i-1];
         const double delta_x_R = x[i+1] - x[i];
