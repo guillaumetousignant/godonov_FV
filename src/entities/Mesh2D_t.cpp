@@ -271,7 +271,7 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
 }
 
 void FVM::Entities::Mesh2D_t::reconstruction() {
-    //#pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(static)
     for (long long i = 0; i < n_cells_; ++i) {
         double delta_x2 = 0;
         double delta_y2 = 0;
@@ -288,7 +288,7 @@ void FVM::Entities::Mesh2D_t::build_node_to_cell() {
 }
 
 void FVM::Entities::Mesh2D_t::build_cell_to_cell() {
-    //#pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(static)
     for (long long i = 0; i < cells_.size(); ++i) {
         for (size_t j = 0; j < cells_[i].nodes_.size() - 1; ++j) {
             for (size_t m = 0; m < nodes_[cells_[i].nodes_[j]].cells_.size(); ++m) {
@@ -349,7 +349,7 @@ void FVM::Entities::Mesh2D_t::build_faces() {
 }
 
 void FVM::Entities::Mesh2D_t::compute_cell_geometry() {
-    //#pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(static)
     for (long long i = 0; i < cells_.size(); ++i) {
         FVM::Entities::Cell_t& cell = cells_[i];
         cell.center_ = Vec2f();
@@ -370,7 +370,7 @@ void FVM::Entities::Mesh2D_t::compute_cell_geometry() {
 }
 
 void FVM::Entities::Mesh2D_t::compute_face_geometry() {
-    //#pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(static)
     for (long long i = 0; i < faces_.size(); ++i) {
         FVM::Entities::Face_t& face = faces_[i];
         face.tangent_ = nodes_[face.nodes_[1]].pos_ - nodes_[face.nodes_[0]].pos_; 

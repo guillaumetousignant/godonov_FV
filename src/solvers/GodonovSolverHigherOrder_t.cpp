@@ -150,7 +150,7 @@ void GodonovSolverHigherOrder_t<FluxCalculator, FluxLimiter>::predictor(double d
 
 template<typename FluxCalculator, typename FluxLimiter>
 void GodonovSolverHigherOrder_t<FluxCalculator, FluxLimiter>::corrector(double delta_t, double delta_x, const std::vector<double> &gamma, std::vector<double> &u, std::vector<double> &a, std::vector<double> &p, const std::vector<double> F_1, const std::vector<double> F_2, const std::vector<double> F_3, const std::vector<double> F_1_hat, const std::vector<double> F_2_hat, const std::vector<double> F_3_hat) {
-    #pragma omp parallel for schedule(guided)
+    #pragma omp parallel for schedule(static)
     for (int i = 1; i <= gamma.size() - 2; ++i) {
         double U_1 = gamma[i] * p[i] /std::pow(a[i], 2);
         double U_2 = gamma[i] * p[i] * u[i]/std::pow(a[i], 2);
