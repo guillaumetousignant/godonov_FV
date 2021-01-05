@@ -55,6 +55,23 @@ void GodonovSolver2D_t<FluxCalculator, FluxLimiter>::solve(double end_time, doub
 }
 
 template<typename FluxCalculator, typename FluxLimiter>
+void GodonovSolver2D_t<FluxCalculator, FluxLimiter>::solve_first_order(double end_time, double cfl, FVM::Entities::Mesh2D_t& mesh) {
+    double time = 0.0;
+
+    while (time < end_time) {
+        double delta_t = calculate_delta_t(cfl, mesh);
+        if (time + delta_t > end_time) {
+            delta_t = end_time - time;
+        }
+
+        mesh.boundary_conditions();
+        flux_calculator_.calculate_fluxes(delta_t, mesh);
+        timestep(delta_t, mesh);
+        time += delta_t;
+    }
+}
+
+template<typename FluxCalculator, typename FluxLimiter>
 double GodonovSolver2D_t<FluxCalculator, FluxLimiter>::calculate_delta_t(double cfl, FVM::Entities::Mesh2D_t& mesh) {
     double min_dt = std::numeric_limits<double>::infinity();
     for (size_t i = 0; i < mesh.n_cells_; ++i) {
