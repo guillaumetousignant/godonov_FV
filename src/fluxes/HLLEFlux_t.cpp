@@ -291,14 +291,14 @@ void FVM::Fluxes::HLLEFlux_t::calculate_fluxes_higher_order_hat(double delta_t, 
         const Vec2f delta_L = face.center_ - cell_L.center_;
         const Vec2f delta_R = face.center_ - cell_R.center_;
 
-        const double gamma_L = cell_L.gamma_hat_ + delta_L.dot(cell_L.gamma_derivative_);
-        const Vec2f u_L = cell_L.u_hat_ + Vec2f(delta_L.dot(cell_L.ux_derivative_), delta_L.dot(cell_L.uy_derivative_));
-        const double a_L = cell_L.a_hat_ + delta_L.dot(cell_L.a_derivative_);
-        const double p_L = cell_L.p_hat_ + delta_L.dot(cell_L.p_derivative_);
-        const double gamma_R = cell_R.gamma_hat_ + delta_R.dot(cell_R.gamma_derivative_);
-        const Vec2f u_R = cell_R.u_hat_ + Vec2f(delta_R.dot(cell_R.ux_derivative_), delta_R.dot(cell_R.uy_derivative_));
-        const double a_R = cell_R.a_hat_ + delta_R.dot(cell_R.a_derivative_);
-        const double p_R = cell_R.p_hat_ + delta_R.dot(cell_R.p_derivative_);
+        const double gamma_L = cell_L.gamma_hat_ + delta_L.dot(cell_L.gamma_derivative_hat_);
+        const Vec2f u_L = cell_L.u_hat_ + Vec2f(delta_L.dot(cell_L.ux_derivative_hat_), delta_L.dot(cell_L.uy_derivative_hat_));
+        const double a_L = cell_L.a_hat_ + delta_L.dot(cell_L.a_derivative_hat_);
+        const double p_L = cell_L.p_hat_ + delta_L.dot(cell_L.p_derivative_hat_);
+        const double gamma_R = cell_R.gamma_hat_ + delta_R.dot(cell_R.gamma_derivative_hat_);
+        const Vec2f u_R = cell_R.u_hat_ + Vec2f(delta_R.dot(cell_R.ux_derivative_hat_), delta_R.dot(cell_R.uy_derivative_hat_));
+        const double a_R = cell_R.a_hat_ + delta_R.dot(cell_R.a_derivative_hat_);
+        const double p_R = cell_R.p_hat_ + delta_R.dot(cell_R.p_derivative_hat_);
 
         const Vec2f u_prime_L(u_L.dot(face.normal_), u_L.dot(face.tangent_));
         const Vec2f u_prime_R(u_R.dot(face.normal_), u_R.dot(face.tangent_));

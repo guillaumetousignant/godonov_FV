@@ -67,7 +67,7 @@ void FVM::Entities::Mesh2D_t::boundary_conditions() {
         cells_[i].gamma_ = cells_[cells_[i].cells_[0]].gamma_;
         cells_[i].a_derivative_ = {0, 0};
         cells_[i].ux_derivative_ = {0, 0};
-        cells_[i].ux_derivative_ = {0, 0};
+        cells_[i].uy_derivative_ = {0, 0};
         cells_[i].p_derivative_ = {0, 0};
         cells_[i].gamma_derivative_ = {0, 0};
     }
@@ -81,11 +81,11 @@ void FVM::Entities::Mesh2D_t::boundary_conditions_hat() {
         cells_[i].u_hat_ = cells_[cells_[i].cells_[0]].u_hat_;
         cells_[i].p_hat_ = cells_[cells_[i].cells_[0]].p_hat_;
         cells_[i].gamma_hat_ = cells_[cells_[i].cells_[0]].gamma_hat_;
-        cells_[i].a_derivative_ = {0, 0};
-        cells_[i].ux_derivative_ = {0, 0};
-        cells_[i].ux_derivative_ = {0, 0};
-        cells_[i].p_derivative_ = {0, 0};
-        cells_[i].gamma_derivative_ = {0, 0};
+        cells_[i].a_derivative_hat_ = {0, 0};
+        cells_[i].ux_derivative_hat_ = {0, 0};
+        cells_[i].uy_derivative_hat_ = {0, 0};
+        cells_[i].p_derivative_hat_ = {0, 0};
+        cells_[i].gamma_derivative_hat_ = {0, 0};
     }
 }
 
@@ -97,8 +97,8 @@ void FVM::Entities::Mesh2D_t::write_tecplot(std::filesystem::path filename, int 
     file.open(filename);
 
     file << "TITLE = \"Problem " << problem_number << " at t= " << time << "\"" << std::endl;
-    file << "VARIABLES = \"X\", \"Y\", \"U_x\", \"U_y\", \"rho\", \"p\", \"mach\", \"T\", \"da_dx\", \"da_dy\", \"dux_dx\", \"dux_dy\", \"duy_dx\", \"duy_dy\", \"dp_dx\", \"dp_dy\"" << std::endl;
-    file << "ZONE T=\"Zone 1\", ZONETYPE=FEQUADRILATERAL, NODES=" << nodes_.size() << ", ELEMENTS=" << n_cells_ << ", DATAPACKING=BLOCK, VARLOCATION=([1,2]=nodal,[3,4,5,6,7,8,9,10,11,12,13,14,15,16]=cellcentered), SOLUTIONTIME=" << time << std::endl;
+    file << "VARIABLES = \"X\", \"Y\", \"U_x\", \"U_y\", \"rho\", \"p\", \"mach\", \"T\", \"da_dx\", \"da_dy\", \"dux_dx\", \"dux_dy\", \"duy_dx\", \"duy_dy\", \"dp_dx\", \"dp_dy\", \"da_dx_hat\", \"da_dy_hat\", \"dux_dx_hat\", \"dux_dy_hat\", \"duy_dx_hat\", \"duy_dy_hat\", \"dp_dx_hat\", \"dp_dy_hat\"" << std::endl;
+    file << "ZONE T=\"Zone 1\", ZONETYPE=FEQUADRILATERAL, NODES=" << nodes_.size() << ", ELEMENTS=" << n_cells_ << ", DATAPACKING=BLOCK, VARLOCATION=([1,2]=nodal,[3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]=cellcentered), SOLUTIONTIME=" << time << std::endl;
 
     for (const auto& node: nodes_) {
         file << std::setw(12) << node.pos_.x() << " ";
@@ -177,6 +177,46 @@ void FVM::Entities::Mesh2D_t::write_tecplot(std::filesystem::path filename, int 
 
     for (int i = 0; i < n_cells_; ++i) {
         file << std::setw(12) << cells_[i].p_derivative_.y() << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].a_derivative_hat_.x() << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].a_derivative_hat_.y() << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].ux_derivative_hat_.x() << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].ux_derivative_hat_.y() << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].uy_derivative_hat_.x() << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].uy_derivative_hat_.y() << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].p_derivative_hat_.x() << " ";
+    }
+    file << std::endl;
+
+    for (int i = 0; i < n_cells_; ++i) {
+        file << std::setw(12) << cells_[i].p_derivative_hat_.y() << " ";
     }
     file << std::endl;
 
@@ -375,13 +415,13 @@ void FVM::Entities::Mesh2D_t::reconstruction() {
         cell.a_derivative_[1] = delta_ay/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_ax * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
         cell.a_derivative_[0] = -delta_ax/delta_x2 - cell.a_derivative_[1] * delta_xy/delta_x2;
         cell.ux_derivative_[1] = delta_uxy/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_uxx * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
-        cell.ux_derivative_[0] = -delta_uxx/delta_x2 - cell.a_derivative_[1] * delta_xy/delta_x2;
+        cell.ux_derivative_[0] = -delta_uxx/delta_x2 - cell.ux_derivative_[1] * delta_xy/delta_x2;
         cell.uy_derivative_[1] = delta_uyy/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_uyx * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
-        cell.uy_derivative_[0] = -delta_uyx/delta_x2 - cell.a_derivative_[1] * delta_xy/delta_x2;
+        cell.uy_derivative_[0] = -delta_uyx/delta_x2 - cell.uy_derivative_[1] * delta_xy/delta_x2;
         cell.p_derivative_[1] = delta_py/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_px * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
-        cell.p_derivative_[0] = -delta_px/delta_x2 - cell.a_derivative_[1] * delta_xy/delta_x2;
+        cell.p_derivative_[0] = -delta_px/delta_x2 - cell.p_derivative_[1] * delta_xy/delta_x2;
         cell.gamma_derivative_[1] = delta_gammay/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_gammax * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
-        cell.gamma_derivative_[0] = -delta_gammax/delta_x2 - cell.a_derivative_[1] * delta_xy/delta_x2;
+        cell.gamma_derivative_[0] = -delta_gammax/delta_x2 - cell.gamma_derivative_[1] * delta_xy/delta_x2;
     }
 }
 
@@ -427,16 +467,16 @@ void FVM::Entities::Mesh2D_t::reconstruction_hat() {
             delta_gammay += (cell_k.gamma_hat_ - cell.gamma_hat_) * delta_y;
         }
 
-        cell.a_derivative_[1] = delta_ay/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_ax * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
-        cell.a_derivative_[0] = -delta_ax/delta_x2 - cell.a_derivative_[1] * delta_xy/delta_x2;
-        cell.ux_derivative_[1] = delta_uxy/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_uxx * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
-        cell.ux_derivative_[0] = -delta_uxx/delta_x2 - cell.a_derivative_[1] * delta_xy/delta_x2;
-        cell.uy_derivative_[1] = delta_uyy/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_uyx * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
-        cell.uy_derivative_[0] = -delta_uyx/delta_x2 - cell.a_derivative_[1] * delta_xy/delta_x2;
-        cell.p_derivative_[1] = delta_py/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_px * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
-        cell.p_derivative_[0] = -delta_px/delta_x2 - cell.a_derivative_[1] * delta_xy/delta_x2;
-        cell.gamma_derivative_[1] = delta_gammay/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_gammax * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
-        cell.gamma_derivative_[0] = -delta_gammax/delta_x2 - cell.a_derivative_[1] * delta_xy/delta_x2;
+        cell.a_derivative_hat_[1] = delta_ay/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_ax * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
+        cell.a_derivative_hat_[0] = -delta_ax/delta_x2 - cell.a_derivative_hat_[1] * delta_xy/delta_x2;
+        cell.ux_derivative_hat_[1] = delta_uxy/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_uxx * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
+        cell.ux_derivative_hat_[0] = -delta_uxx/delta_x2 - cell.ux_derivative_hat_[1] * delta_xy/delta_x2;
+        cell.uy_derivative_hat_[1] = delta_uyy/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_uyx * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
+        cell.uy_derivative_hat_[0] = -delta_uyx/delta_x2 - cell.uy_derivative_hat_[1] * delta_xy/delta_x2;
+        cell.p_derivative_hat_[1] = delta_py/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_px * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
+        cell.p_derivative_hat_[0] = -delta_px/delta_x2 - cell.p_derivative_hat_[1] * delta_xy/delta_x2;
+        cell.gamma_derivative_hat_[1] = delta_gammay/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_gammax * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
+        cell.gamma_derivative_hat_[0] = -delta_gammax/delta_x2 - cell.gamma_derivative_hat_[1] * delta_xy/delta_x2;
     }
 }
 

@@ -33,6 +33,11 @@ namespace FVM { namespace Entities {
             FVM::Entities::Vec2f u_hat_;
             double p_hat_;
             double gamma_hat_;
+            FVM::Entities::Vec2f a_derivative_hat_; // Those can be reused, but I want to print them
+            FVM::Entities::Vec2f ux_derivative_hat_;
+            FVM::Entities::Vec2f uy_derivative_hat_;
+            FVM::Entities::Vec2f p_derivative_hat_;
+            FVM::Entities::Vec2f gamma_derivative_hat_;
     };
 }}
 #endif

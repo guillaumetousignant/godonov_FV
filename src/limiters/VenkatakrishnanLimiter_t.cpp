@@ -165,11 +165,11 @@ void FVM::Limiters::VenkatakrishnanLimiter_t::calculate_derivatives_hat(FVM::Ent
             const FVM::Entities::Face_t& face = mesh.faces_[face_index];
 
             const Vec2f delta = face.center_ - cell.center_;
-            const double a_l = cell.a_hat_ + delta.dot(cell.a_derivative_);
-            const Vec2f u_l = cell.u_hat_ + Vec2f(delta.dot(cell.ux_derivative_),
-                                              delta.dot(cell.uy_derivative_));
-            const double p_l = cell.p_hat_ + delta.dot(cell.p_derivative_);
-            const double gamma_l = cell.gamma_hat_ + delta.dot(cell.gamma_derivative_);
+            const double a_l = cell.a_hat_ + delta.dot(cell.a_derivative_hat_);
+            const Vec2f u_l = cell.u_hat_ + Vec2f(delta.dot(cell.ux_derivative_hat_),
+                                              delta.dot(cell.uy_derivative_hat_));
+            const double p_l = cell.p_hat_ + delta.dot(cell.p_derivative_hat_);
+            const double gamma_l = cell.gamma_hat_ + delta.dot(cell.gamma_derivative_hat_);
 
             double y_a;
             double y_ux;
@@ -239,10 +239,10 @@ void FVM::Limiters::VenkatakrishnanLimiter_t::calculate_derivatives_hat(FVM::Ent
             phi_gamma = std::min(phi_gamma, phi_gamma_l);
         }
 
-        cell.a_derivative_ *= phi_a;
-        cell.ux_derivative_ *= phi_u.x();
-        cell.uy_derivative_ *= phi_u.y();
-        cell.p_derivative_ *= phi_p;
-        cell.gamma_derivative_ *= phi_gamma;
+        cell.a_derivative_hat_ *= phi_a;
+        cell.ux_derivative_hat_ *= phi_u.x();
+        cell.uy_derivative_hat_ *= phi_u.y();
+        cell.p_derivative_hat_ *= phi_p;
+        cell.gamma_derivative_hat_ *= phi_gamma;
     }
 }
