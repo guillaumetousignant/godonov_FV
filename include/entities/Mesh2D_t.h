@@ -30,6 +30,7 @@ namespace FVM { namespace Entities {
             std::vector<Face_t> faces_;
 
             void initial_conditions(FVM::Entities::Vec2f center, const state& state_NE, const state& state_NW, const state& state_SW, const state& state_SE);
+            void initial_conditions(const state& state);
             void boundary_conditions();
             void boundary_conditions_hat();
             void write_tecplot(std::filesystem::path filename, int problem_number, double time);

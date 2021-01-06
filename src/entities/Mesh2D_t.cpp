@@ -57,6 +57,18 @@ void FVM::Entities::Mesh2D_t::initial_conditions(FVM::Entities::Vec2f center, co
     }
 }
 
+void FVM::Entities::Mesh2D_t::initial_conditions(const state& state) {
+    #pragma omp parallel for schedule(static)
+    for (long long i = 0; i < cells_.size(); ++i) {
+        FVM::Entities::Cell_t &cell = cells_[i];
+
+        cell.a_ = std::sqrt(state.gamma * state.p / state.rho);
+        cell.u_ = state.u;
+        cell.p_ = state.p;
+        cell.gamma_ = state.gamma;
+    }
+}
+
 void FVM::Entities::Mesh2D_t::boundary_conditions() {
     #pragma omp parallel for schedule(static)
     for (long long i = n_cells_; i < n_cells_ + n_farfield_; ++i) {
