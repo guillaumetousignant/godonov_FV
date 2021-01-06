@@ -287,159 +287,172 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
     std::ifstream meshfile(filename);
     if (!meshfile.is_open()) {
         std::cerr << "Error: file '" << filename << "' could not be opened. Exiting." << std::endl;
-        return;
+        exit(7);
     }
 
     do {
-        std::getline(meshfile, line);
-        if (!line.empty()) {
-            std::istringstream liness(line);
-            liness >> token;
-            liness >> value;
-        }   
+        std::getline(meshfile, line);  
     }
-    while (token != "NPOIN=");
-
-    nodes_ = std::vector<Node_t>(value);
-
-    for (size_t i = 0; i < nodes_.size(); ++i) {
-        std::getline(meshfile, line);
-        std::istringstream liness2(line);
-        liness2 >> nodes_[i].pos_[0] >> nodes_[i].pos_[1];
+    while (line.empty());
+    
+    std::istringstream liness(line);
+    liness >> token;
+    liness >> value;
+    if (token != "NDIME=") {
+        std::cerr << "Error: first token should be 'NDIME=', found '" << token << "'. Exiting." << std::endl;
+        exit(8);
     }
 
-    do {
-        std::getline(meshfile, line);
-        if (!line.empty()) {
-            std::istringstream liness(line);
-            liness >> token;
-            liness >> value;
-        }   
+    if (value != 2) {
+        std::cerr << "Error: program only works for 2 dimensions, found '" << value << "'. Exiting." << std::endl;
+        exit(9);
     }
-    while (token != "NELEM=");
-
-    cells_ = std::vector<Cell_t>(value);
-    n_cells_ = value;
-
-    for (size_t i = 0; i < cells_.size(); ++i) {
-        int n_sides;
-        size_t val[4];
-
-        std::getline(meshfile, line);
-        std::istringstream liness2(line);
-        liness2 >> token;
-        if (token == "9") {
-            n_sides = 4;
-            liness2 >> val[0] >> val[1] >> val[2] >> val[3];
-
-            cells_[i] = Cell_t(n_sides);
-            for (int j = 0; j < n_sides; ++j) {
-                cells_[i].nodes_[j] = val[j] - 1;
-            }
-        }
-        else {
-            std::cerr << "Error: expected token '9', found '" << token << "'. Exiting." << std::endl;
-            return;
-        }
-    }
-
-    int n_markers;
-    do {
-        std::getline(meshfile, line);
-        if (!line.empty()) {
-            std::istringstream liness(line);
-            liness >> token;
-            liness >> n_markers;
-        }   
-    }
-    while (token != "NMARK=");
 
     std::vector<Cell_t> farfield;
     std::vector<Cell_t> wall;
-    n_farfield_ = 0;
-    n_wall_ = 0;
 
-    for (int i = 0; i < n_markers; ++i) {
-        std::string type;
+    while (!meshfile.eof()) {
         do {
-            std::getline(meshfile, line);
-            if (!line.empty()) {
-                std::istringstream liness(line);
-                liness >> token;
-                liness >> type;
-            }   
+            std::getline(meshfile, line);  
         }
-        while (token != "MARKER_TAG=");
-        std::transform(type.begin(), type.end(), type.begin(),
+        while (line.empty());
+
+        std::istringstream liness(line);
+        liness >> token;
+        std::transform(token.begin(), token.end(), token.begin(),
             [](unsigned char c){ return std::tolower(c); });
 
-        if (type == "farfield") {
-            do {
+        if (token == "NPOIN=") {
+            liness >> value;
+            nodes_ = std::vector<Node_t>(value);
+
+            for (size_t i = 0; i < nodes_.size(); ++i) {
                 std::getline(meshfile, line);
-                if (!line.empty()) {
-                    std::istringstream liness(line);
-                    liness >> token;
-                    liness >> value;
-                }   
-            }
-            while (token != "MARKER_ELEMS=");
-
-            n_farfield_ += value;
-            farfield.reserve(n_farfield_);
-
-            for (size_t j = 0; j < value; ++j) {
-
-                std::getline(meshfile, line);
-                std::istringstream liness6(line);
-
-                liness6 >> token;
-                if (token != "3") {
-                    std::cerr << "Error: expected token '3', found '" << token << "'. Exiting." << std::endl;
-                    return;
-                }
-
-                size_t val0, val1;
-                liness6 >> val0 >> val1;
-                farfield.push_back(Cell_t(2));
-                farfield[farfield.size() - 1].nodes_[0] = val0 - 1;
-                farfield[farfield.size() - 1].nodes_[1] = val1 - 1;
+                std::istringstream liness2(line);
+                liness2 >> nodes_[i].pos_[0] >> nodes_[i].pos_[1];
             }
         }
-        else if (type == "wall") {
-            do {
-                std::getline(meshfile, line);
-                if (!line.empty()) {
-                    std::istringstream liness(line);
-                    liness >> token;
-                    liness >> value;
-                }   
-            }
-            while (token != "MARKER_ELEMS=");
+        else if (token == "NELEM=") {
+            liness >> value;
+            cells_ = std::vector<Cell_t>(value);
+            n_cells_ = value;
 
-            n_wall_ += value;
-            wall.reserve(n_wall_);
-
-            for (size_t j = 0; j < value; ++j) {
+            for (size_t i = 0; i < cells_.size(); ++i) {
+                int n_sides;
+                size_t val[4];
 
                 std::getline(meshfile, line);
-                std::istringstream liness6(line);
+                std::istringstream liness2(line);
+                liness2 >> token;
+                if (token == "9") {
+                    n_sides = 4;
+                    liness2 >> val[0] >> val[1] >> val[2] >> val[3];
 
-                liness6 >> token;
-                if (token != "3") {
-                    std::cerr << "Error: expected token '3', found '" << token << "'. Exiting." << std::endl;
-                    return;
+                    cells_[i] = Cell_t(n_sides);
+                    for (int j = 0; j < n_sides; ++j) {
+                        cells_[i].nodes_[j] = val[j] - 1;
+                    }
                 }
+                else {
+                    std::cerr << "Error: expected token '9', found '" << token << "'. Exiting." << std::endl;
+                    exit(10);
+                }
+            }
+        }
+        else if (token == "NMARK=") {
+            int n_markers;
+            liness >> n_markers;
 
-                size_t val0, val1;
-                liness6 >> val0 >> val1;
-                wall.push_back(Cell_t(2));
-                wall[wall.size() - 1].nodes_[0] = val0 - 1;
-                wall[wall.size() - 1].nodes_[1] = val1 - 1;
+            n_farfield_ = 0;
+            n_wall_ = 0;
+
+            for (int i = 0; i < n_markers; ++i) {
+                std::string type;
+                do {
+                    std::getline(meshfile, line);
+                    if (!line.empty()) {
+                        std::istringstream liness(line);
+                        liness >> token;
+                        liness >> type;
+                    }   
+                }
+                while (token != "MARKER_TAG=");
+                std::transform(type.begin(), type.end(), type.begin(),
+                    [](unsigned char c){ return std::tolower(c); });
+
+                if (type == "farfield") {
+                    do {
+                        std::getline(meshfile, line);
+                        if (!line.empty()) {
+                            std::istringstream liness(line);
+                            liness >> token;
+                            liness >> value;
+                        }   
+                    }
+                    while (token != "MARKER_ELEMS=");
+
+                    n_farfield_ += value;
+                    farfield.reserve(n_farfield_);
+
+                    for (size_t j = 0; j < value; ++j) {
+
+                        std::getline(meshfile, line);
+                        std::istringstream liness6(line);
+
+                        liness6 >> token;
+                        if (token != "3") {
+                            std::cerr << "Error: expected token '3', found '" << token << "'. Exiting." << std::endl;
+                            exit(11);
+                        }
+
+                        size_t val0, val1;
+                        liness6 >> val0 >> val1;
+                        farfield.push_back(Cell_t(2));
+                        farfield[farfield.size() - 1].nodes_[0] = val0 - 1;
+                        farfield[farfield.size() - 1].nodes_[1] = val1 - 1;
+                    }
+                }
+                else if (type == "wall") {
+                    do {
+                        std::getline(meshfile, line);
+                        if (!line.empty()) {
+                            std::istringstream liness(line);
+                            liness >> token;
+                            liness >> value;
+                        }   
+                    }
+                    while (token != "MARKER_ELEMS=");
+
+                    n_wall_ += value;
+                    wall.reserve(n_wall_);
+
+                    for (size_t j = 0; j < value; ++j) {
+
+                        std::getline(meshfile, line);
+                        std::istringstream liness6(line);
+
+                        liness6 >> token;
+                        if (token != "3") {
+                            std::cerr << "Error: expected token '3', found '" << token << "'. Exiting." << std::endl;
+                            exit(12);
+                        }
+
+                        size_t val0, val1;
+                        liness6 >> val0 >> val1;
+                        wall.push_back(Cell_t(2));
+                        wall[wall.size() - 1].nodes_[0] = val0 - 1;
+                        wall[wall.size() - 1].nodes_[1] = val1 - 1;
+                    }
+                }
+                else {
+                    std::cerr << "Error: expected marker tag 'farfield' or 'wall', found '" << type << "'. Exiting." << std::endl;
+                    exit(6);
+                }
             }
         }
         else {
-            std::cerr << "Error: expected marker tag 'farfield' or 'wall', found '" << type << "'. Exiting." << std::endl;
-            exit(6);
+            std::cerr << "Error: expected marker 'NPOIN=', 'NELEM=' or 'NMARK=', found '" << token << "'. Exiting." << std::endl;
+                    exit(13);
         }
     }
 
@@ -493,46 +506,23 @@ void FVM::Entities::Mesh2D_t::reconstruction() {
             delta_gammax += delta.x() * cell_k.gamma_;
             delta_gammay += delta.y() * cell_k.gamma_;
         }
-        
-        cell.a_derivative_[0] = -delta_ax/(delta_x2 - std::pow(delta_xy, 2)/delta_y2) 
-                                + cell.a_ * delta_x/(delta_x2 - std::pow(delta_xy, 2)/delta_y2) 
-                                + delta_ay * delta_xy/(delta_x2 * delta_y2 - std::pow(delta_xy, 2)) 
-                                - cell.a_ * delta_y * delta_xy/(delta_x2 * delta_y2 - std::pow(delta_xy, 2));
-        cell.a_derivative_[1] = -delta_ay/delta_y2
-                                + cell.a_ * delta_y/delta_y2
-                                - cell.a_derivative_[0] * delta_xy/delta_y2;
-        
-        cell.ux_derivative_[0] = -delta_uxx/(delta_x2 - std::pow(delta_xy, 2)/delta_y2) 
-                                + cell.u_.x() * delta_x/(delta_x2 - std::pow(delta_xy, 2)/delta_y2) 
-                                + delta_uxy * delta_xy/(delta_x2 * delta_y2 - std::pow(delta_xy, 2)) 
-                                - cell.u_.x() * delta_y * delta_xy/(delta_x2 * delta_y2 - std::pow(delta_xy, 2));
-        cell.ux_derivative_[1] = -delta_uxy/delta_y2
-                                + cell.u_.x() * delta_y/delta_y2
-                                - cell.ux_derivative_[0] * delta_xy/delta_y2;
 
-        cell.uy_derivative_[0] = -delta_uyx/(delta_x2 - std::pow(delta_xy, 2)/delta_y2) 
-                                + cell.u_.y() * delta_x/(delta_x2 - std::pow(delta_xy, 2)/delta_y2) 
-                                + delta_uyy * delta_xy/(delta_x2 * delta_y2 - std::pow(delta_xy, 2)) 
-                                - cell.u_.y() * delta_y * delta_xy/(delta_x2 * delta_y2 - std::pow(delta_xy, 2));
-        cell.uy_derivative_[1] = -delta_uyy/delta_y2
-                                + cell.u_.y() * delta_y/delta_y2
-                                - cell.uy_derivative_[0] * delta_xy/delta_y2;   
+        cell.a_derivative_[1] = delta_ay/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_ax * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
+        cell.a_derivative_[0] = -delta_ax/delta_x2 - cell.a_derivative_[1] * delta_xy/delta_x2;
+        cell.ux_derivative_[1] = delta_uxy/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_uxx * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
+        cell.ux_derivative_[0] = -delta_uxx/delta_x2 - cell.ux_derivative_[1] * delta_xy/delta_x2;
+        cell.uy_derivative_[1] = delta_uyy/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_uyx * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
+        cell.uy_derivative_[0] = -delta_uyx/delta_x2 - cell.uy_derivative_[1] * delta_xy/delta_x2;
+        cell.p_derivative_[1] = delta_py/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_px * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
+        cell.p_derivative_[0] = -delta_px/delta_x2 - cell.p_derivative_[1] * delta_xy/delta_x2;
+        cell.gamma_derivative_[1] = delta_gammay/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_gammax * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
+        cell.gamma_derivative_[0] = -delta_gammax/delta_x2 - cell.gamma_derivative_[1] * delta_xy/delta_x2;
 
-        cell.p_derivative_[0] = -delta_px/(delta_x2 - std::pow(delta_xy, 2)/delta_y2) 
-                                + cell.p_ * delta_x/(delta_x2 - std::pow(delta_xy, 2)/delta_y2) 
-                                + delta_py * delta_xy/(delta_x2 * delta_y2 - std::pow(delta_xy, 2)) 
-                                - cell.p_ * delta_y * delta_xy/(delta_x2 * delta_y2 - std::pow(delta_xy, 2));
-        cell.p_derivative_[1] = -delta_py/delta_y2
-                                + cell.p_ * delta_y/delta_y2
-                                - cell.p_derivative_[0] * delta_xy/delta_y2;
-
-        cell.gamma_derivative_[0] = -delta_gammax/(delta_x2 - std::pow(delta_xy, 2)/delta_y2) 
-                                    + cell.gamma_ * delta_x/(delta_x2 - std::pow(delta_xy, 2)/delta_y2) 
-                                    + delta_gammay * delta_xy/(delta_x2 * delta_y2 - std::pow(delta_xy, 2)) 
-                                    - cell.gamma_ * delta_y * delta_xy/(delta_x2 * delta_y2 - std::pow(delta_xy, 2));
-        cell.gamma_derivative_[1] = -delta_gammay/delta_y2
-                                    + cell.gamma_ * delta_y/delta_y2
-                                    - cell.gamma_derivative_[0] * delta_xy/delta_y2;
+        cell.a_derivative_ *= -1;
+        cell.ux_derivative_ *= -1;
+        cell.uy_derivative_ *= -1;
+        cell.p_derivative_ *= -1;
+        cell.gamma_derivative_ *= -1;
     }
 }
 
@@ -580,46 +570,23 @@ void FVM::Entities::Mesh2D_t::reconstruction_hat() {
             delta_gammax += delta.x() * cell_k.gamma_hat_;
             delta_gammay += delta.y() * cell_k.gamma_hat_;
         }
-        
-        cell.a_derivative_hat_[0] = -delta_ax/(delta_x2 - std::pow(delta_xy, 2)/delta_y2) 
-                                    + cell.a_hat_ * delta_x/(delta_x2 - std::pow(delta_xy, 2)/delta_y2) 
-                                    + delta_ay * delta_xy/(delta_x2 * delta_y2 - std::pow(delta_xy, 2)) 
-                                    - cell.a_hat_ * delta_y * delta_xy/(delta_x2 * delta_y2 - std::pow(delta_xy, 2));
-        cell.a_derivative_hat_[1] = -delta_ay/delta_y2
-                                    + cell.a_hat_ * delta_y/delta_y2
-                                    - cell.a_derivative_hat_[0] * delta_xy/delta_y2;
-        
-        cell.ux_derivative_hat_[0] = -delta_uxx/(delta_x2 - std::pow(delta_xy, 2)/delta_y2) 
-                                    + cell.u_hat_.x() * delta_x/(delta_x2 - std::pow(delta_xy, 2)/delta_y2) 
-                                    + delta_uxy * delta_xy/(delta_x2 * delta_y2 - std::pow(delta_xy, 2)) 
-                                    - cell.u_hat_.x() * delta_y * delta_xy/(delta_x2 * delta_y2 - std::pow(delta_xy, 2));
-        cell.ux_derivative_hat_[1] = -delta_uxy/delta_y2
-                                    + cell.u_hat_.x() * delta_y/delta_y2
-                                    - cell.ux_derivative_hat_[0] * delta_xy/delta_y2;
 
-        cell.uy_derivative_hat_[0] = -delta_uyx/(delta_x2 - std::pow(delta_xy, 2)/delta_y2) 
-                                    + cell.u_hat_.y() * delta_x/(delta_x2 - std::pow(delta_xy, 2)/delta_y2) 
-                                    + delta_uyy * delta_xy/(delta_x2 * delta_y2 - std::pow(delta_xy, 2)) 
-                                    - cell.u_hat_.y() * delta_y * delta_xy/(delta_x2 * delta_y2 - std::pow(delta_xy, 2));
-        cell.uy_derivative_hat_[1] = -delta_uyy/delta_y2
-                                    + cell.u_hat_.y() * delta_y/delta_y2
-                                    - cell.uy_derivative_hat_[0] * delta_xy/delta_y2;   
+        cell.a_derivative_hat_[1] = delta_ay/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_ax * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
+        cell.a_derivative_hat_[0] = -delta_ax/delta_x2 - cell.a_derivative_hat_[1] * delta_xy/delta_x2;
+        cell.ux_derivative_hat_[1] = delta_uxy/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_uxx * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
+        cell.ux_derivative_hat_[0] = -delta_uxx/delta_x2 - cell.ux_derivative_hat_[1] * delta_xy/delta_x2;
+        cell.uy_derivative_hat_[1] = delta_uyy/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_uyx * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
+        cell.uy_derivative_hat_[0] = -delta_uyx/delta_x2 - cell.uy_derivative_hat_[1] * delta_xy/delta_x2;
+        cell.p_derivative_hat_[1] = delta_py/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_px * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
+        cell.p_derivative_hat_[0] = -delta_px/delta_x2 - cell.p_derivative_hat_[1] * delta_xy/delta_x2;
+        cell.gamma_derivative_hat_[1] = delta_gammay/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_gammax * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
+        cell.gamma_derivative_hat_[0] = -delta_gammax/delta_x2 - cell.gamma_derivative_hat_[1] * delta_xy/delta_x2;
 
-        cell.p_derivative_hat_[0] = -delta_px/(delta_x2 - std::pow(delta_xy, 2)/delta_y2) 
-                                    + cell.p_hat_ * delta_x/(delta_x2 - std::pow(delta_xy, 2)/delta_y2) 
-                                    + delta_py * delta_xy/(delta_x2 * delta_y2 - std::pow(delta_xy, 2)) 
-                                    - cell.p_hat_ * delta_y * delta_xy/(delta_x2 * delta_y2 - std::pow(delta_xy, 2));
-        cell.p_derivative_hat_[1] = -delta_py/delta_y2
-                                    + cell.p_hat_ * delta_y/delta_y2
-                                    - cell.p_derivative_hat_[0] * delta_xy/delta_y2;
-
-        cell.gamma_derivative_hat_[0] = -delta_gammax/(delta_x2 - std::pow(delta_xy, 2)/delta_y2) 
-                                        + cell.gamma_hat_ * delta_x/(delta_x2 - std::pow(delta_xy, 2)/delta_y2) 
-                                        + delta_gammay * delta_xy/(delta_x2 * delta_y2 - std::pow(delta_xy, 2)) 
-                                        - cell.gamma_hat_ * delta_y * delta_xy/(delta_x2 * delta_y2 - std::pow(delta_xy, 2));
-        cell.gamma_derivative_hat_[1] = -delta_gammay/delta_y2
-                                        + cell.gamma_hat_ * delta_y/delta_y2
-                                        - cell.gamma_derivative_hat_[0] * delta_xy/delta_y2;
+        cell.a_derivative_hat_ *= -1;
+        cell.ux_derivative_hat_ *= -1;
+        cell.uy_derivative_hat_ *= -1;
+        cell.p_derivative_hat_ *= -1;
+        cell.gamma_derivative_hat_ *= -1;
     }
 }
 
