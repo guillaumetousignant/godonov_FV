@@ -320,9 +320,9 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
         std::istringstream liness(line);
         liness >> token;
         std::transform(token.begin(), token.end(), token.begin(),
-            [](unsigned char c){ return std::tolower(c); });
+            [](unsigned char c){ return std::toupper(c); });
 
-        if (token == "npoin=") {
+        if (token == "NPOIN=") {
             liness >> value;
             nodes_ = std::vector<Node_t>(value);
 
@@ -332,7 +332,7 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
                 liness2 >> nodes_[i].pos_[0] >> nodes_[i].pos_[1];
             }
         }
-        else if (token == "nelem=") {
+        else if (token == "NELEM=") {
             liness >> value;
             cells_ = std::vector<Cell_t>(value);
             n_cells_ = value;
@@ -359,7 +359,7 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
                 }
             }
         }
-        else if (token == "nmark=") {
+        else if (token == "NMARK=") {
             int n_markers;
             liness >> n_markers;
 
