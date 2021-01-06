@@ -501,6 +501,12 @@ void FVM::Entities::Mesh2D_t::reconstruction() {
         cell.p_derivative_[0] = -delta_px/delta_x2 - cell.p_derivative_[1] * delta_xy/delta_x2;
         cell.gamma_derivative_[1] = delta_gammay/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_gammax * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
         cell.gamma_derivative_[0] = -delta_gammax/delta_x2 - cell.gamma_derivative_[1] * delta_xy/delta_x2;
+
+        cell.a_derivative_ *= -1;
+        cell.ux_derivative_ *= -1;
+        cell.uy_derivative_ *= -1;
+        cell.p_derivative_ *= -1;
+        cell.gamma_derivative_ *= -1;
     }
 }
 
@@ -556,6 +562,12 @@ void FVM::Entities::Mesh2D_t::reconstruction_hat() {
         cell.p_derivative_hat_[0] = -delta_px/delta_x2 - cell.p_derivative_hat_[1] * delta_xy/delta_x2;
         cell.gamma_derivative_hat_[1] = delta_gammay/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_gammax * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
         cell.gamma_derivative_hat_[0] = -delta_gammax/delta_x2 - cell.gamma_derivative_hat_[1] * delta_xy/delta_x2;
+
+        cell.a_derivative_hat_ *= -1;
+        cell.ux_derivative_hat_ *= -1;
+        cell.uy_derivative_hat_ *= -1;
+        cell.p_derivative_hat_ *= -1;
+        cell.gamma_derivative_hat_ *= -1;
     }
 }
 
