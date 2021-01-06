@@ -365,6 +365,15 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
                         cells_[i].nodes_[j] = val[j];
                     }
                 }
+                else if (token == "5") {
+                    n_sides = 3;
+                    liness2 >> val[0] >> val[1] >> val[2];
+
+                    cells_[i] = Cell_t(n_sides);
+                    for (int j = 0; j < n_sides; ++j) {
+                        cells_[i].nodes_[j] = val[j];
+                    }
+                }
                 else {
                     std::cerr << "Error: expected token '9', found '" << token << "'. Exiting." << std::endl;
                     exit(10);
