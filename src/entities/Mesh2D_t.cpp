@@ -287,159 +287,172 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
     std::ifstream meshfile(filename);
     if (!meshfile.is_open()) {
         std::cerr << "Error: file '" << filename << "' could not be opened. Exiting." << std::endl;
-        return;
+        exit(7);
     }
 
     do {
-        std::getline(meshfile, line);
-        if (!line.empty()) {
-            std::istringstream liness(line);
-            liness >> token;
-            liness >> value;
-        }   
+        std::getline(meshfile, line);  
     }
-    while (token != "NPOIN=");
-
-    nodes_ = std::vector<Node_t>(value);
-
-    for (size_t i = 0; i < nodes_.size(); ++i) {
-        std::getline(meshfile, line);
-        std::istringstream liness2(line);
-        liness2 >> nodes_[i].pos_[0] >> nodes_[i].pos_[1];
+    while (line.empty());
+    
+    std::istringstream liness(line);
+    liness >> token;
+    liness >> value;
+    if (token != "NDIME=") {
+        std::cerr << "Error: first token should be 'NDIME=', found '" << token << "'. Exiting." << std::endl;
+        exit(8);
     }
 
-    do {
-        std::getline(meshfile, line);
-        if (!line.empty()) {
-            std::istringstream liness(line);
-            liness >> token;
-            liness >> value;
-        }   
+    if (value != 2) {
+        std::cerr << "Error: program only works for 2 dimensions, found '" << value << "'. Exiting." << std::endl;
+        exit(9);
     }
-    while (token != "NELEM=");
-
-    cells_ = std::vector<Cell_t>(value);
-    n_cells_ = value;
-
-    for (size_t i = 0; i < cells_.size(); ++i) {
-        int n_sides;
-        size_t val[4];
-
-        std::getline(meshfile, line);
-        std::istringstream liness2(line);
-        liness2 >> token;
-        if (token == "9") {
-            n_sides = 4;
-            liness2 >> val[0] >> val[1] >> val[2] >> val[3];
-
-            cells_[i] = Cell_t(n_sides);
-            for (int j = 0; j < n_sides; ++j) {
-                cells_[i].nodes_[j] = val[j] - 1;
-            }
-        }
-        else {
-            std::cerr << "Error: expected token '9', found '" << token << "'. Exiting." << std::endl;
-            return;
-        }
-    }
-
-    int n_markers;
-    do {
-        std::getline(meshfile, line);
-        if (!line.empty()) {
-            std::istringstream liness(line);
-            liness >> token;
-            liness >> n_markers;
-        }   
-    }
-    while (token != "NMARK=");
 
     std::vector<Cell_t> farfield;
     std::vector<Cell_t> wall;
-    n_farfield_ = 0;
-    n_wall_ = 0;
 
-    for (int i = 0; i < n_markers; ++i) {
-        std::string type;
+    while (!meshfile.eof()) {
         do {
-            std::getline(meshfile, line);
-            if (!line.empty()) {
-                std::istringstream liness(line);
-                liness >> token;
-                liness >> type;
-            }   
+            std::getline(meshfile, line);  
         }
-        while (token != "MARKER_TAG=");
-        std::transform(type.begin(), type.end(), type.begin(),
+        while (line.empty());
+
+        std::istringstream liness(line);
+        liness >> token;
+        std::transform(token.begin(), token.end(), token.begin(),
             [](unsigned char c){ return std::tolower(c); });
 
-        if (type == "farfield") {
-            do {
+        if (token == "NPOIN=") {
+            liness >> value;
+            nodes_ = std::vector<Node_t>(value);
+
+            for (size_t i = 0; i < nodes_.size(); ++i) {
                 std::getline(meshfile, line);
-                if (!line.empty()) {
-                    std::istringstream liness(line);
-                    liness >> token;
-                    liness >> value;
-                }   
-            }
-            while (token != "MARKER_ELEMS=");
-
-            n_farfield_ += value;
-            farfield.reserve(n_farfield_);
-
-            for (size_t j = 0; j < value; ++j) {
-
-                std::getline(meshfile, line);
-                std::istringstream liness6(line);
-
-                liness6 >> token;
-                if (token != "3") {
-                    std::cerr << "Error: expected token '3', found '" << token << "'. Exiting." << std::endl;
-                    return;
-                }
-
-                size_t val0, val1;
-                liness6 >> val0 >> val1;
-                farfield.push_back(Cell_t(2));
-                farfield[farfield.size() - 1].nodes_[0] = val0 - 1;
-                farfield[farfield.size() - 1].nodes_[1] = val1 - 1;
+                std::istringstream liness2(line);
+                liness2 >> nodes_[i].pos_[0] >> nodes_[i].pos_[1];
             }
         }
-        else if (type == "wall") {
-            do {
-                std::getline(meshfile, line);
-                if (!line.empty()) {
-                    std::istringstream liness(line);
-                    liness >> token;
-                    liness >> value;
-                }   
-            }
-            while (token != "MARKER_ELEMS=");
+        else if (token == "NELEM=") {
+            liness >> value;
+            cells_ = std::vector<Cell_t>(value);
+            n_cells_ = value;
 
-            n_wall_ += value;
-            wall.reserve(n_wall_);
-
-            for (size_t j = 0; j < value; ++j) {
+            for (size_t i = 0; i < cells_.size(); ++i) {
+                int n_sides;
+                size_t val[4];
 
                 std::getline(meshfile, line);
-                std::istringstream liness6(line);
+                std::istringstream liness2(line);
+                liness2 >> token;
+                if (token == "9") {
+                    n_sides = 4;
+                    liness2 >> val[0] >> val[1] >> val[2] >> val[3];
 
-                liness6 >> token;
-                if (token != "3") {
-                    std::cerr << "Error: expected token '3', found '" << token << "'. Exiting." << std::endl;
-                    return;
+                    cells_[i] = Cell_t(n_sides);
+                    for (int j = 0; j < n_sides; ++j) {
+                        cells_[i].nodes_[j] = val[j] - 1;
+                    }
                 }
+                else {
+                    std::cerr << "Error: expected token '9', found '" << token << "'. Exiting." << std::endl;
+                    exit(10);
+                }
+            }
+        }
+        else if (token == "NMARK=") {
+            int n_markers;
+            liness >> n_markers;
 
-                size_t val0, val1;
-                liness6 >> val0 >> val1;
-                wall.push_back(Cell_t(2));
-                wall[wall.size() - 1].nodes_[0] = val0 - 1;
-                wall[wall.size() - 1].nodes_[1] = val1 - 1;
+            n_farfield_ = 0;
+            n_wall_ = 0;
+
+            for (int i = 0; i < n_markers; ++i) {
+                std::string type;
+                do {
+                    std::getline(meshfile, line);
+                    if (!line.empty()) {
+                        std::istringstream liness(line);
+                        liness >> token;
+                        liness >> type;
+                    }   
+                }
+                while (token != "MARKER_TAG=");
+                std::transform(type.begin(), type.end(), type.begin(),
+                    [](unsigned char c){ return std::tolower(c); });
+
+                if (type == "farfield") {
+                    do {
+                        std::getline(meshfile, line);
+                        if (!line.empty()) {
+                            std::istringstream liness(line);
+                            liness >> token;
+                            liness >> value;
+                        }   
+                    }
+                    while (token != "MARKER_ELEMS=");
+
+                    n_farfield_ += value;
+                    farfield.reserve(n_farfield_);
+
+                    for (size_t j = 0; j < value; ++j) {
+
+                        std::getline(meshfile, line);
+                        std::istringstream liness6(line);
+
+                        liness6 >> token;
+                        if (token != "3") {
+                            std::cerr << "Error: expected token '3', found '" << token << "'. Exiting." << std::endl;
+                            exit(11);
+                        }
+
+                        size_t val0, val1;
+                        liness6 >> val0 >> val1;
+                        farfield.push_back(Cell_t(2));
+                        farfield[farfield.size() - 1].nodes_[0] = val0 - 1;
+                        farfield[farfield.size() - 1].nodes_[1] = val1 - 1;
+                    }
+                }
+                else if (type == "wall") {
+                    do {
+                        std::getline(meshfile, line);
+                        if (!line.empty()) {
+                            std::istringstream liness(line);
+                            liness >> token;
+                            liness >> value;
+                        }   
+                    }
+                    while (token != "MARKER_ELEMS=");
+
+                    n_wall_ += value;
+                    wall.reserve(n_wall_);
+
+                    for (size_t j = 0; j < value; ++j) {
+
+                        std::getline(meshfile, line);
+                        std::istringstream liness6(line);
+
+                        liness6 >> token;
+                        if (token != "3") {
+                            std::cerr << "Error: expected token '3', found '" << token << "'. Exiting." << std::endl;
+                            exit(12);
+                        }
+
+                        size_t val0, val1;
+                        liness6 >> val0 >> val1;
+                        wall.push_back(Cell_t(2));
+                        wall[wall.size() - 1].nodes_[0] = val0 - 1;
+                        wall[wall.size() - 1].nodes_[1] = val1 - 1;
+                    }
+                }
+                else {
+                    std::cerr << "Error: expected marker tag 'farfield' or 'wall', found '" << type << "'. Exiting." << std::endl;
+                    exit(6);
+                }
             }
         }
         else {
-            std::cerr << "Error: expected marker tag 'farfield' or 'wall', found '" << type << "'. Exiting." << std::endl;
-            exit(6);
+            std::cerr << "Error: expected marker 'NPOIN=', 'NELEM=' or 'NMARK=', found '" << token << "'. Exiting." << std::endl;
+                    exit(13);
         }
     }
 
