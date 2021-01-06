@@ -467,8 +467,6 @@ void FVM::Entities::Mesh2D_t::reconstruction() {
     for (long long i = 0; i < n_cells_; ++i) {
         FVM::Entities::Cell_t& cell = cells_[i];
 
-        double delta_x = 0;
-        double delta_y = 0;
         double delta_x2 = 0;
         double delta_y2 = 0;
         double delta_xy = 0;
@@ -487,24 +485,23 @@ void FVM::Entities::Mesh2D_t::reconstruction() {
         for (auto cell_index: cell.cells_) {
             FVM::Entities::Cell_t& cell_k = cells_[cell_index];
 
-            const Vec2f delta = cell_k.center_ - cell.center_;
+            const double delta_x = cell_k.center_.x() - cell.center_.x();
+            const double delta_y = cell_k.center_.y() - cell.center_.y();
 
-            delta_x += delta.x();
-            delta_y += delta.y();
             delta_x2 += std::pow(delta_x, 2);
             delta_y2 += std::pow(delta_y, 2);
             delta_xy += delta_x * delta_y;
 
-            delta_ax += delta.x() * cell_k.a_;
-            delta_ay += delta.y() * cell_k.a_;
-            delta_uxx += delta.x() * cell_k.u_.x();
-            delta_uxy += delta.y() * cell_k.u_.x();
-            delta_uyx += delta.x() * cell_k.u_.y();
-            delta_uyy += delta.y() * cell_k.u_.y();
-            delta_px += delta.x() * cell_k.p_;
-            delta_py += delta.y() * cell_k.p_;
-            delta_gammax += delta.x() * cell_k.gamma_;
-            delta_gammay += delta.y() * cell_k.gamma_;
+            delta_ax += (cell_k.a_ - cell.a_) * delta_x;
+            delta_ay += (cell_k.a_ - cell.a_) * delta_y;
+            delta_uxx += (cell_k.u_.x() - cell.u_.x()) * delta_x;
+            delta_uxy += (cell_k.u_.x() - cell.u_.x()) * delta_y;
+            delta_uyx += (cell_k.u_.y() - cell.u_.y()) * delta_x;
+            delta_uyy += (cell_k.u_.y() - cell.u_.y()) * delta_y;
+            delta_px += (cell_k.p_ - cell.p_) * delta_x;
+            delta_py += (cell_k.p_ - cell.p_) * delta_y;
+            delta_gammax += (cell_k.gamma_ - cell.gamma_) * delta_x;
+            delta_gammay += (cell_k.gamma_ - cell.gamma_) * delta_y;
         }
 
         cell.a_derivative_[1] = delta_ay/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_ax * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
@@ -531,8 +528,6 @@ void FVM::Entities::Mesh2D_t::reconstruction_hat() {
     for (long long i = 0; i < n_cells_; ++i) {
         FVM::Entities::Cell_t& cell = cells_[i];
 
-        double delta_x = 0;
-        double delta_y = 0;
         double delta_x2 = 0;
         double delta_y2 = 0;
         double delta_xy = 0;
@@ -551,24 +546,23 @@ void FVM::Entities::Mesh2D_t::reconstruction_hat() {
         for (auto cell_index: cell.cells_) {
             FVM::Entities::Cell_t& cell_k = cells_[cell_index];
 
-            const Vec2f delta = cell_k.center_ - cell.center_;
+            const double delta_x = cell_k.center_.x() - cell.center_.x();
+            const double delta_y = cell_k.center_.y() - cell.center_.y();
 
-            delta_x += delta.x();
-            delta_y += delta.y();
             delta_x2 += std::pow(delta_x, 2);
             delta_y2 += std::pow(delta_y, 2);
             delta_xy += delta_x * delta_y;
 
-            delta_ax += delta.x() * cell_k.a_hat_;
-            delta_ay += delta.y() * cell_k.a_hat_;
-            delta_uxx += delta.x() * cell_k.u_hat_.x();
-            delta_uxy += delta.y() * cell_k.u_hat_.x();
-            delta_uyx += delta.x() * cell_k.u_hat_.y();
-            delta_uyy += delta.y() * cell_k.u_hat_.y();
-            delta_px += delta.x() * cell_k.p_hat_;
-            delta_py += delta.y() * cell_k.p_hat_;
-            delta_gammax += delta.x() * cell_k.gamma_hat_;
-            delta_gammay += delta.y() * cell_k.gamma_hat_;
+            delta_ax += (cell_k.a_hat_ - cell.a_hat_) * delta_x;
+            delta_ay += (cell_k.a_hat_ - cell.a_hat_) * delta_y;
+            delta_uxx += (cell_k.u_hat_.x() - cell.u_hat_.x()) * delta_x;
+            delta_uxy += (cell_k.u_hat_.x() - cell.u_hat_.x()) * delta_y;
+            delta_uyx += (cell_k.u_hat_.y() - cell.u_hat_.y()) * delta_x;
+            delta_uyy += (cell_k.u_hat_.y() - cell.u_hat_.y()) * delta_y;
+            delta_px += (cell_k.p_hat_ - cell.p_hat_) * delta_x;
+            delta_py += (cell_k.p_hat_ - cell.p_hat_) * delta_y;
+            delta_gammax += (cell_k.gamma_hat_ - cell.gamma_hat_) * delta_x;
+            delta_gammay += (cell_k.gamma_hat_ - cell.gamma_hat_) * delta_y;
         }
 
         cell.a_derivative_hat_[1] = delta_ay/(std::pow(delta_xy, 2)/delta_x2 - delta_y2) - delta_ax * delta_xy/(delta_x2 * (std::pow(delta_xy, 2)/delta_x2 - delta_y2));
