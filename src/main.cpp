@@ -30,11 +30,11 @@ int main(int argc, char *argv[]) {
     constexpr int n_problems = 1;
     constexpr double cfl = 0.5;
 
-    double t_end = 1e-3;
+    double t_end = 1e-1;
 
     state initial_conditions {  
         1.225,
-        Vec2f(381.385035698, 0.0),
+        Vec2f(200, 0.0),
         101.325e3,
         1.4
     };
