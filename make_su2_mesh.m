@@ -121,14 +121,14 @@ function make_su2_mesh(varargin)
         
             fprintf(su2_file, '\nNELEM= %g\n', n_elements);
             for k = 1:n_elements
-                fprintf(su2_file, '9 %g %g %g %g\n', elements(k, 1), elements(k, 2), elements(k, 3), elements(k, 4));
+                fprintf(su2_file, '9 %g %g %g %g\n', elements(k, 1) - 1, elements(k, 2) - 1, elements(k, 3) - 1, elements(k, 4) - 1);
             end
     
             fprintf(su2_file, 'NMARK= 1\n');
             fprintf(su2_file, 'MARKER_TAG= %s\n', boundary_tag);
             fprintf(su2_file, 'MARKER_ELEMS= %g\n', n_boundaries);
             for k = 1:n_boundaries
-                fprintf(su2_file, '3 %g %g\n', boundaries(k, 1), boundaries(k, 2));
+                fprintf(su2_file, '3 %g %g\n', boundaries(k, 1) - 1, boundaries(k, 2) - 1);
             end
     
             fclose(su2_file);

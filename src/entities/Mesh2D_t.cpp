@@ -362,7 +362,7 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
 
                     cells_[i] = Cell_t(n_sides);
                     for (int j = 0; j < n_sides; ++j) {
-                        cells_[i].nodes_[j] = val[j] - 1;
+                        cells_[i].nodes_[j] = val[j];
                     }
                 }
                 else {
@@ -420,8 +420,8 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
                         size_t val0, val1;
                         liness6 >> val0 >> val1;
                         farfield.push_back(Cell_t(2));
-                        farfield[farfield.size() - 1].nodes_[0] = val0 - 1;
-                        farfield[farfield.size() - 1].nodes_[1] = val1 - 1;
+                        farfield[farfield.size() - 1].nodes_[0] = val0;
+                        farfield[farfield.size() - 1].nodes_[1] = val1;
                     }
                 }
                 else if (type == "wall") {
@@ -452,8 +452,8 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
                         size_t val0, val1;
                         liness6 >> val0 >> val1;
                         wall.push_back(Cell_t(2));
-                        wall[wall.size() - 1].nodes_[0] = val0 - 1;
-                        wall[wall.size() - 1].nodes_[1] = val1 - 1;
+                        wall[wall.size() - 1].nodes_[0] = val0;
+                        wall[wall.size() - 1].nodes_[1] = val1;
                     }
                 }
                 else {
