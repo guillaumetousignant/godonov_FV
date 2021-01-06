@@ -315,7 +315,7 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
         do {
             std::getline(meshfile, line);  
         }
-        while (line.empty());
+        while (line.empty() && !meshfile.eof());
 
         std::istringstream liness(line);
         liness >> token;
@@ -451,8 +451,10 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
             }
         }
         else {
-            std::cerr << "Error: expected marker 'NPOIN=', 'NELEM=' or 'NMARK=', found '" << token << "'. Exiting." << std::endl;
-                    exit(13);
+            if (!meshfile.eof()) {
+                std::cerr << "Error: expected marker 'NPOIN=', 'NELEM=' or 'NMARK=', found '" << token << "'. Exiting." << std::endl;
+                exit(13);
+            }
         }
     }
 
