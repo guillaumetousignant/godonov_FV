@@ -25,9 +25,12 @@ namespace FVM { namespace Entities {
             size_t n_cells_;
             size_t n_farfield_;
             size_t n_wall_;
+            size_t n_inlet_;
             std::vector<Node_t> nodes_; // x, y
             std::vector<Cell_t> cells_;
             std::vector<Face_t> faces_;
+
+            state inlet_state_;
 
             void initial_conditions(FVM::Entities::Vec2f center, const state& state_NE, const state& state_NW, const state& state_SW, const state& state_SE);
             void initial_conditions(const state& state);

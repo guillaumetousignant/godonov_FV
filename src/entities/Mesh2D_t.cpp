@@ -57,15 +57,17 @@ void FVM::Entities::Mesh2D_t::initial_conditions(FVM::Entities::Vec2f center, co
     }
 }
 
-void FVM::Entities::Mesh2D_t::initial_conditions(const state& state) {
+void FVM::Entities::Mesh2D_t::initial_conditions(const state& initial_state) {
+    inlet_state_ = initial_state;
+
     #pragma omp parallel for schedule(static)
     for (long long i = 0; i < cells_.size(); ++i) {
         FVM::Entities::Cell_t &cell = cells_[i];
 
-        cell.a_ = std::sqrt(state.gamma * state.p / state.rho);
-        cell.u_ = state.u;
-        cell.p_ = state.p;
-        cell.gamma_ = state.gamma;
+        cell.a_ = std::sqrt(initial_state.gamma * initial_state.p / initial_state.rho);
+        cell.u_ = initial_state.u;
+        cell.p_ = initial_state.p;
+        cell.gamma_ = initial_state.gamma;
     }
 }
 
@@ -104,6 +106,19 @@ void FVM::Entities::Mesh2D_t::boundary_conditions() {
         cells_[i].p_derivative_ = {0, 0};
         cells_[i].gamma_derivative_ = {0, 0};
     }
+
+    #pragma omp parallel for schedule(static)
+    for (long long i = n_cells_ + n_farfield_ + n_wall_; i < n_cells_ + n_farfield_ + n_wall_ + n_inlet_; ++i) {
+        cells_[i].a_ = std::sqrt(inlet_state_.gamma * inlet_state_.p / inlet_state_.rho);
+        cells_[i].u_ = inlet_state_.u;
+        cells_[i].p_ = inlet_state_.p;
+        cells_[i].gamma_ = inlet_state_.gamma;
+        cells_[i].a_derivative_ = {0, 0};
+        cells_[i].ux_derivative_ = {0, 0};
+        cells_[i].uy_derivative_ = {0, 0};
+        cells_[i].p_derivative_ = {0, 0};
+        cells_[i].gamma_derivative_ = {0, 0};
+    }
 }
 
 void FVM::Entities::Mesh2D_t::boundary_conditions_hat() {
@@ -135,6 +150,19 @@ void FVM::Entities::Mesh2D_t::boundary_conditions_hat() {
         cells_[i].u_hat_ = {normal_inv.dot(u_prime), tangent_inv.dot(u_prime)};
         cells_[i].p_hat_ = cells_[cells_[i].cells_[0]].p_hat_;
         cells_[i].gamma_hat_ = cells_[cells_[i].cells_[0]].gamma_hat_;
+        cells_[i].a_derivative_hat_ = {0, 0};
+        cells_[i].ux_derivative_hat_ = {0, 0};
+        cells_[i].uy_derivative_hat_ = {0, 0};
+        cells_[i].p_derivative_hat_ = {0, 0};
+        cells_[i].gamma_derivative_hat_ = {0, 0};
+    }
+
+    #pragma omp parallel for schedule(static)
+    for (long long i = n_cells_ + n_farfield_ + n_wall_; i < n_cells_ + n_farfield_ + n_wall_ + n_inlet_; ++i) {
+        cells_[i].a_hat_ = std::sqrt(inlet_state_.gamma * inlet_state_.p / inlet_state_.rho);
+        cells_[i].u_hat_ = inlet_state_.u;
+        cells_[i].p_hat_ = inlet_state_.p;
+        cells_[i].gamma_hat_ = inlet_state_.gamma;
         cells_[i].a_derivative_hat_ = {0, 0};
         cells_[i].ux_derivative_hat_ = {0, 0};
         cells_[i].uy_derivative_hat_ = {0, 0};
@@ -322,6 +350,7 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
 
     std::vector<Cell_t> farfield;
     std::vector<Cell_t> wall;
+    std::vector<Cell_t> inlet;
 
     while (!meshfile.eof()) {
         do {
@@ -386,6 +415,7 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
 
             n_farfield_ = 0;
             n_wall_ = 0;
+            n_inlet_ = 0;
 
             for (int i = 0; i < n_markers; ++i) {
                 std::string type;
@@ -465,8 +495,40 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
                         wall[wall.size() - 1].nodes_[1] = val1;
                     }
                 }
+                else if (type == "inlet") {
+                    do {
+                        std::getline(meshfile, line);
+                        if (!line.empty()) {
+                            std::istringstream liness(line);
+                            liness >> token;
+                            liness >> value;
+                        }   
+                    }
+                    while (token != "MARKER_ELEMS=");
+
+                    n_inlet_ += value;
+                    inlet.reserve(n_inlet_);
+
+                    for (size_t j = 0; j < value; ++j) {
+
+                        std::getline(meshfile, line);
+                        std::istringstream liness6(line);
+
+                        liness6 >> token;
+                        if (token != "3") {
+                            std::cerr << "Error: expected token '3', found '" << token << "'. Exiting." << std::endl;
+                            exit(12);
+                        }
+
+                        size_t val0, val1;
+                        liness6 >> val0 >> val1;
+                        inlet.push_back(Cell_t(2));
+                        inlet[inlet.size() - 1].nodes_[0] = val0;
+                        inlet[inlet.size() - 1].nodes_[1] = val1;
+                    }
+                }
                 else {
-                    std::cerr << "Error: expected marker tag 'farfield' or 'wall', found '" << type << "'. Exiting." << std::endl;
+                    std::cerr << "Error: expected marker tag 'farfield', 'wall' or 'inlet', found '" << type << "'. Exiting." << std::endl;
                     exit(6);
                 }
             }
@@ -483,6 +545,7 @@ void FVM::Entities::Mesh2D_t::read_su2(std::filesystem::path filename){
 
     cells_.insert(std::end(cells_), std::begin(farfield), std::end(farfield));
     cells_.insert(std::end(cells_), std::begin(wall), std::end(wall));
+    cells_.insert(std::end(cells_), std::begin(inlet), std::end(inlet));
 }
 
 void FVM::Entities::Mesh2D_t::reconstruction() {
