@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
     constexpr int n_problems = 1;
     constexpr double cfl = 0.5;
 
-    double t_end = 0.5;
+    double t_end = 10;
 
     state initial_conditions {  
         1.225,
