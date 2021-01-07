@@ -611,7 +611,7 @@ void FVM::Entities::Mesh2D_t::build_cell_to_cell() {
             endloop: ;
         }
         for (size_t m = 0; m < nodes_[cells_[i].nodes_[cells_[i].nodes_.size() - 1]].cells_.size(); ++m) {
-            if (nodes_[cells_[i].nodes_.size() - 1].cells_[m] != i) {
+            if (nodes_[cells_[i].nodes_[cells_[i].nodes_.size() - 1]].cells_[m] != i) {
                 for (size_t n = 0; n < nodes_[cells_[i].nodes_[0]].cells_.size(); ++n) {
                     if (nodes_[cells_[i].nodes_[cells_[i].nodes_.size() - 1]].cells_[m] == nodes_[cells_[i].nodes_[0]].cells_[n]) {
                         cells_[i].cells_[cells_[i].nodes_.size() - 1] = nodes_[cells_[i].nodes_[cells_[i].nodes_.size() - 1]].cells_[m];
